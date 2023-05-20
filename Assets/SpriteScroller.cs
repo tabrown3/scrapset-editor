@@ -5,6 +5,7 @@ public class SpriteScroller : MonoBehaviour
     // the image is 32x32 Unity units at 64 pixels-per-unit resolution scale (1, 1)
     private const int HALF_WIDTH = 16;
     private const int HALF_HEIGHT = 16;
+    private float small_bg_alpha;
 
     void Update()
     {
@@ -21,5 +22,24 @@ public class SpriteScroller : MonoBehaviour
             transform.position = new Vector2(Mathf.RoundToInt(Camera.main.transform.position.x),
                 Mathf.RoundToInt(Camera.main.transform.position.y));
         }
+
+        var camSize = Camera.main.orthographicSize;
+        if (camSize < 12f)
+        {
+            small_bg_alpha = 1f;
+        } else if (camSize >= 12f && camSize <= 18f)
+        {
+            small_bg_alpha = 1f - ((camSize - 12f) / 6f);
+        } else // camSize > 18
+        {
+            small_bg_alpha = 0f;
+        }
+
+        Debug.Log(small_bg_alpha);
+    }
+
+    public float GetSmallBgAlpha()
+    {
+        return small_bg_alpha;
     }
 }
