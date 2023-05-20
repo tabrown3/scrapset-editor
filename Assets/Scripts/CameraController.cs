@@ -58,7 +58,6 @@ public class CameraController : MonoBehaviour
     {
         // stores the mouse's pos in world coords before scaling
         var beforeZoomPos = cam.ScreenToWorldPoint(Input.mousePosition);
-        //cam.orthographicSize > MIN_CAM_SIZE
         var newSize = cam.orthographicSize + cam.orthographicSize * direction / 5f;
         cam.orthographicSize = Mathf.Clamp(newSize, MIN_CAM_SIZE, MAX_CAM_SIZE); ;
         var afterZoomPos = cam.ScreenToWorldPoint(Input.mousePosition);
