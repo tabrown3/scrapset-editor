@@ -23,7 +23,6 @@ public class InputManager : MonoBehaviour
     void OnZoom(InputValue value)
     {
         ZoomDelta = value.Get<Vector2>().y;
-        Debug.Log(ZoomDelta);
     }
 
     void OnCursorPosition(InputValue value)
