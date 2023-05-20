@@ -17,7 +17,6 @@ public class CameraController : MonoBehaviour
     float prevSize;
     bool prevDiscretePanIsActive;
     Vector3 initDragPos;
-    Vector3 initCamPos;
 
     public bool PositionHasChanged { get; private set; }
     public bool SizeHasChanged { get; private set; }
@@ -28,7 +27,7 @@ public class CameraController : MonoBehaviour
         playerMovement = GetComponentInChildren<PlayerMovement>();
         prevPos = cam.transform.position;
         prevSize = cam.orthographicSize;
-        prevDiscretePanIsActive = playerMovement.DiscretePanIsActive;
+        prevDiscretePanIsActive = playerMovement.IsPanningByDrag;
     }
 
     void LateUpdate()
@@ -45,32 +44,30 @@ public class CameraController : MonoBehaviour
 
     void PanCamera()
     {
-        //if (Input.GetMouseButtonDown(MIDDLE_MOUSE_BUTTON))
-        //{
-        //    mouseDownPos = cam.ScreenToWorldPoint(Input.mousePosition);
-        //}
+        DragPan();
+        ContinuousPan();
+        TrackPositionChange();
+    }
 
-        //if (Input.GetMouseButton(MIDDLE_MOUSE_BUTTON))
-        //{
-        //    var delta = mouseDownPos - cam.ScreenToWorldPoint(Input.mousePosition);
-        //    cam.transform.position += delta;
-        //}
-
-        if (playerMovement.DiscretePanIsActive && !prevDiscretePanIsActive)
+    // logic for panning by offset, like clicking middle mouse button and dragging
+    void DragPan()
+    {
+        if (playerMovement.IsPanningByDrag && !prevDiscretePanIsActive)
         {
-            initDragPos = cam.ScreenToWorldPoint(playerMovement.PanDiscrete);
-            initCamPos = cam.transform.position;
+            initDragPos = cam.ScreenToWorldPoint(playerMovement.DraggingCursorPos);
         }
-        prevDiscretePanIsActive = playerMovement.DiscretePanIsActive;
+        prevDiscretePanIsActive = playerMovement.IsPanningByDrag;
 
-        if (playerMovement.DiscretePanIsActive)
+        if (playerMovement.IsPanningByDrag)
         {
-            var delta = cam.ScreenToWorldPoint(playerMovement.PanDiscrete) - initDragPos;
-            var newCamPos = cam.transform.position - new Vector3(initCamPos.x, initCamPos.y, 0) - delta;
-            Debug.Log(newCamPos);
-            cam.transform.position = newCamPos;
+            var delta = cam.ScreenToWorldPoint(playerMovement.DraggingCursorPos) - initDragPos;
+            cam.transform.position -= delta;
         }
+    }
 
+    // logic for panning by speed and direction, like holding an arrow key or tilting an analog stick
+    void ContinuousPan()
+    {
         if (playerMovement.PanDirection != Vector2.zero)
         {
             var delta = playerMovement.PanDirection * // PanDirection is a unit vector pointing in the world direction to move the camera
@@ -80,8 +77,6 @@ public class CameraController : MonoBehaviour
 
             cam.transform.position += (Vector3)delta;
         }
-
-        TrackPositionChange();
     }
 
     void TrackPositionChange()

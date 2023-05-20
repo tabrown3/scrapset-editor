@@ -24,7 +24,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "ActivateDiscretePan",
+                    "name": "ActivatePanByDrag",
                     "type": "Value",
                     "id": "23537203-4b9a-45c0-aaec-6d95bc913ca8",
                     "expectedControlType": "Button",
@@ -33,7 +33,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "PanDiscrete",
+                    "name": "PanByDrag",
                     "type": "Value",
                     "id": "b092c00a-0c15-4cf7-b7dc-323b7e7d57e8",
                     "expectedControlType": "Vector2",
@@ -182,7 +182,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ActivateDiscretePan",
+                    "action": "ActivatePanByDrag",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -193,7 +193,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "PanDiscrete",
+                    "action": "PanByDrag",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

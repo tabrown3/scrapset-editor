@@ -4,9 +4,8 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     public Vector2 PanDirection { get; private set; }
-    public Vector2 PanDiscrete { get; private set; }
-    public Vector2 InitPanDiscrete { get; private set; }
-    public bool DiscretePanIsActive { get; private set; }
+    public Vector2 DraggingCursorPos { get; private set; }
+    public bool IsPanningByDrag { get; private set; }
 
     void Start()
     {
@@ -23,13 +22,13 @@ public class PlayerMovement : MonoBehaviour
         PanDirection = value.Get<Vector2>();
     }
 
-    void OnPanDiscrete(InputValue value)
+    void OnPanByDrag(InputValue value)
     {
-        PanDiscrete = value.Get<Vector2>();
+        DraggingCursorPos = value.Get<Vector2>();
     }
 
-    void OnActivateDiscretePan(InputValue value)
+    void OnActivatePanByDrag(InputValue value)
     {
-        DiscretePanIsActive = value.Get<float>() != 0f;
+        IsPanningByDrag = value.Get<float>() != 0f;
     }
 }
