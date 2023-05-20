@@ -3,7 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    Vector2 moveInput;
+    public Vector2 MoveInput { get; private set; }
+
     void Start()
     {
 
@@ -14,9 +15,8 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    void OnMove(InputValue value)
+    void OnPan(InputValue value)
     {
-        moveInput = value.Get<Vector2>();
-        Debug.Log(moveInput);
+        MoveInput = value.Get<Vector2>();
     }
 }

@@ -2,15 +2,17 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    [SerializeField] float cameraMoveSpeed = 64f;
+
     const string SCROLL_WHEEL_AXIS = "Mouse ScrollWheel";
     const float MIN_CAM_SIZE = 2f;
     const float MAX_CAM_SIZE = 65f;
-    const int MIDDLE_MOUSE_BUTTON = 2;
     const float TOWARD_SCREEN = -1f;
     const float AWAY_FROM_SCREEN = 1f;
 
     Vector3 mouseDownPos;
     Camera cam;
+    PlayerMovement playerMovement;
     Vector3 prevPos;
     float prevSize;
 
@@ -19,7 +21,8 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
-        cam = transform.gameObject.GetComponent<Camera>();
+        cam = GetComponent<Camera>();
+        playerMovement = GetComponentInChildren<PlayerMovement>();
         prevPos = cam.transform.position;
         prevSize = cam.orthographicSize;
     }
@@ -38,15 +41,21 @@ public class CameraController : MonoBehaviour
 
     void PanCamera()
     {
-        if (Input.GetMouseButtonDown(MIDDLE_MOUSE_BUTTON))
-        {
-            mouseDownPos = cam.ScreenToWorldPoint(Input.mousePosition);
-        }
+        //if (Input.GetMouseButtonDown(MIDDLE_MOUSE_BUTTON))
+        //{
+        //    mouseDownPos = cam.ScreenToWorldPoint(Input.mousePosition);
+        //}
 
-        if (Input.GetMouseButton(MIDDLE_MOUSE_BUTTON))
+        //if (Input.GetMouseButton(MIDDLE_MOUSE_BUTTON))
+        //{
+        //    var delta = mouseDownPos - cam.ScreenToWorldPoint(Input.mousePosition);
+        //    cam.transform.position += delta;
+        //}
+
+        if (playerMovement.MoveInput != Vector2.zero)
         {
-            var delta = mouseDownPos - cam.ScreenToWorldPoint(Input.mousePosition);
-            cam.transform.position += delta;
+            var delta = playerMovement.MoveInput * cam.orthographicSize / cameraMoveSpeed;
+            cam.transform.position += (Vector3)delta;
         }
 
         TrackPositionChange();
