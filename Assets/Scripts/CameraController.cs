@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] float cameraMoveSpeed = 64f;
+    [SerializeField] float cameraPanSpeed = 3.5f;
 
     const string SCROLL_WHEEL_AXIS = "Mouse ScrollWheel";
     const float MIN_CAM_SIZE = 2f;
@@ -52,9 +52,13 @@ public class CameraController : MonoBehaviour
         //    cam.transform.position += delta;
         //}
 
-        if (playerMovement.MoveInput != Vector2.zero)
+        if (playerMovement.PanDirection != Vector2.zero)
         {
-            var delta = playerMovement.MoveInput * cam.orthographicSize * cameraMoveSpeed * Time.deltaTime;
+            var delta = playerMovement.PanDirection * // PanDirection is a unit vector pointing in the world direction to move the camera
+                cam.orthographicSize * // we need the camera to translate slower when zoomed in and faster when zoomed out, so scaled to size
+                cameraPanSpeed * // this is an adjustable speed multiplier to make the pan speed UX feel right
+                Time.deltaTime; // makes camera pan framerate independent
+
             cam.transform.position += (Vector3)delta;
         }
 

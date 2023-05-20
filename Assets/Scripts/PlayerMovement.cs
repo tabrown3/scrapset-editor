@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Vector2 MoveInput { get; private set; }
+    public Vector2 PanDirection { get; private set; }
 
     void Start()
     {
@@ -17,6 +17,6 @@ public class PlayerMovement : MonoBehaviour
 
     void OnPan(InputValue value)
     {
-        MoveInput = value.Get<Vector2>();
+        PanDirection = value.Get<Vector2>();
     }
 }
