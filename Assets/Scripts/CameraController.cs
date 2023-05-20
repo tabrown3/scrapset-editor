@@ -54,13 +54,13 @@ public class CameraController : MonoBehaviour
     {
         if (playerMovement.IsPanningByDrag && !prevDiscretePanIsActive)
         {
-            initDragPos = cam.ScreenToWorldPoint(playerMovement.DraggingCursorPos);
+            initDragPos = cam.ScreenToWorldPoint(playerMovement.CursorPos);
         }
         prevDiscretePanIsActive = playerMovement.IsPanningByDrag;
 
         if (playerMovement.IsPanningByDrag)
         {
-            var delta = cam.ScreenToWorldPoint(playerMovement.DraggingCursorPos) - initDragPos;
+            var delta = cam.ScreenToWorldPoint(playerMovement.CursorPos) - initDragPos;
             cam.transform.position -= delta;
         }
     }

@@ -33,7 +33,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "PanByDrag",
+                    "name": "CursorPosition",
                     "type": "Value",
                     "id": "b092c00a-0c15-4cf7-b7dc-323b7e7d57e8",
                     "expectedControlType": "Vector2",
@@ -193,7 +193,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "PanByDrag",
+                    "action": "CursorPosition",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
