@@ -8,21 +8,21 @@ public class InfiniteGrid : MonoBehaviour
     [SerializeField] float gridHeight = 32f; // in Scrapset Editor tiles
     [SerializeField] Camera cam;
 
+    CameraController camController;
     float halfWidth;
     float halfHeight;
-    Vector3 prevCamPos;
 
     void Start()
     {
+        camController = cam.GetComponent<CameraController>();
         halfWidth = gridWidth / 2f;
         halfHeight = gridHeight / 2f;
-        prevCamPos = cam.transform.position;
     }
 
     void Update()
     {
         // if the camera hasn't moved, skip the bounds logic for performance
-        if (cam.transform.position != prevCamPos)
+        if (camController.PositionHasChanged)
         {
             var bottomLeft = cam.ViewportToWorldPoint(new Vector2(0, 0));
             var topRight = cam.ViewportToWorldPoint(new Vector2(1, 1));
@@ -38,7 +38,5 @@ public class InfiniteGrid : MonoBehaviour
                     Mathf.RoundToInt(cam.transform.position.y / tileHeight) * tileHeight);
             }
         }
-
-        prevCamPos = cam.transform.position;
     }
 }

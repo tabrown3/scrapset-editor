@@ -7,24 +7,24 @@ public class BackgroundTransition : MonoBehaviour
     [SerializeField] float transitionStartSize = 9f;
     [SerializeField] float transitionEndSize = 22f;
 
-    float smallBgAlpha = 1f;
     SpriteRenderer mySpriteRenderer;
-    float prevCamSize;
+    CameraController camController;
 
     void Start()
     {
         mySpriteRenderer = GetComponent<SpriteRenderer>();
-        prevCamSize = cam.orthographicSize;
+        camController = cam.GetComponent<CameraController>();
 
     }
 
     void Update()
     {
-        if (cam.orthographicSize != prevCamSize)
+        if (camController.SizeHasChanged)
         {
             var camSize = cam.orthographicSize;
             var transitionSizeDiff = transitionEndSize - transitionStartSize;
 
+            float smallBgAlpha;
             if (camSize < transitionStartSize)
             {
                 smallBgAlpha = 1f;
@@ -38,7 +38,5 @@ public class BackgroundTransition : MonoBehaviour
 
             mySpriteRenderer.color = mySpriteRenderer.color.WithAlpha(smallBgAlpha);
         }
-
-        prevCamSize = cam.orthographicSize;
     }
 }
