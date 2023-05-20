@@ -15,6 +15,9 @@ public class CameraController : MonoBehaviour
     PlayerMovement playerMovement;
     Vector3 prevPos;
     float prevSize;
+    bool prevDiscretePanIsActive;
+    Vector3 initDragPos;
+    Vector3 initCamPos;
 
     public bool PositionHasChanged { get; private set; }
     public bool SizeHasChanged { get; private set; }
@@ -25,6 +28,7 @@ public class CameraController : MonoBehaviour
         playerMovement = GetComponentInChildren<PlayerMovement>();
         prevPos = cam.transform.position;
         prevSize = cam.orthographicSize;
+        prevDiscretePanIsActive = playerMovement.DiscretePanIsActive;
     }
 
     void LateUpdate()
@@ -51,6 +55,21 @@ public class CameraController : MonoBehaviour
         //    var delta = mouseDownPos - cam.ScreenToWorldPoint(Input.mousePosition);
         //    cam.transform.position += delta;
         //}
+
+        if (playerMovement.DiscretePanIsActive && !prevDiscretePanIsActive)
+        {
+            initDragPos = cam.ScreenToWorldPoint(playerMovement.PanDiscrete);
+            initCamPos = cam.transform.position;
+        }
+        prevDiscretePanIsActive = playerMovement.DiscretePanIsActive;
+
+        if (playerMovement.DiscretePanIsActive)
+        {
+            var delta = cam.ScreenToWorldPoint(playerMovement.PanDiscrete) - initDragPos;
+            var newCamPos = cam.transform.position - new Vector3(initCamPos.x, initCamPos.y, 0) - delta;
+            Debug.Log(newCamPos);
+            cam.transform.position = newCamPos;
+        }
 
         if (playerMovement.PanDirection != Vector2.zero)
         {
@@ -91,7 +110,7 @@ public class CameraController : MonoBehaviour
         // stores the mouse's pos in world coords before scaling
         var beforeZoomPos = cam.ScreenToWorldPoint(Input.mousePosition);
         var newSize = cam.orthographicSize + cam.orthographicSize * direction / 5f;
-        cam.orthographicSize = Mathf.Clamp(newSize, MIN_CAM_SIZE, MAX_CAM_SIZE); ;
+        cam.orthographicSize = Mathf.Clamp(newSize, MIN_CAM_SIZE, MAX_CAM_SIZE);
         var afterZoomPos = cam.ScreenToWorldPoint(Input.mousePosition);
         // moves the camera such that the mouse appears not to have moved in world coords, which
         //  gives the "zoom toward and away from the mouse" effect
