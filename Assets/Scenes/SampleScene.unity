@@ -609,6 +609,7 @@ MonoBehaviour:
   tileHeight: 8
   gridWidth: 256
   gridHeight: 256
+  cam: {fileID: 519420031}
 --- !u!1 &965268975
 GameObject:
   m_ObjectHideFlags: 0
@@ -655,6 +656,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e33c5aa523b98f544b361ea7367c3b5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cam: {fileID: 519420031}
 --- !u!1 &1120738939
 GameObject:
   m_ObjectHideFlags: 0
@@ -1040,10 +1042,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3febe204348b64e45891f9c6e070ad9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileWidth: 1
-  tileHeight: 1
-  gridWidth: 32
-  gridHeight: 32
+  tileWidth: 3
+  tileHeight: 3
+  gridWidth: 96
+  gridHeight: 96
+  cam: {fileID: 519420031}
 --- !u!1 &1717375825
 GameObject:
   m_ObjectHideFlags: 0
