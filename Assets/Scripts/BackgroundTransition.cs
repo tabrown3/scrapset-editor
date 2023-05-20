@@ -22,7 +22,6 @@ public class BackgroundTransition : MonoBehaviour
     {
         if (cam.orthographicSize != prevCamSize)
         {
-            Debug.Log("Running grid transition logic!");
             var camSize = cam.orthographicSize;
             var transitionSizeDiff = transitionEndSize - transitionStartSize;
 

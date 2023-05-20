@@ -2,19 +2,26 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    private const string SCROLL_WHEEL_AXIS = "Mouse ScrollWheel";
-    private const float MIN_CAM_SIZE = 2f;
-    private const float MAX_CAM_SIZE = 65f;
-    private const int MIDDLE_MOUSE_BUTTON = 2;
-    private const float TOWARD_SCREEN = -1f;
-    private const float AWAY_FROM_SCREEN = 1f;
+    const string SCROLL_WHEEL_AXIS = "Mouse ScrollWheel";
+    const float MIN_CAM_SIZE = 2f;
+    const float MAX_CAM_SIZE = 65f;
+    const int MIDDLE_MOUSE_BUTTON = 2;
+    const float TOWARD_SCREEN = -1f;
+    const float AWAY_FROM_SCREEN = 1f;
 
-    private Vector3 mouseDownPos;
-    private Camera cam;
+    Vector3 mouseDownPos;
+    Camera cam;
+    Vector3 prevPos;
+    float prevSize;
 
-    private void Start()
+    public bool PositionHasChanged { get; private set; }
+    public bool SizeHasChanged { get; private set; }
+
+    void Start()
     {
         cam = transform.gameObject.GetComponent<Camera>();
+        prevPos = cam.transform.position;
+        prevSize = cam.orthographicSize;
     }
 
     void LateUpdate()
@@ -41,6 +48,16 @@ public class CameraController : MonoBehaviour
             var delta = mouseDownPos - cam.ScreenToWorldPoint(Input.mousePosition);
             cam.transform.position += delta;
         }
+
+        TrackPositionChange();
+    }
+
+    void TrackPositionChange()
+    {
+        PositionHasChanged = cam.transform.position != prevPos;
+
+        // MUST BE LAST LINE
+        prevPos = cam.transform.position;
     }
 
     void ZoomCamera()
@@ -52,6 +69,8 @@ public class CameraController : MonoBehaviour
         {
             Zoom(AWAY_FROM_SCREEN);
         }
+
+        TrackSizeChange();
     }
 
     void Zoom(float direction)
@@ -64,5 +83,13 @@ public class CameraController : MonoBehaviour
         // moves the camera such that the mouse appears not to have moved in world coords, which
         //  gives the "zoom toward and away from the mouse" effect
         cam.transform.position += beforeZoomPos - afterZoomPos;
+    }
+
+    void TrackSizeChange()
+    {
+        SizeHasChanged = cam.orthographicSize != prevSize;
+
+        // MUST BE LAST LINE
+        prevSize = cam.orthographicSize;
     }
 }
