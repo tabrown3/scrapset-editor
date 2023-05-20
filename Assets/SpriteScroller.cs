@@ -2,24 +2,24 @@ using UnityEngine;
 
 public class SpriteScroller : MonoBehaviour
 {
-    Material material;
-    Vector3 prevPos;
-    Vector3 originalPos;
-
-    void Awake()
-    {
-        material = GetComponent<SpriteRenderer>().material;
-        // this magic half-scale that I don't understand allows the background material to remain stationary with respect to game objects
-        //  when its offset changes to the previous camera world position
-        transform.localScale = new Vector3(0.5f, 0.5f, 1f);
-        prevPos = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
-        originalPos = prevPos;
-    }
+    // the image is 32x32 Unity units at 64 pixels-per-unit resolution scale (1, 1)
+    private const int HALF_WIDTH = 16;
+    private const int HALF_HEIGHT = 16;
 
     void Update()
     {
-        Debug.Log(prevPos - originalPos);
-        material.mainTextureOffset = prevPos - originalPos;
-        prevPos = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0));
+        var bottomLeft = Camera.main.ViewportToWorldPoint(new Vector2(0, 0));
+        var topRight = Camera.main.ViewportToWorldPoint(new Vector2(1, 1));
+
+        var isOutOfBounds = bottomLeft.x < transform.position.x - HALF_WIDTH + 1 ||
+            bottomLeft.y < transform.position.y - HALF_HEIGHT + 1 ||
+            topRight.x > transform.position.x + HALF_WIDTH - 1 ||
+            topRight.y > transform.position.y + HALF_HEIGHT - 1;
+
+        if (isOutOfBounds)
+        {
+            transform.position = new Vector2(Mathf.RoundToInt(Camera.main.transform.position.x),
+                Mathf.RoundToInt(Camera.main.transform.position.y));
+        }
     }
 }
