@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] float cameraPanSpeed = 3.5f;
+    [SerializeField] float cameraPanSpeed = 3f;
 
     const string SCROLL_WHEEL_AXIS = "Mouse ScrollWheel";
     const float MIN_CAM_SIZE = 2f;
