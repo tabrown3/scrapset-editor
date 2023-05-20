@@ -78,10 +78,10 @@ public class CameraController : MonoBehaviour
 
     void ZoomCamera()
     {
-        if (Input.GetAxis(SCROLL_WHEEL_AXIS) > 0f)
+        if (inputManager.ZoomDelta > 0f)
         {
             Zoom(TOWARD_SCREEN);
-        } else if (Input.GetAxis(SCROLL_WHEEL_AXIS) < 0f)
+        } else if (inputManager.ZoomDelta < 0f)
         {
             Zoom(AWAY_FROM_SCREEN);
         }
