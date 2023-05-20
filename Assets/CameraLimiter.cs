@@ -18,12 +18,12 @@ public class CameraLimiter : MonoBehaviour
 
     void PanCamera()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(2))
         {
             mouseDownPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(2))
         {
             var delta = mouseDownPos - Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Camera.main.transform.position += delta;
@@ -43,11 +43,17 @@ public class CameraLimiter : MonoBehaviour
 
     void ZoomIn()
     {
+        var beforeZoomPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Camera.main.orthographicSize -= Camera.main.orthographicSize / 5f;
+        var afterZoomPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Camera.main.transform.position += beforeZoomPos - afterZoomPos;
     }
 
     void ZoomOut()
     {
+        var beforeZoomPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Camera.main.orthographicSize += Camera.main.orthographicSize / 5f;
+        var afterZoomPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Camera.main.transform.position += beforeZoomPos - afterZoomPos;
     }
 }
