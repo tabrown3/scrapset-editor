@@ -19,8 +19,8 @@ public class SpriteScrollerLarge : MonoBehaviour
 
         if (isOutOfBounds)
         {
-            transform.position = new Vector2(Mathf.RoundToInt(Camera.main.transform.position.x),
-                Mathf.RoundToInt(Camera.main.transform.position.y));
+            transform.position = new Vector2(Mathf.RoundToInt(Camera.main.transform.position.x / 8) * 8,
+                Mathf.RoundToInt(Camera.main.transform.position.y / 8) * 8);
         }
     }
 }
