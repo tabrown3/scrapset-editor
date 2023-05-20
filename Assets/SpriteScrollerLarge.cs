@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SpriteScroller : MonoBehaviour
+public class SpriteScrollerLarge : MonoBehaviour
 {
     // the image is 32x32 Unity units at 64 pixels-per-unit resolution scale (1, 1)
     private const int HALF_WIDTH = 16;
