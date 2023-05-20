@@ -1,37 +1,36 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerMovement : MonoBehaviour
+public class InputManager : MonoBehaviour
 {
     public Vector2 PanDirection { get; private set; }
+    public float ZoomDelta { get; private set; }
     public Vector2 CursorPosScreen { get; private set; }
     public Vector3 CursorPosWorld { get; private set; }
     public bool IsPanningByDrag { get; private set; }
     public Vector3 InitDragPosWorld { get; private set; }
 
+    [SerializeField] Camera cam;
+
     bool prevIsPanningByDrag;
-    Camera parentCam;
 
-    void Start()
-    {
-        parentCam = transform.parent.gameObject.GetComponent<Camera>();
-    }
-
-    void Update()
-    {
-
-    }
 
     void OnPan(InputValue value)
     {
         PanDirection = value.Get<Vector2>();
     }
 
+    void OnZoom(InputValue value)
+    {
+        ZoomDelta = value.Get<Vector2>().y;
+        Debug.Log(ZoomDelta);
+    }
+
     void OnCursorPosition(InputValue value)
     {
         var screenPos = value.Get<Vector2>();
         CursorPosScreen = screenPos;
-        CursorPosWorld = parentCam.ScreenToWorldPoint(screenPos);
+        CursorPosWorld = cam.ScreenToWorldPoint(screenPos);
     }
 
     void OnActivatePanByDrag(InputValue value)

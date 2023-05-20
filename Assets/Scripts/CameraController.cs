@@ -3,6 +3,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     [SerializeField] float cameraPanSpeed = 3f;
+    [SerializeField] InputManager inputManager;
 
     const string SCROLL_WHEEL_AXIS = "Mouse ScrollWheel";
     const float MIN_CAM_SIZE = 2f;
@@ -10,9 +11,7 @@ public class CameraController : MonoBehaviour
     const float TOWARD_SCREEN = -1f;
     const float AWAY_FROM_SCREEN = 1f;
 
-    Vector3 mouseDownPos;
     Camera cam;
-    PlayerMovement playerMovement;
     Vector3 prevPos;
     float prevSize;
 
@@ -22,7 +21,6 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         cam = GetComponent<Camera>();
-        playerMovement = GetComponentInChildren<PlayerMovement>();
         prevPos = cam.transform.position;
         prevSize = cam.orthographicSize;
     }
@@ -49,9 +47,9 @@ public class CameraController : MonoBehaviour
     // logic for panning by offset, like clicking middle mouse button and dragging
     void DragPan()
     {
-        if (playerMovement.IsPanningByDrag)
+        if (inputManager.IsPanningByDrag)
         {
-            var delta = cam.ScreenToWorldPoint(playerMovement.CursorPosScreen) - playerMovement.InitDragPosWorld;
+            var delta = cam.ScreenToWorldPoint(inputManager.CursorPosScreen) - inputManager.InitDragPosWorld;
             cam.transform.position -= delta;
         }
     }
@@ -59,9 +57,9 @@ public class CameraController : MonoBehaviour
     // logic for panning by speed and direction, like holding an arrow key or tilting an analog stick
     void ContinuousPan()
     {
-        if (playerMovement.PanDirection != Vector2.zero)
+        if (inputManager.PanDirection != Vector2.zero)
         {
-            var delta = playerMovement.PanDirection * // PanDirection is a unit vector pointing in the world direction to move the camera
+            var delta = inputManager.PanDirection * // PanDirection is a unit vector pointing in the world direction to move the camera
                 cam.orthographicSize * // we need the camera to translate slower when zoomed in and faster when zoomed out, so scaled to size
                 cameraPanSpeed * // this is an adjustable speed multiplier to make the pan speed UX feel right
                 Time.deltaTime; // makes camera pan framerate independent
