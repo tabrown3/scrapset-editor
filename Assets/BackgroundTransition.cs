@@ -4,17 +4,17 @@ using UnityEngine;
 public class BackgroundTransition : MonoBehaviour
 {
     [SerializeField] GameObject bgParent;
-    SpriteScroller bgSpriteScroller;
+    BackgroundTransitionParent backgroundTransitionParent;
     SpriteRenderer mySpriteRenderer;
 
     void Start()
     {
-        bgSpriteScroller = bgParent.GetComponent<SpriteScroller>();
+        backgroundTransitionParent = bgParent.GetComponent<BackgroundTransitionParent>();
         mySpriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
     {
-        mySpriteRenderer.color = mySpriteRenderer.color.WithAlpha(bgSpriteScroller.GetSmallBgAlpha());
+        mySpriteRenderer.color = mySpriteRenderer.color.WithAlpha(backgroundTransitionParent.GetSmallBgAlpha());
     }
 }

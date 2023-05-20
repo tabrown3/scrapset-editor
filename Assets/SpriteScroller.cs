@@ -9,6 +9,9 @@ public class SpriteScroller : MonoBehaviour
 
     void Update()
     {
+        var camSize = Camera.main.orthographicSize;
+
+
         var bottomLeft = Camera.main.ViewportToWorldPoint(new Vector2(0, 0));
         var topRight = Camera.main.ViewportToWorldPoint(new Vector2(1, 1));
 
@@ -19,27 +22,9 @@ public class SpriteScroller : MonoBehaviour
 
         if (isOutOfBounds)
         {
+            Debug.Log("Out of BOUNDS!");
             transform.position = new Vector2(Mathf.RoundToInt(Camera.main.transform.position.x),
                 Mathf.RoundToInt(Camera.main.transform.position.y));
         }
-
-        var camSize = Camera.main.orthographicSize;
-        if (camSize < 12f)
-        {
-            small_bg_alpha = 1f;
-        } else if (camSize >= 12f && camSize <= 18f)
-        {
-            small_bg_alpha = 1f - ((camSize - 12f) / 6f);
-        } else // camSize > 18
-        {
-            small_bg_alpha = 0f;
-        }
-
-        Debug.Log(small_bg_alpha);
-    }
-
-    public float GetSmallBgAlpha()
-    {
-        return small_bg_alpha;
     }
 }
