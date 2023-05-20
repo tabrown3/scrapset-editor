@@ -54,7 +54,7 @@ public class CameraController : MonoBehaviour
 
         if (playerMovement.MoveInput != Vector2.zero)
         {
-            var delta = playerMovement.MoveInput * cam.orthographicSize / cameraMoveSpeed;
+            var delta = playerMovement.MoveInput * cam.orthographicSize * cameraMoveSpeed * Time.deltaTime;
             cam.transform.position += (Vector3)delta;
         }
 
