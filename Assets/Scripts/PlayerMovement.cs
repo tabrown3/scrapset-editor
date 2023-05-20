@@ -4,15 +4,17 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     public Vector2 PanDirection { get; private set; }
-    public Vector2 CursorPos { get; private set; }
+    public Vector2 CursorPosScreen { get; private set; }
+    public Vector3 CursorPosWorld { get; private set; }
     public bool IsPanningByDrag { get; private set; }
-    public Vector2 InitDragPos { get; private set; }
+    public Vector3 InitDragPosWorld { get; private set; }
 
     bool prevIsPanningByDrag;
+    Camera parentCam;
 
     void Start()
     {
-
+        parentCam = transform.parent.gameObject.GetComponent<Camera>();
     }
 
     void Update()
@@ -27,7 +29,9 @@ public class PlayerMovement : MonoBehaviour
 
     void OnCursorPosition(InputValue value)
     {
-        CursorPos = value.Get<Vector2>();
+        var screenPos = value.Get<Vector2>();
+        CursorPosScreen = screenPos;
+        CursorPosWorld = parentCam.ScreenToWorldPoint(screenPos);
     }
 
     void OnActivatePanByDrag(InputValue value)
@@ -35,10 +39,7 @@ public class PlayerMovement : MonoBehaviour
         IsPanningByDrag = value.Get<float>() != 0f;
         if (IsPanningByDrag && !prevIsPanningByDrag)
         {
-            InitDragPos = CursorPos;
-        } else if (!IsPanningByDrag && prevIsPanningByDrag)
-        {
-            InitDragPos = Vector2.zero;
+            InitDragPosWorld = CursorPosWorld;
         }
         prevIsPanningByDrag = IsPanningByDrag;
     }

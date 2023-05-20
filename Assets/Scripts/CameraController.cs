@@ -15,8 +15,6 @@ public class CameraController : MonoBehaviour
     PlayerMovement playerMovement;
     Vector3 prevPos;
     float prevSize;
-    bool prevDiscretePanIsActive;
-    Vector3 initDragPos;
 
     public bool PositionHasChanged { get; private set; }
     public bool SizeHasChanged { get; private set; }
@@ -27,7 +25,6 @@ public class CameraController : MonoBehaviour
         playerMovement = GetComponentInChildren<PlayerMovement>();
         prevPos = cam.transform.position;
         prevSize = cam.orthographicSize;
-        prevDiscretePanIsActive = playerMovement.IsPanningByDrag;
     }
 
     void LateUpdate()
@@ -52,15 +49,9 @@ public class CameraController : MonoBehaviour
     // logic for panning by offset, like clicking middle mouse button and dragging
     void DragPan()
     {
-        if (playerMovement.IsPanningByDrag && !prevDiscretePanIsActive)
-        {
-            initDragPos = cam.ScreenToWorldPoint(playerMovement.CursorPos);
-        }
-        prevDiscretePanIsActive = playerMovement.IsPanningByDrag;
-
         if (playerMovement.IsPanningByDrag)
         {
-            var delta = cam.ScreenToWorldPoint(playerMovement.CursorPos) - initDragPos;
+            var delta = cam.ScreenToWorldPoint(playerMovement.CursorPosScreen) - playerMovement.InitDragPosWorld;
             cam.transform.position -= delta;
         }
     }
