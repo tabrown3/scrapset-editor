@@ -11,8 +11,7 @@ public class Processor : MonoBehaviour
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
     Dictionary<int, GameObject> gateObjects = new Dictionary<int, GameObject>();
-    Dictionary<int, GateLink> linksByOutputGate = new Dictionary<int, GateLink>();
-    Dictionary<int, GateLink> linksByInputGate = new Dictionary<int, GateLink>();
+    Dictionary<int, Dictionary<string, GateLink>> linkByInputGate = new Dictionary<int, Dictionary<string, GateLink>>(); // outter key is IGate.Id, inner key is InputParam name, value is GateLink
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
 
     int fakeCount = 0;
@@ -41,6 +40,14 @@ public class Processor : MonoBehaviour
         while (nextStatement != null)
         {
             currentStatement = nextStatement;
+
+            var currentGate = currentStatement as IGate;
+            if (currentGate == null)
+            {
+                throw new System.Exception("Statements must also implement IGate to be executed by the Processor");
+            }
+            // find all gates outputting to currentGate
+
             nextStatement = null;
             currentStatement.PerformSideEffect(this);
         }
@@ -112,8 +119,19 @@ public class Processor : MonoBehaviour
             InputParameterName = inputParameterName,
         };
 
-        linksByOutputGate.Add(outputGateId, link);
-        linksByInputGate.Add(inputGateId, link);
+        if (!linkByInputGate.ContainsKey(inputGateId))
+        {
+            linkByInputGate.Add(inputGateId, new Dictionary<string, GateLink>());
+        }
+
+        var linkByInput = linkByInputGate[inputGateId];
+        if (!linkByInput.ContainsKey(inputParameterName))
+        {
+            linkByInput.Add(inputParameterName, link);
+        } else
+        {
+            throw new System.Exception($"An I/O link entry for Gate ID {inputGateId} and input param '{inputParameterName}' already exists");
+        }
 
         Debug.Log(link);
     }
