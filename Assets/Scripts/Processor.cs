@@ -13,4 +13,10 @@ public class Processor : MonoBehaviour
     {
 
     }
+
+    public void SpawnGate<T>(string name) where T : MonoBehaviour, IExecutable, new()
+    {
+        var tempGameObj = new GameObject(name, typeof(T));
+        tempGameObj.transform.parent = transform;
+    }
 }

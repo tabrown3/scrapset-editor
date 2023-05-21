@@ -1,18 +1,22 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AddGate : MonoBehaviour
+public class AddGate : MonoBehaviour, IExecutable, IExpression
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public string Name => "Add";
 
-    // Update is called once per frame
-    void Update()
+    public int Id => 0;
+
+    public string Description => "Adds numbers together";
+
+    public string Category => "Arithmetic";
+
+    public Dictionary<string, ScrapsetType> Inputs { get; } = new Dictionary<string, ScrapsetType>();
+
+    public Dictionary<string, ScrapsetType> Outputs { get; } = new Dictionary<string, ScrapsetType>();
+
+    public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
     {
-        
+        return new Dictionary<string, ScrapsetValue>();
     }
 }

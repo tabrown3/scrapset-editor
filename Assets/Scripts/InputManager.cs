@@ -38,7 +38,13 @@ public class InputManager : MonoBehaviour
         if (IsPanningByDrag && !prevIsPanningByDrag)
         {
             InitDragPosWorld = CursorPosWorld;
+            FakeMethod();
         }
         prevIsPanningByDrag = IsPanningByDrag;
+    }
+
+    void FakeMethod()
+    {
+        FindObjectOfType<Processor>().SpawnGate<AddGate>("Add");
     }
 }
