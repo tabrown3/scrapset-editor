@@ -11,7 +11,8 @@ public class Processor : MonoBehaviour
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
     Dictionary<int, GameObject> gateObjects = new Dictionary<int, GameObject>();
-    Dictionary<int, Dictionary<string, GateLink>> linkByInputGate = new Dictionary<int, Dictionary<string, GateLink>>(); // outter key is IGate.Id, inner key is InputParam name, value is GateLink
+    // outter key is IGate.Id, inner key is InputParam name
+    Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam = new Dictionary<int, Dictionary<string, GateLink>>();
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
 
     int fakeCount = 0;
@@ -46,7 +47,16 @@ public class Processor : MonoBehaviour
             {
                 throw new System.Exception("Statements must also implement IGate to be executed by the Processor");
             }
-            // find all gates outputting to currentGate
+
+            if (linksByGateIdInputParam.TryGetValue(currentGate.Id, out var linksByInputParam))
+            {
+                foreach (var kv in linksByInputParam)
+                {
+                    var key = kv.Key; var value = kv.Value;
+                    var gate = FindGateById(value.OutputGateId);
+                    Debug.Log($"Gate '{currentGate.Name}' input param {key} is receiving from Gate {gate.Name} output param {value.OutputParameterName}");
+                }
+            }
 
             nextStatement = null;
             currentStatement.PerformSideEffect(this);
@@ -119,12 +129,12 @@ public class Processor : MonoBehaviour
             InputParameterName = inputParameterName,
         };
 
-        if (!linkByInputGate.ContainsKey(inputGateId))
+        if (!linksByGateIdInputParam.ContainsKey(inputGateId))
         {
-            linkByInputGate.Add(inputGateId, new Dictionary<string, GateLink>());
+            linksByGateIdInputParam.Add(inputGateId, new Dictionary<string, GateLink>());
         }
 
-        var linkByInput = linkByInputGate[inputGateId];
+        var linkByInput = linksByGateIdInputParam[inputGateId];
         if (!linkByInput.ContainsKey(inputParameterName))
         {
             linkByInput.Add(inputParameterName, link);
