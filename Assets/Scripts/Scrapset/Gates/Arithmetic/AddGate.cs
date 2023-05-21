@@ -9,9 +9,9 @@ public class AddGate : MonoBehaviour, IGate, IExpression
 
     public string Category => "Arithmetic";
 
-    public Dictionary<string, ScrapsetTypes> Inputs { get; } = new Dictionary<string, ScrapsetTypes>() { { "A", ScrapsetTypes.Number }, { "B", ScrapsetTypes.Number } };
+    public Dictionary<string, ScrapsetTypes> InputParameters { get; } = new Dictionary<string, ScrapsetTypes>() { { "A", ScrapsetTypes.Number }, { "B", ScrapsetTypes.Number } };
 
-    public Dictionary<string, ScrapsetTypes> Outputs { get; } = new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
+    public Dictionary<string, ScrapsetTypes> OutputParameters { get; } = new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
 
     public int Id { get; set; }
 

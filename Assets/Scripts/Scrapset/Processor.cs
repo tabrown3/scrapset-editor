@@ -36,7 +36,7 @@ public class Processor : MonoBehaviour
     }
 
     // create an I/O link between gates
-    public void CreateInputOutputLink(int inputGateId, string inputArgName, int outputGateId, string outputArgName)
+    public void CreateInputOutputLink(int inputGateId, string inputParameterName, int outputGateId, string outputParameterName)
     {
         if (!gates.TryGetValue(outputGateId, out var outputGate))
         {
@@ -48,31 +48,33 @@ public class Processor : MonoBehaviour
             throw new System.Exception($"Gate with ID {inputGateId} not found");
         }
 
-        if (!outputGate.Outputs.TryGetValue(outputArgName, out var outputArgType))
+        if (!outputGate.OutputParameters.TryGetValue(outputParameterName, out var outputArgType))
         {
-            throw new System.Exception($"The output gate does not have an output argument '{outputArgName}'");
+            throw new System.Exception($"The output gate does not have an output paramater '{outputParameterName}'");
         }
 
-        if (!inputGate.Inputs.TryGetValue(inputArgName, out var inputArgType))
+        if (!inputGate.InputParameters.TryGetValue(inputParameterName, out var inputArgType))
         {
-            throw new System.Exception($"The input gate does not have an input argument '{inputArgName}'");
+            throw new System.Exception($"The input gate does not have an input parameter '{inputParameterName}'");
         }
 
         if (outputArgType != inputArgType)
         {
-            throw new System.Exception($"Output '{outputArgName}' and input '{inputArgName}' are not of the same Scrapset type");
+            throw new System.Exception($"Output '{outputParameterName}' and input '{inputParameterName}' are not of the same Scrapset type");
         }
 
         var link = new GateLink()
         {
             OutputGateId = outputGateId,
-            OutputArgName = outputArgName,
+            OutputParameterName = outputParameterName,
             InputGateId = inputGateId,
-            InputArgsName = inputArgName,
+            InputParameterName = inputParameterName,
         };
 
         linksByOutputGate.Add(outputGateId, link);
         linksByInputGate.Add(inputGateId, link);
+
+        Debug.Log(link);
     }
 
     // establish program execution order by linking statements together

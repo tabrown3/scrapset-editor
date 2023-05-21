@@ -11,9 +11,9 @@ public class Entrypoint : MonoBehaviour, IGate, IStatement
 
     public string Category => "System";
 
-    public Dictionary<string, ScrapsetTypes> Inputs => new Dictionary<string, ScrapsetTypes>();
+    public Dictionary<string, ScrapsetTypes> InputParameters => new Dictionary<string, ScrapsetTypes>();
 
-    public Dictionary<string, ScrapsetTypes> Outputs => new Dictionary<string, ScrapsetTypes>();
+    public Dictionary<string, ScrapsetTypes> OutputParameters => new Dictionary<string, ScrapsetTypes>();
 
     public int Id { get; set; }
 

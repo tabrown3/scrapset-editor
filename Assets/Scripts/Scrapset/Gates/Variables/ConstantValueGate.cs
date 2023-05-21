@@ -9,9 +9,9 @@ public class ConstantValueGate : MonoBehaviour, IGate, IExpression
 
     public string Category => "Variables";
 
-    public Dictionary<string, ScrapsetTypes> Inputs { get; } = new Dictionary<string, ScrapsetTypes>();
+    public Dictionary<string, ScrapsetTypes> InputParameters { get; } = new Dictionary<string, ScrapsetTypes>();
 
-    public Dictionary<string, ScrapsetTypes> Outputs { get; } = new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
+    public Dictionary<string, ScrapsetTypes> OutputParameters { get; } = new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
 
     public int Id { get; set; }
 

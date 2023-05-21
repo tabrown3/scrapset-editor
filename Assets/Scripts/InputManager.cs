@@ -45,7 +45,9 @@ public class InputManager : MonoBehaviour
 
     void FakeMethod()
     {
-        FindObjectOfType<Processor>().SpawnGate<AddGate>("Add");
-        FindObjectOfType<Processor>().SpawnGate<ConstantValueGate>("Constant Value");
+        var processor = FindObjectOfType<Processor>();
+        var addGateId = processor.SpawnGate<AddGate>("Add");
+        var constantValueId = processor.SpawnGate<ConstantValueGate>("Constant Value");
+        processor.CreateInputOutputLink(addGateId, "A", constantValueId, "Out");
     }
 }
