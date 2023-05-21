@@ -3,15 +3,17 @@ using UnityEngine;
 
 public class AddGate : MonoBehaviour, IExecutable, IExpression
 {
-    public string Name => "Add";
+    static public string Name => "Add";
 
-    public string Description => "Adds numbers together";
+    static public string Description => "Adds numbers together";
 
-    public string Category => "Arithmetic";
+    static public string Category => "Arithmetic";
 
-    public Dictionary<string, ScrapsetTypes> Inputs { get; } = new Dictionary<string, ScrapsetTypes>() { { "A", ScrapsetTypes.Number }, { "B", ScrapsetTypes.Number } };
+    static public Dictionary<string, ScrapsetTypes> Inputs { get; } = new Dictionary<string, ScrapsetTypes>() { { "A", ScrapsetTypes.Number }, { "B", ScrapsetTypes.Number } };
 
-    public Dictionary<string, ScrapsetTypes> Outputs { get; } = new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
+    static public Dictionary<string, ScrapsetTypes> Outputs { get; } = new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
+
+    public int Id { get; set; }
 
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
     {
