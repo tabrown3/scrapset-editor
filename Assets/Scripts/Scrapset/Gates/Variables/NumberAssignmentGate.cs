@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AssignmentGate : MonoBehaviour, IGate, IStatement
+public class NumberAssignmentGate : MonoBehaviour, IGate, IStatement
 {
     public List<string> OutwardPaths { get; set; } = new List<string>() { "Next" };
 
@@ -11,9 +11,10 @@ public class AssignmentGate : MonoBehaviour, IGate, IStatement
 
     public string Category => "Variables";
 
-    public Dictionary<string, ScrapsetTypes> InputParameters => new Dictionary<string, ScrapsetTypes>() { { "In", ScrapsetTypes.Generic } };
+    // TODO: work out generics theme when convenient
+    public Dictionary<string, ScrapsetTypes> InputParameters => new Dictionary<string, ScrapsetTypes>() { { "In", ScrapsetTypes.Number } };
 
-    public Dictionary<string, ScrapsetTypes> OutputParameters => new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Generic } };
+    public Dictionary<string, ScrapsetTypes> OutputParameters => new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
 
     public int Id { get; set; }
 
