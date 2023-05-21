@@ -37,29 +37,64 @@ public class Processor : MonoBehaviour
         return gate.Id;
     }
 
+    public IGate FindGateById(int id)
+    {
+        if (!gates.TryGetValue(id, out var gate))
+        {
+            return null;
+        }
+
+        return gate;
+    }
+
+    public ScrapsetTypes SelectGateInputParameter(IGate gate, string parameterName)
+    {
+        if (!gate.InputParameters.TryGetValue(parameterName, out var inputParameterType))
+        {
+            return ScrapsetTypes.None;
+        }
+
+        return inputParameterType;
+    }
+
+    public ScrapsetTypes SelectGateOutputParameter(IGate gate, string parameterName)
+    {
+        if (!gate.OutputParameters.TryGetValue(parameterName, out var outputParameterType))
+        {
+            return ScrapsetTypes.None;
+        }
+
+        return outputParameterType;
+    }
+
     // create an I/O link between gates
     public void CreateInputOutputLink(int inputGateId, string inputParameterName, int outputGateId, string outputParameterName)
     {
-        if (!gates.TryGetValue(outputGateId, out var outputGate))
+        var outputGate = FindGateById(outputGateId);
+        if (outputGate == null)
         {
-            throw new System.Exception($"Gate with ID {outputGateId} not found");
+            throw new System.Exception($"Could not find gate with ID ${outputGateId}");
         }
 
-        if (!gates.TryGetValue(inputGateId, out var inputGate))
+        var inputGate = FindGateById(inputGateId);
+        if (inputGate == null)
         {
-            throw new System.Exception($"Gate with ID {inputGateId} not found");
+            throw new System.Exception($"Could not find gate with ID ${inputGateId}");
         }
 
-        if (!outputGate.OutputParameters.TryGetValue(outputParameterName, out var outputParameterType))
+        var outputParameterType = SelectGateOutputParameter(outputGate, outputParameterName);
+        if (outputParameterType == ScrapsetTypes.None)
         {
-            throw new System.Exception($"The output gate does not have an output paramater '{outputParameterName}'");
+            throw new System.Exception($"The output gate does not have an output parameter '{outputParameterName}'");
         }
 
-        if (!inputGate.InputParameters.TryGetValue(inputParameterName, out var inputParameterType))
+        var inputParameterType = SelectGateInputParameter(inputGate, inputParameterName);
+        if (inputParameterType == ScrapsetTypes.None)
         {
             throw new System.Exception($"The input gate does not have an input parameter '{inputParameterName}'");
         }
 
+        // TODO: in the future, perform logic with Generics here for more dynamic type checking
         if (outputParameterType != inputParameterType)
         {
             throw new System.Exception($"Output '{outputParameterName}' and input '{inputParameterName}' are not of the same Scrapset type");

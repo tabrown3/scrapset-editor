@@ -46,14 +46,14 @@ public class InputManager : MonoBehaviour
     void FakeMethod()
     {
         var processor = FindObjectOfType<Processor>();
-        var assignmentGateId = processor.SpawnGate<NumberAssignmentGate>("Assignment");
-        processor.CreateProgramFlowLink(processor.EntrypointId, "Next", assignmentGateId);
-        var numberVariableId = processor.SpawnGate<NumberVariableGate>("Number Variable");
-        processor.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out");
+        var assignmentGateId = processor.SpawnGate<NumberAssignmentGate>("Number Assignment"); // spawn Number Assignment
+        processor.CreateProgramFlowLink(processor.EntrypointId, "Next", assignmentGateId); // program flow link Entrypoint -> Number Assignment
+        var numberVariableId = processor.SpawnGate<NumberVariableGate>("Number Variable"); // spawn Number Variable
+        processor.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out"); // I/O link Number Assignment -> Number Variable
 
-        var addGateId = processor.SpawnGate<AddGate>("Add");
-        processor.CreateInputOutputLink(assignmentGateId, "In", addGateId, "Out");
-        var constantValueId = processor.SpawnGate<ConstantValueGate>("Constant Value");
-        processor.CreateInputOutputLink(addGateId, "A", constantValueId, "Out");
+        var addGateId = processor.SpawnGate<AddGate>("Add"); // spawn Add
+        processor.CreateInputOutputLink(assignmentGateId, "In", addGateId, "Out"); // I/O link // Add -> Number Assignment
+        var constantValueId = processor.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
+        processor.CreateInputOutputLink(addGateId, "A", constantValueId, "Out"); // I/O link Constant Value -> Add
     }
 }
