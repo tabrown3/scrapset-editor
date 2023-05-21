@@ -4,7 +4,7 @@ public class NumberAssignmentGate : Gate, IStatement
 {
     public List<string> OutwardPaths { get; set; } = new List<string>() { "Next" };
 
-    override public string Name => "Assignment";
+    override public string Name => "Number Assignment";
 
     override public string Description => "Assigns values to variables";
 

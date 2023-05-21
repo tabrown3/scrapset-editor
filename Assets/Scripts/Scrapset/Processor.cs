@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Processor : MonoBehaviour
@@ -6,7 +7,6 @@ public class Processor : MonoBehaviour
     public int EntrypointId { get; private set; }
     private IStatement currentStatement;
     private IStatement nextStatement;
-    private IGate currentGate;
 
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
@@ -15,6 +15,8 @@ public class Processor : MonoBehaviour
     Dictionary<int, GateLink> linksByInputGate = new Dictionary<int, GateLink>();
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
 
+    int fakeCount = 0;
+
     void Start()
     {
         EntrypointId = SpawnGate<Entrypoint>("Entrypoint");
@@ -22,9 +24,10 @@ public class Processor : MonoBehaviour
 
     void Update()
     {
-        if (programFlows.Count > 0)
+        if (programFlows.Count > 0 && fakeCount == 0)
         {
             RunProgram();
+            fakeCount++; // TODO: DELETE - limited to a single run for testing purposes
         }
     }
 
@@ -32,10 +35,17 @@ public class Processor : MonoBehaviour
     {
         var entrypoint = FindGateById(EntrypointId);
         currentStatement = entrypoint as IStatement;
+        nextStatement = null;
         currentStatement.PerformSideEffect(this);
-        currentGate = entrypoint;
 
+        while (nextStatement != null)
+        {
+            currentStatement = nextStatement;
+            nextStatement = null;
+            currentStatement.PerformSideEffect(this);
+        }
 
+        Debug.Log("Execution finished!");
     }
 
     public int SpawnGate<T>(string name) where T : IGate
@@ -142,9 +152,9 @@ public class Processor : MonoBehaviour
 
         var programFlow = new ProgramFlow()
         {
-            FromGate = fromStatement,
+            FromGateId = fromGate.Id,
             FromFlowName = flowName,
-            ToGate = toStatement,
+            ToGateId = toGate.Id,
         };
 
         programFlows.Add(programFlow);
@@ -155,12 +165,34 @@ public class Processor : MonoBehaviour
     // directly assign the value of inputName to outputName
     public void AssignInputToOutput<T>(T assigningGate, string inputName, string outputName) where T : IGate, IStatement
     {
-
+        Debug.Log($"Assigning gate {assigningGate.Name} input {inputName} to target of {outputName}");
     }
 
     // follow the program flow from the source statement to the statement it's linked to via the named flow link
-    public void Goto<T>(T sourceGate, string flowName) where T : IGate, IStatement
+    public void Goto<T>(T fromGate, string flowName) where T : IGate, IStatement
     {
-        Debug.Log($"Following ${sourceGate.Name} outward path '{flowName}'");
+        Debug.Log($"Following {fromGate.Name} outward path '{flowName}'");
+
+        var programFlow = programFlows.FirstOrDefault(u => u.FromGateId == fromGate.Id && u.FromFlowName == flowName);
+        if (programFlow == null)
+        {
+            nextStatement = null;
+        } else
+        {
+            var toGateId = programFlow.ToGateId;
+            var toGate = FindGateById(toGateId);
+            if (toGate == null)
+            {
+                throw new System.Exception($"Gate with ID {toGateId} not found");
+            }
+
+            var toStatement = toGate as IStatement;
+            if (toStatement == null)
+            {
+                throw new System.Exception($"Gate with ID {toGateId} does not implement IStatement");
+            }
+
+            nextStatement = toStatement;
+        }
     }
 }

@@ -1,6 +1,6 @@
 public class ProgramFlow
 {
-    public IStatement FromGate { get; set; }
+    public int FromGateId { get; set; }
     public string FromFlowName { get; set; }
-    public IStatement ToGate { get; set; }
+    public int ToGateId { get; set; }
 }
