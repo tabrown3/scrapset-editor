@@ -4,6 +4,9 @@ using UnityEngine;
 public class Processor : MonoBehaviour
 {
     public int EntrypointId { get; private set; }
+    private IStatement currentStatement;
+    private IStatement nextStatement;
+    private IGate currentGate;
 
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
@@ -12,15 +15,26 @@ public class Processor : MonoBehaviour
     Dictionary<int, GateLink> linksByInputGate = new Dictionary<int, GateLink>();
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
 
-    // Start is called before the first frame update
     void Start()
     {
         EntrypointId = SpawnGate<Entrypoint>("Entrypoint");
     }
 
-    // Update is called once per frame
     void Update()
     {
+        if (programFlows.Count > 0)
+        {
+            RunProgram();
+        }
+    }
+
+    private void RunProgram()
+    {
+        var entrypoint = FindGateById(EntrypointId);
+        currentStatement = entrypoint as IStatement;
+        currentStatement.PerformSideEffect(this);
+        currentGate = entrypoint;
+
 
     }
 
@@ -147,6 +161,6 @@ public class Processor : MonoBehaviour
     // follow the program flow from the source statement to the statement it's linked to via the named flow link
     public void Goto<T>(T sourceGate, string flowName) where T : IGate, IStatement
     {
-
+        Debug.Log($"Following ${sourceGate.Name} outward path '{flowName}'");
     }
 }
