@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class Processor : MonoBehaviour
 {
+    public int EntrypointId { get; private set; }
+
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
     Dictionary<int, GameObject> gateObjects = new Dictionary<int, GameObject>();
@@ -13,7 +15,7 @@ public class Processor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SpawnGate<Entrypoint>("Entrypoint");
+        EntrypointId = SpawnGate<Entrypoint>("Entrypoint");
     }
 
     // Update is called once per frame
@@ -48,17 +50,17 @@ public class Processor : MonoBehaviour
             throw new System.Exception($"Gate with ID {inputGateId} not found");
         }
 
-        if (!outputGate.OutputParameters.TryGetValue(outputParameterName, out var outputArgType))
+        if (!outputGate.OutputParameters.TryGetValue(outputParameterName, out var outputParameterType))
         {
             throw new System.Exception($"The output gate does not have an output paramater '{outputParameterName}'");
         }
 
-        if (!inputGate.InputParameters.TryGetValue(inputParameterName, out var inputArgType))
+        if (!inputGate.InputParameters.TryGetValue(inputParameterName, out var inputParameterType))
         {
             throw new System.Exception($"The input gate does not have an input parameter '{inputParameterName}'");
         }
 
-        if (outputArgType != inputArgType)
+        if (outputParameterType != inputParameterType)
         {
             throw new System.Exception($"Output '{outputParameterName}' and input '{inputParameterName}' are not of the same Scrapset type");
         }
@@ -107,12 +109,16 @@ public class Processor : MonoBehaviour
             throw new System.Exception($"Gate with ID {fromId} does not have outward path of '${flowName}'");
         }
 
-        programFlows.Add(new ProgramFlow()
+        var programFlow = new ProgramFlow()
         {
             FromGate = fromStatement,
             FromFlowName = flowName,
             ToGate = toStatement,
-        });
+        };
+
+        programFlows.Add(programFlow);
+
+        Debug.Log(programFlow);
     }
 
     // directly assign the value of inputName to outputName
