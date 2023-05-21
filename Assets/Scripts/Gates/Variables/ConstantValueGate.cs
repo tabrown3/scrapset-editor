@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ConstantValueGate : MonoBehaviour, IExecutable, IExpression
+public class ConstantValueGate : MonoBehaviour, IExecutable
 {
-    static public string Name => "Constant Value";
+    public string Name => "Constant Value";
 
-    static public string Description => "Returns a constant value";
+    public string Description => "Returns a constant value";
 
-    static public string Category => "Variables";
+    public string Category => "Variables";
 
-    static public Dictionary<string, ScrapsetTypes> Inputs { get; } = new Dictionary<string, ScrapsetTypes>();
+    public Dictionary<string, ScrapsetTypes> Inputs { get; } = new Dictionary<string, ScrapsetTypes>();
 
-    static public Dictionary<string, ScrapsetTypes> Outputs { get; } = new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
+    public Dictionary<string, ScrapsetTypes> Outputs { get; } = new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
 
     public int Id { get; set; }
 

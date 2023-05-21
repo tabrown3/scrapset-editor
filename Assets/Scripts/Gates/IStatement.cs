@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public interface IStatement
+public interface IStatement : IExecutable
 {
-    IList<string> OutwardPaths { get; }
+    public List<string> OutwardPaths { get; set; }
 }
