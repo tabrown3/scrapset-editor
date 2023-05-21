@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AssignmentGate : MonoBehaviour, IStatement
+public class AssignmentGate : MonoBehaviour, IGate, IStatement
 {
-    public List<string> OutwardPaths { get; set; } = new List<string>() { "Goto" };
+    public List<string> OutwardPaths { get; set; } = new List<string>() { "Next" };
 
     public string Name => "Assignment";
 
@@ -19,6 +19,7 @@ public class AssignmentGate : MonoBehaviour, IStatement
 
     public void PerformSideEffect(Processor processor)
     {
-        // TODO: figure out how to implement variable assignment
+        processor.AssignInputToOutput(this, "In", "Out");
+        processor.Goto(this, "Next");
     }
 }

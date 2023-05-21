@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Entrypoint : MonoBehaviour, IGate, IStatement
 {
-    public List<string> OutwardPaths { get; set; }
+    public List<string> OutwardPaths { get; set; } = new List<string>() { "Next" };
 
     public string Name => "Entrypoint";
 
@@ -17,13 +17,8 @@ public class Entrypoint : MonoBehaviour, IGate, IStatement
 
     public int Id { get; set; }
 
-    public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
-    {
-        return new Dictionary<string, ScrapsetValue>();
-    }
-
     public void PerformSideEffect(Processor processor)
     {
-
+        processor.Goto(this, "Next");
     }
 }

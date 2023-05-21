@@ -35,7 +35,8 @@ public class Processor : MonoBehaviour
         return gate.Id;
     }
 
-    public void LinkGates(int outputGateId, string outputArgName, int inputGateId, string inputArgName)
+    // create an I/O link between gates
+    public void CreateInputOutputLink(int inputGateId, string inputArgName, int outputGateId, string outputArgName)
     {
         if (!gates.TryGetValue(outputGateId, out var outputGate))
         {
@@ -74,7 +75,8 @@ public class Processor : MonoBehaviour
         linksByInputGate.Add(inputGateId, link);
     }
 
-    public void GoFromTo(int fromId, string flowName, int toId)
+    // establish program execution order by linking statements together
+    public void CreateProgramFlowLink(int fromId, string flowName, int toId)
     {
         if (!gates.TryGetValue(fromId, out var fromGate))
         {
@@ -111,7 +113,14 @@ public class Processor : MonoBehaviour
         });
     }
 
-    public void AssignToVariable(ScrapsetValue value, IGate variable)
+    // directly assign the value of inputName to outputName
+    public void AssignInputToOutput<T>(T assigningGate, string inputName, string outputName) where T : IGate, IStatement
+    {
+
+    }
+
+    // follow the program flow from the source statement to the statement it's linked to via the named flow link
+    public void Goto<T>(T sourceGate, string flowName) where T : IGate, IStatement
     {
 
     }
