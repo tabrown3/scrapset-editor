@@ -117,12 +117,14 @@ public class Processor : MonoBehaviour
     // establish program execution order by linking statements together
     public void CreateProgramFlowLink(int fromId, string flowName, int toId)
     {
-        if (!gates.TryGetValue(fromId, out var fromGate))
+        var fromGate = FindGateById(fromId);
+        if (fromGate == null)
         {
             throw new System.Exception($"Gate with ID {fromId} not found");
         }
 
-        if (!gates.TryGetValue(toId, out var toGate))
+        var toGate = FindGateById(toId);
+        if (toGate == null)
         {
             throw new System.Exception($"Gate with ID {toId} not found");
         }
