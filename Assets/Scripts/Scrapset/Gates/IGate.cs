@@ -8,4 +8,8 @@ public interface IGate
     public Dictionary<string, ScrapsetTypes> InputParameters { get; }
     public Dictionary<string, ScrapsetTypes> OutputParameters { get; }
     public int Id { get; set; }
+
+    public ScrapsetTypes GetInputParameter(string parameterName);
+
+    public ScrapsetTypes GetOutputParameter(string parameterName);
 }

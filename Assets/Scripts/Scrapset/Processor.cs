@@ -47,26 +47,6 @@ public class Processor : MonoBehaviour
         return gate;
     }
 
-    public ScrapsetTypes SelectGateInputParameter(IGate gate, string parameterName)
-    {
-        if (!gate.InputParameters.TryGetValue(parameterName, out var inputParameterType))
-        {
-            return ScrapsetTypes.None;
-        }
-
-        return inputParameterType;
-    }
-
-    public ScrapsetTypes SelectGateOutputParameter(IGate gate, string parameterName)
-    {
-        if (!gate.OutputParameters.TryGetValue(parameterName, out var outputParameterType))
-        {
-            return ScrapsetTypes.None;
-        }
-
-        return outputParameterType;
-    }
-
     // create an I/O link between gates
     public void CreateInputOutputLink(int inputGateId, string inputParameterName, int outputGateId, string outputParameterName)
     {
@@ -82,13 +62,13 @@ public class Processor : MonoBehaviour
             throw new System.Exception($"Could not find gate with ID ${inputGateId}");
         }
 
-        var outputParameterType = SelectGateOutputParameter(outputGate, outputParameterName);
+        var outputParameterType = outputGate.GetOutputParameter(outputParameterName);
         if (outputParameterType == ScrapsetTypes.None)
         {
             throw new System.Exception($"The output gate does not have an output parameter '{outputParameterName}'");
         }
 
-        var inputParameterType = SelectGateInputParameter(inputGate, inputParameterName);
+        var inputParameterType = inputGate.GetInputParameter(inputParameterName);
         if (inputParameterType == ScrapsetTypes.None)
         {
             throw new System.Exception($"The input gate does not have an input parameter '{inputParameterName}'");

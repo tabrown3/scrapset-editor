@@ -13,4 +13,24 @@ public abstract class Gate : MonoBehaviour, IGate
     public Dictionary<string, ScrapsetTypes> OutputParameters { get; private set; } = new Dictionary<string, ScrapsetTypes>();
 
     public int Id { get; set; }
+
+    public ScrapsetTypes GetInputParameter(string parameterName)
+    {
+        if (!InputParameters.TryGetValue(parameterName, out var parameterType))
+        {
+            return ScrapsetTypes.None;
+        }
+
+        return parameterType;
+    }
+
+    public ScrapsetTypes GetOutputParameter(string parameterName)
+    {
+        if (!OutputParameters.TryGetValue(parameterName, out var parameterType))
+        {
+            return ScrapsetTypes.None;
+        }
+
+        return parameterType;
+    }
 }
