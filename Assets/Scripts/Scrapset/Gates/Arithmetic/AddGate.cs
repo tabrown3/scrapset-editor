@@ -1,19 +1,19 @@
 using System.Collections.Generic;
-using UnityEngine;
 
-public class AddGate : MonoBehaviour, IGate, IExpression
+public class AddGate : Gate, IExpression
 {
-    public string Name => "Add";
+    override public string Name => "Add";
 
-    public string Description => "Adds numbers together";
+    override public string Description => "Adds numbers together";
 
-    public string Category => "Arithmetic";
+    override public string Category => "Arithmetic";
 
-    public Dictionary<string, ScrapsetTypes> InputParameters { get; } = new Dictionary<string, ScrapsetTypes>() { { "A", ScrapsetTypes.Number }, { "B", ScrapsetTypes.Number } };
-
-    public Dictionary<string, ScrapsetTypes> OutputParameters { get; } = new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
-
-    public int Id { get; set; }
+    public AddGate()
+    {
+        InputParameters.Add("A", ScrapsetTypes.Number);
+        InputParameters.Add("B", ScrapsetTypes.Number);
+        OutputParameters.Add("Out", ScrapsetTypes.Number);
+    }
 
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
     {

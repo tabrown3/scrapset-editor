@@ -1,19 +1,17 @@
 using System.Collections.Generic;
-using UnityEngine;
 
-public class ConstantValueGate : MonoBehaviour, IGate, IExpression
+public class ConstantValueGate : Gate, IExpression
 {
-    public string Name => "Constant Value";
+    override public string Name => "Constant Value";
 
-    public string Description => "Returns a constant value";
+    override public string Description => "Returns a constant value";
 
-    public string Category => "Variables";
+    override public string Category => "Variables";
 
-    public Dictionary<string, ScrapsetTypes> InputParameters { get; } = new Dictionary<string, ScrapsetTypes>();
-
-    public Dictionary<string, ScrapsetTypes> OutputParameters { get; } = new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
-
-    public int Id { get; set; }
+    public ConstantValueGate()
+    {
+        OutputParameters.Add("Out", ScrapsetTypes.Number);
+    }
 
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
     {

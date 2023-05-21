@@ -1,21 +1,18 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-
-public class NumberVariableGate : MonoBehaviour, IGate, IVariable
+﻿public class NumberVariableGate : Gate, IVariable
 {
-    public string Name => "Number Variable";
+    override public string Name => "Number Variable";
 
-    public string Description => "Stores a value of type Number";
+    override public string Description => "Stores a value of type Number";
 
-    public string Category => "Variables";
-
-    public Dictionary<string, ScrapsetTypes> InputParameters => new Dictionary<string, ScrapsetTypes>() { { "In", ScrapsetTypes.Number } };
-
-    public Dictionary<string, ScrapsetTypes> OutputParameters => new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
-
-    public int Id { get; set; }
+    override public string Category => "Variables";
 
     private float value;
+
+    public NumberVariableGate()
+    {
+        InputParameters.Add("In", ScrapsetTypes.Number);
+        OutputParameters.Add("Out", ScrapsetTypes.Number);
+    }
 
     public ScrapsetValue Read()
     {

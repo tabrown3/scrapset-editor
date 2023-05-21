@@ -1,21 +1,14 @@
 using System.Collections.Generic;
-using UnityEngine;
 
-public class Entrypoint : MonoBehaviour, IGate, IStatement
+public class Entrypoint : Gate, IStatement
 {
     public List<string> OutwardPaths { get; set; } = new List<string>() { "Next" };
 
-    public string Name => "Entrypoint";
+    override public string Name => "Entrypoint";
 
-    public string Description => "The program's starting point";
+    override public string Description => "The program's starting point";
 
-    public string Category => "System";
-
-    public Dictionary<string, ScrapsetTypes> InputParameters => new Dictionary<string, ScrapsetTypes>();
-
-    public Dictionary<string, ScrapsetTypes> OutputParameters => new Dictionary<string, ScrapsetTypes>();
-
-    public int Id { get; set; }
+    override public string Category => "System";
 
     public void PerformSideEffect(Processor processor)
     {

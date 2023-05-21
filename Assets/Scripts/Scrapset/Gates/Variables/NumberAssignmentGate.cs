@@ -1,22 +1,20 @@
 using System.Collections.Generic;
-using UnityEngine;
 
-public class NumberAssignmentGate : MonoBehaviour, IGate, IStatement
+public class NumberAssignmentGate : Gate, IStatement
 {
     public List<string> OutwardPaths { get; set; } = new List<string>() { "Next" };
 
-    public string Name => "Assignment";
+    override public string Name => "Assignment";
 
-    public string Description => "Assigns values to variables";
+    override public string Description => "Assigns values to variables";
 
-    public string Category => "Variables";
+    override public string Category => "Variables";
 
-    // TODO: work out generics theme when convenient
-    public Dictionary<string, ScrapsetTypes> InputParameters => new Dictionary<string, ScrapsetTypes>() { { "In", ScrapsetTypes.Number } };
-
-    public Dictionary<string, ScrapsetTypes> OutputParameters => new Dictionary<string, ScrapsetTypes>() { { "Out", ScrapsetTypes.Number } };
-
-    public int Id { get; set; }
+    public NumberAssignmentGate()
+    {
+        InputParameters.Add("In", ScrapsetTypes.Number);
+        OutputParameters.Add("Out", ScrapsetTypes.Number);
+    }
 
     public void PerformSideEffect(Processor processor)
     {

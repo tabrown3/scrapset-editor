@@ -24,7 +24,7 @@ public class Processor : MonoBehaviour
 
     }
 
-    public int SpawnGate<T>(string name) where T : MonoBehaviour, IGate
+    public int SpawnGate<T>(string name) where T : IGate
     {
         var tempGameObj = new GameObject(name, typeof(T));
         var gate = tempGameObj.GetComponent<IGate>();
