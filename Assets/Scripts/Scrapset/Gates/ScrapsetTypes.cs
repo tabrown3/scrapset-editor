@@ -1,5 +1,6 @@
 public enum ScrapsetTypes
 {
+    Generic,
     Bool,
     Number,
     Vec2,

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AddGate : MonoBehaviour, IExecutable
+public class AddGate : MonoBehaviour, IGate, IExpression
 {
     public string Name => "Add";
 

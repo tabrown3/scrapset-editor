@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ConstantValueGate : MonoBehaviour, IExecutable
+public class ConstantValueGate : MonoBehaviour, IGate, IExpression
 {
     public string Name => "Constant Value";
 

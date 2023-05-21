@@ -4,7 +4,7 @@ using UnityEngine;
 public class Processor : MonoBehaviour
 {
     int idCounter = 0;
-    Dictionary<int, IExecutable> gates = new Dictionary<int, IExecutable>();
+    Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
     Dictionary<int, GameObject> gateObjects = new Dictionary<int, GameObject>();
     Dictionary<int, GateLink> linksByOutputGate = new Dictionary<int, GateLink>();
     Dictionary<int, GateLink> linksByInputGate = new Dictionary<int, GateLink>();
@@ -22,10 +22,10 @@ public class Processor : MonoBehaviour
 
     }
 
-    public int SpawnGate<T>(string name) where T : MonoBehaviour, IExecutable, new()
+    public int SpawnGate<T>(string name) where T : MonoBehaviour, IGate
     {
         var tempGameObj = new GameObject(name, typeof(T));
-        var gate = tempGameObj.GetComponent<IExecutable>();
+        var gate = tempGameObj.GetComponent<IGate>();
         gate.Id = idCounter++;
         Debug.Log(gate.Id);
         gates.Add(gate.Id, gate);
@@ -109,5 +109,10 @@ public class Processor : MonoBehaviour
             FromFlowName = flowName,
             ToGate = toStatement,
         });
+    }
+
+    public void AssignToVariable(ScrapsetValue value, IGate variable)
+    {
+
     }
 }

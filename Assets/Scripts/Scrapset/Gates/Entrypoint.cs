@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Entrypoint : MonoBehaviour, IExecutable, IStatement
+public class Entrypoint : MonoBehaviour, IGate, IStatement
 {
     public List<string> OutwardPaths { get; set; }
 
@@ -20,5 +20,10 @@ public class Entrypoint : MonoBehaviour, IExecutable, IStatement
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
     {
         return new Dictionary<string, ScrapsetValue>();
+    }
+
+    public void PerformSideEffect(Processor processor)
+    {
+
     }
 }
