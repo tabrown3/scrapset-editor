@@ -57,6 +57,8 @@ public class Processor : MonoBehaviour
                 throw new System.Exception("Statements must also implement IGate to be executed by the Processor");
             }
 
+            Debug.Log($"Started statement execution for gate '{currentGate.Name}' with ID {currentGate.Id}");
+
             // kick off the recursive dependency evaluation; all of the statement's deps will be eval'd
             //  depth-first and the results latched on both the dep's output param and the caller's
             //  input param
@@ -69,6 +71,7 @@ public class Processor : MonoBehaviour
 
             cachedInputValuesForGates.Clear(); // clear the input value cache after each statement finishes
             cachedOutputValuesForGates.Clear(); // clear the output value cache after each statement finishes
+            Debug.Log($"Finished statement execution for gate '{currentGate.Name}' with ID {currentGate.Id}");
         }
 
         Debug.Log("Execution finished!");
