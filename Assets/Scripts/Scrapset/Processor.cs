@@ -84,17 +84,17 @@ public class Processor : MonoBehaviour
                 // if it doesn't have values in the global value store...
                 if (!valuesByGateIdInputParam.ContainsKey(gate.Id))
                 {
-                    Dictionary<string, ScrapsetValue> valuesByInputParam;
+                    Dictionary<string, ScrapsetValue> expressionOutputValues;
                     if (linksByGateIdInputParam.ContainsKey(gate.Id)) // does it have dependencies that need evaluating?
                     {
                         EvaluateDependencies(gate); // update the global value store for all its dependencies
-                        valuesByInputParam = expression.Evaluate(valuesByGateIdInputParam[gate.Id]);
+                        expressionOutputValues = expression.Evaluate(valuesByGateIdInputParam[gate.Id]);
                     } else // if not, just pass in an empty dict
                     {
-                        valuesByInputParam = expression.Evaluate(new Dictionary<string, ScrapsetValue>());
+                        expressionOutputValues = expression.Evaluate(new Dictionary<string, ScrapsetValue>());
                     }
 
-                    var evaluatedValue = valuesByInputParam[gateLink.OutputParameterName];
+                    var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
                     if (!valuesByGateIdInputParam.ContainsKey(inGate.Id))
                     {
                         valuesByGateIdInputParam.Add(inGate.Id, new Dictionary<string, ScrapsetValue>());
