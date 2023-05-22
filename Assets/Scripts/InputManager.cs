@@ -46,7 +46,7 @@ public class InputManager : MonoBehaviour
     void GenerateTestProgram()
     {
         var processor = FindObjectOfType<Processor>();
-        processor.DeclareLocalVariable("The number variable", ScrapsetTypes.Number);
+        processor.DeclareLocalVariable("i", ScrapsetTypes.Number);
 
         /* First statement */
         var firstStatementId = GenerateTestStatement1(processor);
@@ -62,7 +62,7 @@ public class InputManager : MonoBehaviour
     {
         var assignmentGateId = processor.SpawnGate<NumberAssignmentGate>("Number Assignment"); // spawn Number Assignment
         processor.CreateProgramFlowLink(processor.EntrypointId, "Next", assignmentGateId); // program flow link Entrypoint -> Number Assignment
-        var numberVariableId = processor.SpawnVariable("The number variable"); // spawn Number Variable
+        var numberVariableId = processor.SpawnVariable("i"); // spawn Number Variable
         processor.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out"); // I/O link Number Assignment -> Number Variable
         var addGateId = processor.SpawnGate<AddGate>("Add"); // spawn Add
         processor.CreateInputOutputLink(assignmentGateId, "In", addGateId, "Out"); // I/O link // Add -> Number Assignment
@@ -77,7 +77,7 @@ public class InputManager : MonoBehaviour
     {
         var assignmentGateId = processor.SpawnGate<NumberAssignmentGate>("Number Assignment"); // spawn Number Assignment
         processor.CreateProgramFlowLink(prevStatementId, "Next", assignmentGateId); // program flow link previous Number Assignment -> this Number Assignment
-        var numberVariableId = processor.SpawnVariable("The number variable"); // spawn Number Variable
+        var numberVariableId = processor.SpawnVariable("i"); // spawn Number Variable
         processor.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out"); // I/O link Number Assignment -> Number Variable
         var addGateId = processor.SpawnGate<AddGate>("Add"); // spawn Add
         processor.CreateInputOutputLink(assignmentGateId, "In", addGateId, "Out"); // I/O link // Add -> Number Assignment

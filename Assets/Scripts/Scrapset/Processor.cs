@@ -10,7 +10,6 @@ public class Processor : MonoBehaviour
 
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
-    Dictionary<int, GameObject> gateObjects = new Dictionary<int, GameObject>();
     // linksByGateIdInputParam is a deep Dictionary storing all the I/O links by the calling gate's ID and input param name.
     //  Outer key is IGate.Id, inner key is InputParameterName
     Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam = new Dictionary<int, Dictionary<string, GateLink>>();
@@ -180,7 +179,6 @@ public class Processor : MonoBehaviour
         var gate = tempGameObj.GetComponent<IGate>();
         gate.Id = idCounter++;
         gates.Add(gate.Id, gate);
-        gateObjects.Add(gate.Id, tempGameObj);
         tempGameObj.transform.parent = transform;
 
         Debug.Log($"Spawning gate '{gate.Name}' with ID {gate.Id}");
@@ -353,11 +351,6 @@ public class Processor : MonoBehaviour
             localVariableInstances.Add(variableName, new List<int>());
         }
 
-        if (localVariableInstances[variableName] == null)
-        {
-            localVariableInstances[variableName] = new List<int>();
-        }
-
         localVariableInstances[variableName].Add(variableId);
         return variableId;
     }
@@ -405,5 +398,35 @@ public class Processor : MonoBehaviour
 
             nextStatement = toStatement;
         }
+    }
+
+    public ScrapsetValue GetCachedInputValue(int id, string inputName)
+    {
+        if (!cachedInputValuesForGates.TryGetValue(id, out var cachedInputValues))
+        {
+            throw new System.Exception($"Gate ID {id} doesn't contain any cached input values for the current scope");
+        }
+
+        if (!cachedInputValues.TryGetValue(inputName, out var cachedValue))
+        {
+            throw new System.Exception($"Gate ID {id} doesn't contain a cached value for input {inputName}");
+        }
+
+        return cachedValue;
+    }
+
+    public ScrapsetValue GetCachedOutputValue(int id, string outputName)
+    {
+        if (!cachedOutputValuesForGates.TryGetValue(id, out var cachedOutputValues))
+        {
+            throw new System.Exception($"Gate ID {id} doesn't contain any cached output values for the current scope");
+        }
+
+        if (!cachedOutputValues.TryGetValue(outputName, out var cachedValue))
+        {
+            throw new System.Exception($"Gate ID {id} doesn't contain a cached value for output {outputName}");
+        }
+
+        return cachedValue;
     }
 }
