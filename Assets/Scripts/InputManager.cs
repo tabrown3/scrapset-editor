@@ -38,9 +38,21 @@ public class InputManager : MonoBehaviour
         if (IsPanningByDrag && !prevIsPanningByDrag)
         {
             InitDragPosWorld = CursorPosWorld;
-            GenerateTestProgram();
         }
         prevIsPanningByDrag = IsPanningByDrag;
+    }
+
+    void OnBuild()
+    {
+        GenerateTestProgram();
+    }
+
+    void OnRun()
+    {
+        var processor = FindObjectOfType<Processor>();
+
+        /* Manual run - will eventually happen in Processor.Update */
+        processor.RunProgram();
     }
 
     void GenerateTestProgram()
@@ -49,16 +61,13 @@ public class InputManager : MonoBehaviour
         processor.DeclareLocalVariable("i", ScrapsetTypes.Number);
 
         /* First statement */
-        var firstStatementId = GenerateTestStatement1(processor);
+        var ifStatementId = GenerateIfStatement(processor);
 
         /* Second statement */
-        GenerateTestStatement2(processor, firstStatementId);
-
-        /* Manual run - will eventually happen in Processor.Update */
-        processor.RunProgram();
+        GenerateIncrementStatement(processor, ifStatementId);
     }
 
-    int GenerateTestStatement1(Processor processor)
+    int GenerateIfStatement(Processor processor)
     {
         var assignmentGateId = processor.SpawnGate<NumberAssignmentGate>("Number Assignment"); // spawn Number Assignment
         processor.CreateProgramFlowLink(processor.EntrypointId, "Next", assignmentGateId); // program flow link Entrypoint -> Number Assignment
@@ -73,7 +82,7 @@ public class InputManager : MonoBehaviour
         return assignmentGateId;
     }
 
-    void GenerateTestStatement2(Processor processor, int prevStatementId)
+    void GenerateIncrementStatement(Processor processor, int prevStatementId)
     {
         var assignmentGateId = processor.SpawnGate<NumberAssignmentGate>("Number Assignment"); // spawn Number Assignment
         processor.CreateProgramFlowLink(prevStatementId, "Next", assignmentGateId); // program flow link previous Number Assignment -> this Number Assignment
