@@ -14,7 +14,10 @@ public class Processor : MonoBehaviour
     // linksByGateIdInputParam is a Dictionary storing all the I/O links
     // outer key is IGate.Id, inner key is InputParameterName
     Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam = new Dictionary<int, Dictionary<string, GateLink>>();
+    // temporarily caches input values for all inputs of gates with dependencies
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedInputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
+    // temporarily caches output values for all outputs of evaluated gates
+    Dictionary<int, Dictionary<string, ScrapsetValue>> cachedOutputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
 
     int fakeCount = 0;
@@ -82,19 +85,25 @@ public class Processor : MonoBehaviour
                 }
 
                 // if it doesn't have values in the global value cache...
-                if (!cachedInputValuesForGates.ContainsKey(gate.Id))
+                if (!cachedOutputValuesForGates.ContainsKey(gate.Id))
                 {
                     Dictionary<string, ScrapsetValue> expressionOutputValues;
                     if (linksByGateIdInputParam.ContainsKey(gate.Id)) // does it have dependencies that need evaluating?
                     {
                         EvaluateDependencies(gate); // update the global value store for all its dependencies
                         expressionOutputValues = expression.Evaluate(cachedInputValuesForGates[gate.Id]);
+                        CacheOutputValuesForGate(gate, expressionOutputValues);
                     } else // if not, just pass in an empty dict
                     {
                         expressionOutputValues = expression.Evaluate(new Dictionary<string, ScrapsetValue>());
+                        CacheOutputValuesForGate(gate, expressionOutputValues);
                     }
 
                     var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
+                    CacheInputValueForGate(inGate, inputParamName, evaluatedValue);
+                } else // use cached values that were previously evaluated (earlier in this same statement eval)
+                {
+                    var evaluatedValue = cachedOutputValuesForGates[gate.Id][gateLink.OutputParameterName];
                     CacheInputValueForGate(inGate, inputParamName, evaluatedValue);
                 }
             }
@@ -109,6 +118,14 @@ public class Processor : MonoBehaviour
         }
 
         cachedInputValuesForGates[gate.Id].Add(inputParamName, value);
+    }
+
+    private void CacheOutputValuesForGate(IGate gate, Dictionary<string, ScrapsetValue> values)
+    {
+        if (!cachedOutputValuesForGates.ContainsKey(gate.Id))
+        {
+            cachedOutputValuesForGates.Add(gate.Id, values);
+        }
     }
 
     public int SpawnGate<T>(string name) where T : IGate
