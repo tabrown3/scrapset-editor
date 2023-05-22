@@ -1,4 +1,7 @@
-﻿public class NumberVariableGate : Gate, IVariable
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+public class NumberVariableGate : Gate, IVariable, IExpression
 {
     override public string Name => "Number Variable";
 
@@ -36,5 +39,12 @@
         var fInVal = (float)inVal.Value;
 
         value = fInVal;
+
+        Debug.Log($"Wrote value {value} to variable gate '{Name}'");
+    }
+
+    public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
+    {
+        return new Dictionary<string, ScrapsetValue>() { { "Out", Read() } };
     }
 }

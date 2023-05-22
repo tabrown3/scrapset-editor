@@ -84,7 +84,8 @@ public class Processor : MonoBehaviour
     //  It attempts to evaluate each expression it encounters. There are 3 situations it might face:
     //  1) The expression itself has dependencies - it will move to evaluate those dependencies first
     //     recursively and, once the deps are available, evaluate the expression and cache the results
-    //  2) The expression has no dependencies of its own - it will evaluate the expression and cache
+    //  2) The expression has no dependencies of its own, or is a variable - it will evaluate the expression
+    //     and cache the results
     //  3) The expression has already been evaluated and cached - it will not re-evaluate but instead
     //     use the cached value
     private void EvaluateDependencies(IGate callingGate)
@@ -116,7 +117,8 @@ public class Processor : MonoBehaviour
                 } else // otherwise the dependency needs to be evaluated and cached
                 {
                     Dictionary<string, ScrapsetValue> expressionOutputValues;
-                    if (linksByGateIdInputParam.ContainsKey(dependency.Id)) // does it have dependencies that need evaluating?
+                    var depIsAVariable = (dependency as IVariable) != null; // variables do not have dependencies
+                    if (linksByGateIdInputParam.ContainsKey(dependency.Id) && !depIsAVariable) // does it have dependencies that need evaluating?
                     {
                         // Situation 1)
                         EvaluateDependencies(dependency); // update the global value store for all its dependencies
@@ -324,6 +326,17 @@ public class Processor : MonoBehaviour
     public void AssignInputToOutput<T>(T assigningGate, string inputName, string outputName) where T : IGate, IStatement
     {
         Debug.Log($"Assigning gate '{assigningGate.Name}' input '{inputName}' with value {cachedInputValuesForGates[assigningGate.Id][inputName].Value} to output '{outputName}'");
+
+        foreach (var gateLink in linksByGateIdOutputParam[assigningGate.Id][outputName])
+        {
+            var variable = FindGateById(gateLink.InputGateId) as IVariable;
+            if (variable == null)
+            {
+                throw new System.Exception($"Cannot assign to input '{gateLink.InputParameterName}' of Gate ID {gateLink.InputGateId}: Gate ID {gateLink.InputGateId} is not a variable");
+            }
+
+            variable.Write(cachedInputValuesForGates[assigningGate.Id][inputName]);
+        }
     }
 
     // follow the program flow from the source statement to the statement it's linked to via the named flow link
