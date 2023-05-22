@@ -11,7 +11,8 @@ public class Processor : MonoBehaviour
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
     Dictionary<int, GameObject> gateObjects = new Dictionary<int, GameObject>();
-    // outter key is IGate.Id, inner key is InputParam name
+    // linksByGateIdInputParam is a Dictionary storing all the I/O links
+    // outer key is IGate.Id, inner key is InputParameterName
     Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam = new Dictionary<int, Dictionary<string, GateLink>>();
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
 
@@ -33,12 +34,14 @@ public class Processor : MonoBehaviour
 
     private void RunProgram()
     {
+        // entrypoint acts as the first statement to run; it does little more than Goto the real first statement
         var entrypoint = FindGateById(EntrypointId);
         currentStatement = entrypoint as IStatement;
         nextStatement = null;
         currentStatement.PerformSideEffect(this);
 
-        while (nextStatement != null)
+        // this is the main program loop going from statement to statement till it reaches the program end
+        while (nextStatement != null) // basically "while there is a next statement"
         {
             currentStatement = nextStatement;
 
@@ -52,13 +55,28 @@ public class Processor : MonoBehaviour
             {
                 foreach (var kv in linksByInputParam)
                 {
-                    var key = kv.Key; var value = kv.Value;
+                    var key = kv.Key;
+                    var value = kv.Value;
                     var gate = FindGateById(value.OutputGateId);
-                    Debug.Log($"Gate '{currentGate.Name}' input param {key} is receiving from Gate {gate.Name} output param {value.OutputParameterName}");
+                    Debug.Log($"Gate {currentGate.Name} input param {key} is receiving from Gate {gate.Name} output param {value.OutputParameterName}");
+
+                    var expression = gate as IExpression;
+                    if (expression == null)
+                    {
+                        throw new System.Exception($"Error with dependency feeding Gate {currentGate.Name}: Gate {gate.Name} is not an expression");
+                    }
+
+                    // need to check two things here
+                    // 1) does the gate have dependencies?
+                    // 2) do they still need to be evaluated?
+                    // if 1 & 2 are true, move down the dependency list and come back when we have the values
+                    //var returnValues = expression.Evaluate();
                 }
             }
 
             nextStatement = null;
+            // the following PerformSideEffect will either Goto and set nextStatement to a new value or it won't,
+            //  ending the program
             currentStatement.PerformSideEffect(this);
         }
 
