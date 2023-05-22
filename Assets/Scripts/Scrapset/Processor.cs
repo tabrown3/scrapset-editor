@@ -14,6 +14,7 @@ public class Processor : MonoBehaviour
     // linksByGateIdInputParam is a Dictionary storing all the I/O links
     // outer key is IGate.Id, inner key is InputParameterName
     Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam = new Dictionary<int, Dictionary<string, GateLink>>();
+    Dictionary<int, Dictionary<string, ScrapsetValue>> valuesByGateIdInputParam = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
 
     int fakeCount = 0;
@@ -51,28 +52,7 @@ public class Processor : MonoBehaviour
                 throw new System.Exception("Statements must also implement IGate to be executed by the Processor");
             }
 
-            if (linksByGateIdInputParam.TryGetValue(currentGate.Id, out var linksByInputParam))
-            {
-                foreach (var kv in linksByInputParam)
-                {
-                    var key = kv.Key;
-                    var value = kv.Value;
-                    var gate = FindGateById(value.OutputGateId);
-                    Debug.Log($"Gate {currentGate.Name} input param {key} is receiving from Gate {gate.Name} output param {value.OutputParameterName}");
-
-                    var expression = gate as IExpression;
-                    if (expression == null)
-                    {
-                        throw new System.Exception($"Error with dependency feeding Gate {currentGate.Name}: Gate {gate.Name} is not an expression");
-                    }
-
-                    // need to check two things here
-                    // 1) does the gate have dependencies?
-                    // 2) do they still need to be evaluated?
-                    // if 1 & 2 are true, move down the dependency list and come back when we have the values
-                    //var returnValues = expression.Evaluate();
-                }
-            }
+            EvaluateDependencies(currentGate);
 
             nextStatement = null;
             // the following PerformSideEffect will either Goto and set nextStatement to a new value or it won't,
@@ -81,6 +61,35 @@ public class Processor : MonoBehaviour
         }
 
         Debug.Log("Execution finished!");
+    }
+
+    private void EvaluateDependencies(IGate inGate)
+    {
+        if (linksByGateIdInputParam.TryGetValue(inGate.Id, out var linksByInputParam))
+        {
+            // this executes once for every output feeding into the gate's inputs
+            foreach (var kv in linksByInputParam)
+            {
+                var inputParamName = kv.Key;
+                var gateLink = kv.Value;
+                var gate = FindGateById(gateLink.OutputGateId);
+                Debug.Log($"Gate {inGate.Name} input param {inputParamName} is receiving from Gate {gate.Name} output param {gateLink.OutputParameterName}");
+
+                var expression = gate as IExpression;
+                if (expression == null)
+                {
+                    throw new System.Exception($"Error with dependency feeding Gate {inGate.Name}: Gate {gate.Name} is not an expression");
+                }
+
+                // if it doesn't have values in the global value store...
+                if (!valuesByGateIdInputParam.ContainsKey(gate.Id))
+                {
+                    EvaluateDependencies(gate); // update the global value store for all its dependencies
+                    var valuesByInputParam = expression.Evaluate(valuesByGateIdInputParam[gate.Id]);
+                    valuesByGateIdInputParam.Add(gate.Id, valuesByInputParam);
+                }
+            }
+        }
     }
 
     public int SpawnGate<T>(string name) where T : IGate
