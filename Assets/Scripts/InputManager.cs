@@ -55,7 +55,7 @@ public class InputManager : MonoBehaviour
         processor.CreateInputOutputLink(assignmentGateId, "In", addGateId, "Out"); // I/O link // Add -> Number Assignment
         var constantValueId = processor.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
         processor.CreateInputOutputLink(addGateId, "A", constantValueId, "Out"); // I/O link Constant Value -> Add
-        var constantValueId2 = processor.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
-        processor.CreateInputOutputLink(addGateId, "B", constantValueId2, "Out"); // I/O link Constant Value -> Add
+        //var constantValueId2 = processor.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
+        processor.CreateInputOutputLink(addGateId, "B", constantValueId, "Out"); // I/O link Constant Value -> Add
     }
 }

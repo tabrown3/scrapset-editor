@@ -105,6 +105,7 @@ public class Processor : MonoBehaviour
                 {
                     var evaluatedValue = cachedOutputValuesForGates[gate.Id][gateLink.OutputParameterName];
                     CacheInputValueForGate(inGate, inputParamName, evaluatedValue);
+                    Debug.Log($"Using cached value of gate '{gate.Name}' output '{gateLink.OutputParameterName}'");
                 }
             }
         }
