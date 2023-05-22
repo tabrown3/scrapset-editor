@@ -14,6 +14,7 @@ public class Processor : MonoBehaviour
     // linksByGateIdInputParam is a Dictionary storing all the I/O links
     // outer key is IGate.Id, inner key is InputParameterName
     Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam = new Dictionary<int, Dictionary<string, GateLink>>();
+    Dictionary<int, Dictionary<string, List<GateLink>>> linksByGateIdOutputParam = new Dictionary<int, Dictionary<string, List<GateLink>>>();
     // temporarily caches input values for all inputs of gates with dependencies
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedInputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     // temporarily caches output values for all outputs of evaluated gates
@@ -240,7 +241,34 @@ public class Processor : MonoBehaviour
             linkByInput.Add(inputParameterName, link);
         } else
         {
-            throw new System.Exception($"An I/O link entry for Gate ID {inputGateId} and input param '{inputParameterName}' already exists");
+            // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
+            //  single source.
+            var existingLink = linksByGateIdInputParam[inputGateId][inputParameterName];
+            throw new System.Exception($"Input param '{inputParameterName}' for calling gate ID {inputGateId} is" +
+                $"already linked to output param '{existingLink.OutputParameterName}' of source gate ID {existingLink.OutputGateId}");
+        }
+
+        if (!linksByGateIdOutputParam.ContainsKey(outputGateId))
+        {
+            linksByGateIdOutputParam.Add(outputGateId, new Dictionary<string, List<GateLink>>());
+        }
+
+        var linkListByOutput = linksByGateIdOutputParam[outputGateId];
+        if (!linkListByOutput.ContainsKey(outputParameterName))
+        {
+            linkListByOutput.Add(outputParameterName, new List<GateLink>());
+        }
+
+        var linkList = linkListByOutput[outputParameterName];
+        if (linkList.Any(u => u.InputParameterName == inputParameterName))
+        {
+            // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
+            //  single source. We determined in the check above that the input doesn't have a source, so this could only result as a bug.
+            throw new System.Exception($"The output list for gate ID {outputGateId} already contains an entry for input param" +
+                $"'{inputParameterName}' of gate ID {inputGateId}. This is likely a bug in the Processor.");
+        } else
+        {
+            linkList.Add(link);
         }
 
         Debug.Log($"Linking gate '{outputGate.Name}' output '{outputParameterName}' to gate '{inputGate.Name}' input '{inputParameterName}'");
