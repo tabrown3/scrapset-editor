@@ -73,7 +73,7 @@ public class Processor : MonoBehaviour
                 var inputParamName = kv.Key;
                 var gateLink = kv.Value;
                 var gate = FindGateById(gateLink.OutputGateId);
-                Debug.Log($"Gate {inGate.Name} input param {inputParamName} is receiving from Gate {gate.Name} output param {gateLink.OutputParameterName}");
+                Debug.Log($"Gate '{inGate.Name}' input param '{inputParamName}' is receiving from gate '{gate.Name}' output param '{gateLink.OutputParameterName}'");
 
                 var expression = gate as IExpression;
                 if (expression == null)
@@ -111,11 +111,11 @@ public class Processor : MonoBehaviour
         var tempGameObj = new GameObject(name, typeof(T));
         var gate = tempGameObj.GetComponent<IGate>();
         gate.Id = idCounter++;
-        Debug.Log(gate.Id);
         gates.Add(gate.Id, gate);
         gateObjects.Add(gate.Id, tempGameObj);
         tempGameObj.transform.parent = transform;
 
+        Debug.Log($"Spawning gate '{gate.Name}' with ID {gate.Id}");
         return gate.Id;
     }
 
@@ -184,7 +184,7 @@ public class Processor : MonoBehaviour
             throw new System.Exception($"An I/O link entry for Gate ID {inputGateId} and input param '{inputParameterName}' already exists");
         }
 
-        Debug.Log(link);
+        Debug.Log($"Linking gate '{outputGate.Name}' output '{outputParameterName}' to gate '{inputGate.Name}' input '{inputParameterName}'");
     }
 
     // establish program execution order by linking statements together
@@ -228,19 +228,19 @@ public class Processor : MonoBehaviour
 
         programFlows.Add(programFlow);
 
-        Debug.Log(programFlow);
+        Debug.Log($"Linking program flow from gate '{fromGate.Name}' to gate '{toGate.Name}'");
     }
 
     // directly assign the value of inputName to outputName
     public void AssignInputToOutput<T>(T assigningGate, string inputName, string outputName) where T : IGate, IStatement
     {
-        Debug.Log($"Assigning gate {assigningGate.Name} input {inputName} to target of {outputName}");
+        Debug.Log($"Assigning gate '{assigningGate.Name}' input '{inputName}' with value {valuesByGateIdInputParam[assigningGate.Id][inputName].Value} to output '{outputName}'");
     }
 
     // follow the program flow from the source statement to the statement it's linked to via the named flow link
     public void Goto<T>(T fromGate, string flowName) where T : IGate, IStatement
     {
-        Debug.Log($"Following {fromGate.Name} outward path '{flowName}'");
+        Debug.Log($"Following outward path '{flowName}' from gate '{fromGate.Name}'");
 
         var programFlow = programFlows.FirstOrDefault(u => u.FromGateId == fromGate.Id && u.FromFlowName == flowName);
         if (programFlow == null)
