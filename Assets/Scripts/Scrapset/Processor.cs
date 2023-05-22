@@ -23,8 +23,6 @@ public class Processor : MonoBehaviour
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedOutputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
 
-    int fakeCount = 0;
-
     void Start()
     {
         EntrypointId = SpawnGate<Entrypoint>("Entrypoint");
@@ -32,14 +30,10 @@ public class Processor : MonoBehaviour
 
     void Update()
     {
-        if (programFlows.Count > 0 && fakeCount == 0)
-        {
-            RunProgram();
-            fakeCount++; // TODO: DELETE - limited to a single run for testing purposes
-        }
+
     }
 
-    private void RunProgram()
+    public void RunProgram()
     {
         Debug.Log("Program execution started!");
 
