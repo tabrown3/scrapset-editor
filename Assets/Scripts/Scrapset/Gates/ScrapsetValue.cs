@@ -30,7 +30,7 @@ public class ScrapsetValue
         Value = defaultVal;
     }
 
-    private object GetDefaultForType(ScrapsetTypes type)
+    public static object GetDefaultForType(ScrapsetTypes type)
     {
         switch (type)
         {
@@ -44,7 +44,7 @@ public class ScrapsetValue
         }
     }
 
-    private Type TranslateScrapsetTypeToCSharpType(ScrapsetTypes type)
+    public static Type TranslateScrapsetTypeToCSharpType(ScrapsetTypes type)
     {
         switch (type)
         {

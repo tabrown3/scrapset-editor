@@ -22,7 +22,10 @@ public class Processor : MonoBehaviour
     // temporarily caches output values for all outputs of evaluated gates
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedOutputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
-    Dictionary<string, ScrapsetValue> localVariables = new Dictionary<string, ScrapsetValue>();
+    // stores values that will persist during a single program execution before being wiped out
+    Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
+    // a dictionary of local variable name -> gate ID, representing all gates instances of a local variable
+    Dictionary<string, List<int>> localVariableInstances = new Dictionary<string, List<int>>();
 
     void Start()
     {
@@ -70,6 +73,12 @@ public class Processor : MonoBehaviour
             cachedInputValuesForGates.Clear(); // clear the input value cache after each statement finishes
             cachedOutputValuesForGates.Clear(); // clear the output value cache after each statement finishes
             Debug.Log($"Finished statement execution for gate '{currentGate.Name}' with ID {currentGate.Id}");
+        }
+
+        // when program completes, resets all variables to the zero value
+        foreach (var variable in localVariableValues.Values)
+        {
+            variable.Value = ScrapsetValue.GetDefaultForType(variable.Type);
         }
 
         Debug.Log("Program execution finished!");
@@ -319,25 +328,37 @@ public class Processor : MonoBehaviour
 
     public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
     {
-        if (localVariables.ContainsKey(variableName))
+        if (localVariableValues.ContainsKey(variableName))
         {
             throw new System.Exception($"Variable '{variableName}' has already been declared in this scope");
         }
 
-        localVariables.Add(variableName, new ScrapsetValue(scrapsetType));
+        localVariableValues.Add(variableName, new ScrapsetValue(scrapsetType));
     }
 
     public int SpawnVariable(string variableName)
     {
-        if (!localVariables.TryGetValue(variableName, out var scrapsetValue))
+        if (!localVariableValues.TryGetValue(variableName, out var scrapsetValue))
         {
             throw new System.Exception($"Cannot spawn gate for variable '{variableName}': variable has not been declared");
         }
 
         var variableId = SpawnGate<NumberVariableGate>(variableName);
         var newVariable = FindGateById(variableId) as IVariable;
-        newVariable.Reference = localVariables[variableName];
+        newVariable.Reference = localVariableValues[variableName];
         newVariable.VariableName = variableName;
+
+        if (!localVariableInstances.ContainsKey(variableName))
+        {
+            localVariableInstances.Add(variableName, new List<int>());
+        }
+
+        if (localVariableInstances[variableName] == null)
+        {
+            localVariableInstances[variableName] = new List<int>();
+        }
+
+        localVariableInstances[variableName].Add(variableId);
         return variableId;
     }
 
