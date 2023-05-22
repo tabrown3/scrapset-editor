@@ -64,34 +64,40 @@ public class InputManager : MonoBehaviour
         var ifStatementId = GenerateIfStatement(processor);
 
         /* Second statement */
-        GenerateIncrementStatement(processor, ifStatementId);
+        var incrementStatementId = GenerateIncrementStatement(processor);
+
+        processor.CreateProgramFlowLink(processor.EntrypointId, "Next", ifStatementId);
+        processor.CreateProgramFlowLink(ifStatementId, "Then", incrementStatementId);
+        processor.CreateProgramFlowLink(incrementStatementId, "Next", ifStatementId);
+        // intentionally omitted the ELSE block
     }
 
     int GenerateIfStatement(Processor processor)
     {
-        var assignmentGateId = processor.SpawnGate<NumberAssignmentGate>("Number Assignment"); // spawn Number Assignment
-        processor.CreateProgramFlowLink(processor.EntrypointId, "Next", assignmentGateId); // program flow link Entrypoint -> Number Assignment
+        var ifGateId = processor.SpawnGate<IfGate>("If"); // spawn If statement
         var numberVariableId = processor.SpawnVariable("i"); // spawn Number Variable
-        processor.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out"); // I/O link Number Assignment -> Number Variable
-        var addGateId = processor.SpawnGate<AddGate>("Add"); // spawn Add
-        processor.CreateInputOutputLink(assignmentGateId, "In", addGateId, "Out"); // I/O link // Add -> Number Assignment
         var constantValueId = processor.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
-        processor.CreateInputOutputLink(addGateId, "A", constantValueId, "Out"); // I/O link Constant Value -> Add
-        processor.CreateInputOutputLink(addGateId, "B", constantValueId, "Out"); // I/O link Constant Value -> Add
+        var lessThanId = processor.SpawnGate<LessThanGate>("Less Than"); // spawn Less Than
 
-        return assignmentGateId;
+        processor.CreateInputOutputLink(lessThanId, "A", numberVariableId, "Out");
+        processor.CreateInputOutputLink(lessThanId, "B", constantValueId, "Out");
+        processor.CreateInputOutputLink(ifGateId, "Condition", lessThanId, "Out");
+
+        return ifGateId;
     }
 
-    void GenerateIncrementStatement(Processor processor, int prevStatementId)
+    int GenerateIncrementStatement(Processor processor)
     {
         var assignmentGateId = processor.SpawnGate<NumberAssignmentGate>("Number Assignment"); // spawn Number Assignment
-        processor.CreateProgramFlowLink(prevStatementId, "Next", assignmentGateId); // program flow link previous Number Assignment -> this Number Assignment
         var numberVariableId = processor.SpawnVariable("i"); // spawn Number Variable
-        processor.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out"); // I/O link Number Assignment -> Number Variable
-        var addGateId = processor.SpawnGate<AddGate>("Add"); // spawn Add
-        processor.CreateInputOutputLink(assignmentGateId, "In", addGateId, "Out"); // I/O link // Add -> Number Assignment
         var constantValueId = processor.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
-        processor.CreateInputOutputLink(addGateId, "A", constantValueId, "Out"); // I/O link Constant Value -> Add
-        processor.CreateInputOutputLink(addGateId, "B", numberVariableId, "Out"); // I/O link Number Variable -> Add
+        var addId = processor.SpawnGate<AddGate>("Add"); // spawn Add
+
+        processor.CreateInputOutputLink(addId, "A", constantValueId, "Out");
+        processor.CreateInputOutputLink(addId, "B", numberVariableId, "Out");
+        processor.CreateInputOutputLink(assignmentGateId, "In", addId, "Out");
+        processor.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out");
+
+        return assignmentGateId;
     }
 }

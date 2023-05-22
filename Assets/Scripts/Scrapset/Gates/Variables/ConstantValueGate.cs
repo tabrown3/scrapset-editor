@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class ConstantValueGate : Gate, IExpression
 {
+    [SerializeField] float constantValue = 1f;
+
     override public string Name => "Constant Value";
 
     override public string Description => "Returns a constant value";
@@ -16,7 +19,7 @@ public class ConstantValueGate : Gate, IExpression
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
     {
         var outVal = new ScrapsetValue(ScrapsetTypes.Number);
-        outVal.Value = 4f;
+        outVal.Value = constantValue;
         return new Dictionary<string, ScrapsetValue>() { { "Out", outVal } };
     }
 }
