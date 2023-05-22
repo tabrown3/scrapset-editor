@@ -16,7 +16,7 @@ public class ConstantValueGate : Gate, IExpression
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
     {
         var outVal = new ScrapsetValue(ScrapsetTypes.Number);
-        outVal.Value = 4;
+        outVal.Value = 4f;
         return new Dictionary<string, ScrapsetValue>() { { "Out", outVal } };
     }
 }
