@@ -38,7 +38,7 @@ public class Processor : MonoBehaviour
 
     private void RunProgram()
     {
-        Debug.Log("Execution started!");
+        Debug.Log("Program execution started!");
 
         // entrypoint acts as the first statement to run; it does little more than Goto the real first statement
         var entrypoint = FindGateById(EntrypointId);
@@ -74,7 +74,7 @@ public class Processor : MonoBehaviour
             Debug.Log($"Finished statement execution for gate '{currentGate.Name}' with ID {currentGate.Id}");
         }
 
-        Debug.Log("Execution finished!");
+        Debug.Log("Program execution finished!");
     }
 
     // EvaluateDependencies will recurse over the calling gate's expression dependency tree depth-first.
