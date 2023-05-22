@@ -14,7 +14,7 @@ public class Processor : MonoBehaviour
     // linksByGateIdInputParam is a Dictionary storing all the I/O links
     // outer key is IGate.Id, inner key is InputParameterName
     Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam = new Dictionary<int, Dictionary<string, GateLink>>();
-    Dictionary<int, Dictionary<string, ScrapsetValue>> valuesByGateIdInputParam = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
+    Dictionary<int, Dictionary<string, ScrapsetValue>> cachedInputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
 
     int fakeCount = 0;
@@ -81,29 +81,34 @@ public class Processor : MonoBehaviour
                     throw new System.Exception($"Error with dependency feeding Gate {inGate.Name}: Gate {gate.Name} is not an expression");
                 }
 
-                // if it doesn't have values in the global value store...
-                if (!valuesByGateIdInputParam.ContainsKey(gate.Id))
+                // if it doesn't have values in the global value cache...
+                if (!cachedInputValuesForGates.ContainsKey(gate.Id))
                 {
                     Dictionary<string, ScrapsetValue> expressionOutputValues;
                     if (linksByGateIdInputParam.ContainsKey(gate.Id)) // does it have dependencies that need evaluating?
                     {
                         EvaluateDependencies(gate); // update the global value store for all its dependencies
-                        expressionOutputValues = expression.Evaluate(valuesByGateIdInputParam[gate.Id]);
+                        expressionOutputValues = expression.Evaluate(cachedInputValuesForGates[gate.Id]);
                     } else // if not, just pass in an empty dict
                     {
                         expressionOutputValues = expression.Evaluate(new Dictionary<string, ScrapsetValue>());
                     }
 
                     var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
-                    if (!valuesByGateIdInputParam.ContainsKey(inGate.Id))
-                    {
-                        valuesByGateIdInputParam.Add(inGate.Id, new Dictionary<string, ScrapsetValue>());
-                    }
-
-                    valuesByGateIdInputParam[inGate.Id].Add(inputParamName, evaluatedValue);
+                    CacheInputValueForGate(inGate, inputParamName, evaluatedValue);
                 }
             }
         }
+    }
+
+    private void CacheInputValueForGate(IGate gate, string inputParamName, ScrapsetValue value)
+    {
+        if (!cachedInputValuesForGates.ContainsKey(gate.Id))
+        {
+            cachedInputValuesForGates.Add(gate.Id, new Dictionary<string, ScrapsetValue>());
+        }
+
+        cachedInputValuesForGates[gate.Id].Add(inputParamName, value);
     }
 
     public int SpawnGate<T>(string name) where T : IGate
@@ -234,7 +239,7 @@ public class Processor : MonoBehaviour
     // directly assign the value of inputName to outputName
     public void AssignInputToOutput<T>(T assigningGate, string inputName, string outputName) where T : IGate, IStatement
     {
-        Debug.Log($"Assigning gate '{assigningGate.Name}' input '{inputName}' with value {valuesByGateIdInputParam[assigningGate.Id][inputName].Value} to output '{outputName}'");
+        Debug.Log($"Assigning gate '{assigningGate.Name}' input '{inputName}' with value {cachedInputValuesForGates[assigningGate.Id][inputName].Value} to output '{outputName}'");
     }
 
     // follow the program flow from the source statement to the statement it's linked to via the named flow link
