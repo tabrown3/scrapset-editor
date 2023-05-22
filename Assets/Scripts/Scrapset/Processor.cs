@@ -11,9 +11,11 @@ public class Processor : MonoBehaviour
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
     Dictionary<int, GameObject> gateObjects = new Dictionary<int, GameObject>();
-    // linksByGateIdInputParam is a Dictionary storing all the I/O links
-    // outer key is IGate.Id, inner key is InputParameterName
+    // linksByGateIdInputParam is a deep Dictionary storing all the I/O links by the calling gate's ID and input param name.
+    //  Outer key is IGate.Id, inner key is InputParameterName
     Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam = new Dictionary<int, Dictionary<string, GateLink>>();
+    // linksByGateIdOutputParam is a deep Dictionary storing all the I/O links by the source (outputting) gate's ID and output param name.
+    //  Outer key is IGate.Id, inner key is InputParameterName, value is a list of all GateLinks for which this output is a data source
     Dictionary<int, Dictionary<string, List<GateLink>>> linksByGateIdOutputParam = new Dictionary<int, Dictionary<string, List<GateLink>>>();
     // temporarily caches input values for all inputs of gates with dependencies
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedInputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
