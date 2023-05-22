@@ -57,6 +57,9 @@ public class Processor : MonoBehaviour
                 throw new System.Exception("Statements must also implement IGate to be executed by the Processor");
             }
 
+            // kick off the recursive dependency evaluation; all of the statement's deps will be eval'd
+            //  depth-first and the results latched on both the dep's output param and the caller's
+            //  input param
             EvaluateDependencies(currentGate);
 
             nextStatement = null;
@@ -71,51 +74,65 @@ public class Processor : MonoBehaviour
         Debug.Log("Execution finished!");
     }
 
-    private void EvaluateDependencies(IGate inGate)
+    // EvaluateDependencies will recurse over the calling gate's expression dependency tree depth-first.
+    //  It attempts to evaluate each expression it encounters. There are 3 situations it might face:
+    //  1) The expression itself has dependencies - it will move to evaluate those dependencies first
+    //     recursively and, once the deps are available, evaluate the expression and cache the results
+    //  2) The expression has no dependencies of its own - it will evaluate the expression and cache
+    //  3) The expression has already been evaluated and cached - it will not re-evaluate but instead
+    //     use the cached value
+    private void EvaluateDependencies(IGate callingGate)
     {
-        if (linksByGateIdInputParam.TryGetValue(inGate.Id, out var linksByInputParam))
+        if (linksByGateIdInputParam.TryGetValue(callingGate.Id, out var linksByInputParam))
         {
             // this executes once for every output feeding into the gate's inputs
             foreach (var kv in linksByInputParam)
             {
                 var inputParamName = kv.Key;
                 var gateLink = kv.Value;
-                var gate = FindGateById(gateLink.OutputGateId);
-                Debug.Log($"Gate '{inGate.Name}' input param '{inputParamName}' is receiving from gate '{gate.Name}' output param '{gateLink.OutputParameterName}'");
+                var dependency = FindGateById(gateLink.OutputGateId);
+                Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
 
-                var expression = gate as IExpression;
-                if (expression == null)
+                var dependencyAsExpression = dependency as IExpression;
+                if (dependencyAsExpression == null)
                 {
-                    throw new System.Exception($"Error with dependency feeding Gate {inGate.Name}: Gate {gate.Name} is not an expression");
+                    throw new System.Exception($"Error with dependency feeding Gate {callingGate.Name}: Gate {dependency.Name} is not an expression");
                 }
 
-                // if it doesn't have values in the global value cache...
-                if (!cachedOutputValuesForGates.ContainsKey(gate.Id))
+                // check to see if this dependency has already been evaluated and had its outputs cached
+                if (DependencyHasBeenEvaluated(dependency))
+                {
+                    // Situation 3)
+                    // use the cached values instead of re-evaluating the dependency
+                    var evaluatedValue = cachedOutputValuesForGates[dependency.Id][gateLink.OutputParameterName];
+                    CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
+                    Debug.Log($"Using cached value of gate '{dependency.Name}' output '{gateLink.OutputParameterName}'");
+                } else // otherwise the dependency needs to be evaluated and cached
                 {
                     Dictionary<string, ScrapsetValue> expressionOutputValues;
-                    if (linksByGateIdInputParam.ContainsKey(gate.Id)) // does it have dependencies that need evaluating?
+                    if (linksByGateIdInputParam.ContainsKey(dependency.Id)) // does it have dependencies that need evaluating?
                     {
-                        EvaluateDependencies(gate); // update the global value store for all its dependencies
-                        expressionOutputValues = expression.Evaluate(cachedInputValuesForGates[gate.Id]);
-                        CacheOutputValuesForGate(gate, expressionOutputValues);
+                        // Situation 1)
+                        EvaluateDependencies(dependency); // update the global value store for all its dependencies
+                        expressionOutputValues = dependencyAsExpression.Evaluate(cachedInputValuesForGates[dependency.Id]);
+                        CacheOutputValuesForGate(dependency, expressionOutputValues);
                     } else // if not, just pass in an empty dict
                     {
-                        expressionOutputValues = expression.Evaluate(new Dictionary<string, ScrapsetValue>());
-                        CacheOutputValuesForGate(gate, expressionOutputValues);
+                        // Situation 2)
+                        expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>());
+                        CacheOutputValuesForGate(dependency, expressionOutputValues);
                     }
 
                     var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
-                    CacheInputValueForGate(inGate, inputParamName, evaluatedValue);
-                } else // use cached values that were previously evaluated (earlier in this same statement eval)
-                {
-                    var evaluatedValue = cachedOutputValuesForGates[gate.Id][gateLink.OutputParameterName];
-                    CacheInputValueForGate(inGate, inputParamName, evaluatedValue);
-                    Debug.Log($"Using cached value of gate '{gate.Name}' output '{gateLink.OutputParameterName}'");
+                    CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
                 }
             }
         }
     }
 
+    // after a gate's dependency has been evaluated and its output values are available, this method
+    //  is called to cache that output value within a Dictionary of Dictionaries, where the outer key
+    //  is the caller's Gate.Id and the inner key is the caller's input param name
     private void CacheInputValueForGate(IGate gate, string inputParamName, ScrapsetValue value)
     {
         if (!cachedInputValuesForGates.ContainsKey(gate.Id))
@@ -126,12 +143,23 @@ public class Processor : MonoBehaviour
         cachedInputValuesForGates[gate.Id].Add(inputParamName, value);
     }
 
+    // after a gate has been evaluated and its output values are available, this method is called
+    //  to cache all of the returned output values with respect to their Gate.Id and output param name
+    // Note: the difference between this and the Input varaint is this latches the value on the output
+    // gate's output parameter; the input variant latches the value on the calling gate's input parameter
     private void CacheOutputValuesForGate(IGate gate, Dictionary<string, ScrapsetValue> values)
     {
         if (!cachedOutputValuesForGates.ContainsKey(gate.Id))
         {
             cachedOutputValuesForGates.Add(gate.Id, values);
         }
+    }
+
+    // if the output cache contains an entry for the gate, that means it had been eval'd earlier in the
+    //  current statement's execution and had its outputs cached
+    private bool DependencyHasBeenEvaluated(IGate gate)
+    {
+        return cachedOutputValuesForGates.ContainsKey(gate.Id);
     }
 
     public int SpawnGate<T>(string name) where T : IGate
