@@ -360,7 +360,17 @@ public class Processor : MonoBehaviour
     {
         Debug.Log($"Assigning gate '{assigningGate.Name}' input '{inputName}' with value {cachedInputValuesForGates[assigningGate.Id][inputName].Value} to output '{outputName}'");
 
-        foreach (var gateLink in linksByGateIdOutputParam[assigningGate.Id][outputName])
+        if (!linksByGateIdOutputParam.TryGetValue(assigningGate.Id, out var linksByOutputParam))
+        {
+            throw new System.Exception($"Assigning gate '{assigningGate.Name}' with ID {assigningGate.Id} does not have any outbound links");
+        }
+
+        if (!linksByOutputParam.TryGetValue(outputName, out var gateLinks))
+        {
+            throw new System.Exception($"Assigning gate '{assigningGate.Name}' with ID {assigningGate.Id} output {outputName} is not linked to any inputs");
+        }
+
+        foreach (var gateLink in gateLinks)
         {
             var variable = FindGateById(gateLink.InputGateId) as IVariable;
             if (variable == null)
