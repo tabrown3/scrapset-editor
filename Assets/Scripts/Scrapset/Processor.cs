@@ -22,6 +22,7 @@ public class Processor : MonoBehaviour
     // temporarily caches output values for all outputs of evaluated gates
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedOutputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
+    Dictionary<string, ScrapsetValue> localVariables = new Dictionary<string, ScrapsetValue>();
 
     void Start()
     {
@@ -314,6 +315,30 @@ public class Processor : MonoBehaviour
         programFlows.Add(programFlow);
 
         Debug.Log($"Linking program flow from gate '{fromGate.Name}' to gate '{toGate.Name}'");
+    }
+
+    public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
+    {
+        if (localVariables.ContainsKey(variableName))
+        {
+            throw new System.Exception($"Variable '{variableName}' has already been declared in this scope");
+        }
+
+        localVariables.Add(variableName, new ScrapsetValue(scrapsetType));
+    }
+
+    public int SpawnVariable(string variableName)
+    {
+        if (!localVariables.TryGetValue(variableName, out var scrapsetValue))
+        {
+            throw new System.Exception($"Cannot spawn gate for variable '{variableName}': variable has not been declared");
+        }
+
+        var variableId = SpawnGate<NumberVariableGate>(variableName);
+        var newVariable = FindGateById(variableId) as IVariable;
+        newVariable.Reference = localVariables[variableName];
+        newVariable.VariableName = variableName;
+        return variableId;
     }
 
     // directly assign the value of inputName to outputName

@@ -9,7 +9,8 @@ public class NumberVariableGate : Gate, IVariable, IExpression
 
     override public string Category => "Variables";
 
-    private float value;
+    public ScrapsetValue Reference { get; set; }
+    public string VariableName { get; set; }
 
     public NumberVariableGate()
     {
@@ -20,7 +21,7 @@ public class NumberVariableGate : Gate, IVariable, IExpression
     public ScrapsetValue Read()
     {
         var outVal = new ScrapsetValue(ScrapsetTypes.Number);
-        outVal.Value = value;
+        outVal.Value = Reference.Value;
         return outVal;
     }
 
@@ -38,9 +39,9 @@ public class NumberVariableGate : Gate, IVariable, IExpression
 
         var fInVal = (float)inVal.Value;
 
-        value = fInVal;
+        Reference.Value = fInVal;
 
-        Debug.Log($"Wrote value {value} to variable gate '{Name}'");
+        Debug.Log($"Wrote value {Reference.Value} to variable gate '{Name}'");
     }
 
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
