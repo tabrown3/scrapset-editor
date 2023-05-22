@@ -38,6 +38,8 @@ public class Processor : MonoBehaviour
 
     private void RunProgram()
     {
+        Debug.Log("Execution started!");
+
         // entrypoint acts as the first statement to run; it does little more than Goto the real first statement
         var entrypoint = FindGateById(EntrypointId);
         currentStatement = entrypoint as IStatement;
@@ -61,6 +63,9 @@ public class Processor : MonoBehaviour
             // the following PerformSideEffect will either Goto and set nextStatement to a new value or it won't,
             //  ending the program
             currentStatement.PerformSideEffect(this);
+
+            cachedInputValuesForGates.Clear(); // clear the input value cache after each statement finishes
+            cachedOutputValuesForGates.Clear(); // clear the output value cache after each statement finishes
         }
 
         Debug.Log("Execution finished!");
