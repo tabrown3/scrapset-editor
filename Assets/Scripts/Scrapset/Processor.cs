@@ -356,6 +356,19 @@ public class Processor : MonoBehaviour
         Debug.Log($"Linking program flow from gate '{fromGate.Name}' to gate '{toGate.Name}'");
     }
 
+    public void RemoveProgramFlowLink(int fromId, string flowName)
+    {
+        var programFlow = programFlows.Find(u => u.FromGateId == fromId && u.FromFlowName == flowName);
+        if (programFlow == null)
+        {
+            throw new System.Exception($"Cannot remove program flow: no program flow links from path '{flowName}' of gate ID {fromId}");
+        }
+
+        programFlows.Remove(programFlow);
+
+        Debug.Log($"Deleting program flow from gate ID {fromId} path '{flowName}'");
+    }
+
     public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
     {
         if (localVariableValues.ContainsKey(variableName))
