@@ -83,6 +83,8 @@ public class InputManager : MonoBehaviour
         processor.CreateInputOutputLink(lessThanId, "B", constantValueId, "Out");
         processor.CreateInputOutputLink(ifGateId, "Condition", lessThanId, "Out");
 
+        processor.RemoveGate(constantValueId);
+
         return ifGateId;
     }
 

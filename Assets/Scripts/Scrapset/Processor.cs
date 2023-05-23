@@ -10,6 +10,7 @@ public class Processor : MonoBehaviour
 
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
+    Dictionary<int, GameObject> gateGameObjects = new Dictionary<int, GameObject>();
     // linksByGateIdInputParam is a deep Dictionary storing all the I/O links by the calling gate's ID and input param name.
     //  Outer key is IGate.Id, inner key is InputParameterName
     Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam = new Dictionary<int, Dictionary<string, GateLink>>();
@@ -23,7 +24,7 @@ public class Processor : MonoBehaviour
     List<ProgramFlow> programFlows = new List<ProgramFlow>();
     // stores values that will persist during a single program execution before being wiped out
     Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
-    // a dictionary of local variable name -> gate ID, representing all gates instances of a local variable
+    // a dictionary of local variable name -> gate ID, representing all gate instances of a local variable
     Dictionary<string, List<int>> localVariableInstances = new Dictionary<string, List<int>>();
 
     void Start()
@@ -180,9 +181,47 @@ public class Processor : MonoBehaviour
         gate.Id = idCounter++;
         gates.Add(gate.Id, gate);
         tempGameObj.transform.parent = transform;
+        gateGameObjects.Add(gate.Id, tempGameObj);
 
         Debug.Log($"Spawning gate '{gate.Name}' with ID {gate.Id}");
         return gate.Id;
+    }
+
+    public void RemoveGate(int gateId)
+    {
+        // remove all links from this gate's inputs
+        var gate = FindGateById(gateId);
+        foreach (var input in gate.InputParameters)
+        {
+            RemoveInputOutputLink(gateId, input.Key);
+        }
+
+        // remove all links from this gate's outputs
+        if (linksByGateIdOutputParam.ContainsKey(gateId))
+        {
+            foreach (var kv in linksByGateIdOutputParam[gateId])
+            {
+                var outputParamName = kv.Key;
+                var gateLinks = kv.Value;
+
+                foreach (var gateLink in gateLinks)
+                {
+
+                    RemoveInputOutputLink(gateLink.InputGateId, gateLink.InputParameterName);
+                }
+            }
+
+            linksByGateIdOutputParam[gateId] = null;
+        }
+
+        // remove program flows where this gate is the source or destination
+        // TODO: replace with program flow removal method
+        programFlows = programFlows.Where(u => u.FromGateId != gateId && u.ToGateId != gateId).ToList();
+
+        // destroy the game object and remove the gate reference from Processor
+        Destroy(gateGameObjects[gateId]);
+        gateGameObjects[gateId] = null;
+        gates[gateId] = null;
     }
 
     public IGate FindGateById(int id)
