@@ -17,8 +17,18 @@ public class LessThanGate : Gate, IExpression
 
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
     {
-        var a = (float)inputs["A"].Value;
-        var b = (float)inputs["B"].Value;
+        var a = (float)ScrapsetValue.GetDefaultForType(ScrapsetTypes.Number);
+        if (inputs.ContainsKey("A"))
+        {
+            a = (float)inputs["A"].Value;
+        }
+
+        var b = (float)ScrapsetValue.GetDefaultForType(ScrapsetTypes.Number);
+        if (inputs.ContainsKey("B"))
+        {
+            b = (float)inputs["B"].Value;
+        }
+
         var result = a < b;
         var outVal = new ScrapsetValue(ScrapsetTypes.Bool);
         outVal.Value = result;

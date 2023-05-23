@@ -280,6 +280,38 @@ public class Processor : MonoBehaviour
         Debug.Log($"Linking gate '{outputGate.Name}' output '{outputParameterName}' to gate '{inputGate.Name}' input '{inputParameterName}'");
     }
 
+    public void RemoveInputOutputLink(int inputGateId, string inputParameterName)
+    {
+        if (!linksByGateIdInputParam.TryGetValue(inputGateId, out var linksByInputParam))
+        {
+            throw new System.Exception($"Cannot remove I/O link: Gate ID {inputGateId} has no linked inputs");
+        }
+
+        if (!linksByInputParam.ContainsKey(inputParameterName))
+        {
+            throw new System.Exception($"Cannot remove I/O link: input '{inputParameterName}' of Gate ID {inputGateId} is not linked");
+        }
+
+        linksByInputParam.Remove(inputParameterName, out var gateLink);
+
+        var outputGateId = gateLink.OutputGateId;
+        var outputParameterName = gateLink.OutputParameterName;
+
+        if (!linksByGateIdOutputParam.TryGetValue(outputGateId, out var linksByOutputParam))
+        {
+            throw new System.Exception($"Cannot remove I/O link: Gate ID {outputGateId} has no linked outputs");
+        }
+
+        if (!linksByOutputParam.ContainsKey(outputParameterName))
+        {
+            throw new System.Exception($"Cannot remove I/O link: output '{outputParameterName}' of Gate ID {outputGateId} is not linked");
+        }
+
+        linksByOutputParam[outputParameterName].Remove(gateLink);
+
+        Debug.Log($"Deleting link for gate ID {outputGateId} output '{outputParameterName}' and gate ID {inputGateId} input '{inputParameterName}'");
+    }
+
     // establish program execution order by linking statements together
     public void CreateProgramFlowLink(int fromId, string flowName, int toId)
     {
