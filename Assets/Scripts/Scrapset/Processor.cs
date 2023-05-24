@@ -6,7 +6,6 @@ public class Processor : MonoBehaviour
 {
     public int EntrypointId { get; private set; }
 
-    private ProgramFlowRegistry programFlowRegistry;
     private IStatement currentStatement;
     private IStatement nextStatement;
 
@@ -27,6 +26,7 @@ public class Processor : MonoBehaviour
     Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
     // a dictionary of local variable name -> gate ID, representing all gate instances of a local variable
     Dictionary<string, List<int>> localVariableInstances = new Dictionary<string, List<int>>();
+    private ProgramFlowRegistry programFlowRegistry;
 
     public Processor()
     {
