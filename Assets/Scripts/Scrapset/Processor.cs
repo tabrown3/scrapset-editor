@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class Processor : MonoBehaviour
@@ -12,12 +11,6 @@ public class Processor : MonoBehaviour
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
     Dictionary<int, GameObject> gateGameObjects = new Dictionary<int, GameObject>();
-    // linksByGateIdInputParam is a deep Dictionary storing all the I/O links by the calling gate's ID and input param name.
-    //  Outer key is IGate.Id, inner key is InputParameterName
-    Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam = new Dictionary<int, Dictionary<string, GateLink>>();
-    // linksByGateIdOutputParam is a deep Dictionary storing all the I/O links by the source (outputting) gate's ID and output param name.
-    //  Outer key is IGate.Id, inner key is InputParameterName, value is a list of all GateLinks for which this output is a data source
-    Dictionary<int, Dictionary<string, List<GateLink>>> linksByGateIdOutputParam = new Dictionary<int, Dictionary<string, List<GateLink>>>();
     // temporarily caches input values for all inputs of gates with dependencies
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedInputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     // temporarily caches output values for all outputs of evaluated gates
@@ -26,10 +19,12 @@ public class Processor : MonoBehaviour
     Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
     // a dictionary of local variable name -> gate ID, representing all gate instances of a local variable
     Dictionary<string, List<int>> localVariableInstances = new Dictionary<string, List<int>>();
+    GateIORegistry gateIORegistry;
     private ProgramFlowRegistry programFlowRegistry;
 
     public Processor()
     {
+        gateIORegistry = new GateIORegistry(this);
         programFlowRegistry = new ProgramFlowRegistry(this);
     }
 
@@ -100,50 +95,47 @@ public class Processor : MonoBehaviour
     //     use the cached value
     private void EvaluateDependencies(IGate callingGate)
     {
-        if (linksByGateIdInputParam.TryGetValue(callingGate.Id, out var linksByInputParam))
+        // this executes once for every output feeding into the gate's inputs
+        foreach (var kv in gateIORegistry.GetInputLinks(callingGate.Id))
         {
-            // this executes once for every output feeding into the gate's inputs
-            foreach (var kv in linksByInputParam)
+            var inputParamName = kv.Key;
+            var gateLink = kv.Value;
+            var dependency = FindGateById(gateLink.OutputGateId);
+            Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
+
+            var dependencyAsExpression = dependency as IExpression;
+            if (dependencyAsExpression == null)
             {
-                var inputParamName = kv.Key;
-                var gateLink = kv.Value;
-                var dependency = FindGateById(gateLink.OutputGateId);
-                Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
+                throw new System.Exception($"Error with dependency feeding Gate {callingGate.Name}: Gate {dependency.Name} is not an expression");
+            }
 
-                var dependencyAsExpression = dependency as IExpression;
-                if (dependencyAsExpression == null)
+            // check to see if this dependency has already been evaluated and had its outputs cached
+            if (DependencyHasBeenEvaluated(dependency))
+            {
+                // Situation 3)
+                // use the cached values instead of re-evaluating the dependency
+                var evaluatedValue = cachedOutputValuesForGates[dependency.Id][gateLink.OutputParameterName];
+                CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
+                Debug.Log($"Using cached value of gate '{dependency.Name}' output '{gateLink.OutputParameterName}'");
+            } else // otherwise the dependency needs to be evaluated and cached
+            {
+                Dictionary<string, ScrapsetValue> expressionOutputValues;
+                var depIsAVariable = (dependency as IVariable) != null; // variables do not have dependencies
+                if (gateIORegistry.HasInputLinks(dependency.Id) && !depIsAVariable) // does it have dependencies that need evaluating?
                 {
-                    throw new System.Exception($"Error with dependency feeding Gate {callingGate.Name}: Gate {dependency.Name} is not an expression");
+                    // Situation 1)
+                    EvaluateDependencies(dependency); // update the global value store for all its dependencies
+                    expressionOutputValues = dependencyAsExpression.Evaluate(cachedInputValuesForGates[dependency.Id]);
+                    CacheOutputValuesForGate(dependency, expressionOutputValues);
+                } else // if not, just pass in an empty dict
+                {
+                    // Situation 2)
+                    expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>());
+                    CacheOutputValuesForGate(dependency, expressionOutputValues);
                 }
 
-                // check to see if this dependency has already been evaluated and had its outputs cached
-                if (DependencyHasBeenEvaluated(dependency))
-                {
-                    // Situation 3)
-                    // use the cached values instead of re-evaluating the dependency
-                    var evaluatedValue = cachedOutputValuesForGates[dependency.Id][gateLink.OutputParameterName];
-                    CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
-                    Debug.Log($"Using cached value of gate '{dependency.Name}' output '{gateLink.OutputParameterName}'");
-                } else // otherwise the dependency needs to be evaluated and cached
-                {
-                    Dictionary<string, ScrapsetValue> expressionOutputValues;
-                    var depIsAVariable = (dependency as IVariable) != null; // variables do not have dependencies
-                    if (linksByGateIdInputParam.ContainsKey(dependency.Id) && !depIsAVariable) // does it have dependencies that need evaluating?
-                    {
-                        // Situation 1)
-                        EvaluateDependencies(dependency); // update the global value store for all its dependencies
-                        expressionOutputValues = dependencyAsExpression.Evaluate(cachedInputValuesForGates[dependency.Id]);
-                        CacheOutputValuesForGate(dependency, expressionOutputValues);
-                    } else // if not, just pass in an empty dict
-                    {
-                        // Situation 2)
-                        expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>());
-                        CacheOutputValuesForGate(dependency, expressionOutputValues);
-                    }
-
-                    var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
-                    CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
-                }
+                var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
+                CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
             }
         }
     }
@@ -207,7 +199,7 @@ public class Processor : MonoBehaviour
         Debug.Log($"Removing gate '{name}' with ID {id}");
 
         // remove all links where this gate acts as an input or output
-        RemoveAllInputOutputLinks(gateId);
+        gateIORegistry.RemoveAllInputOutputLinks(gateId);
 
         // remove program flows where this gate is the source or destination
         programFlowRegistry.RemoveAllProgramFlowLinks(gateId);
@@ -230,148 +222,9 @@ public class Processor : MonoBehaviour
         return gate;
     }
 
-    // create an I/O link between gates
     public void CreateInputOutputLink(int inputGateId, string inputParameterName, int outputGateId, string outputParameterName)
     {
-        var outputGate = FindGateById(outputGateId);
-        if (outputGate == null)
-        {
-            throw new System.Exception($"Could not find gate with ID ${outputGateId}");
-        }
-
-        var inputGate = FindGateById(inputGateId);
-        if (inputGate == null)
-        {
-            throw new System.Exception($"Could not find gate with ID ${inputGateId}");
-        }
-
-        var outputParameterType = outputGate.GetOutputParameter(outputParameterName);
-        if (outputParameterType == ScrapsetTypes.None)
-        {
-            throw new System.Exception($"The output gate does not have an output parameter '{outputParameterName}'");
-        }
-
-        var inputParameterType = inputGate.GetInputParameter(inputParameterName);
-        if (inputParameterType == ScrapsetTypes.None)
-        {
-            throw new System.Exception($"The input gate does not have an input parameter '{inputParameterName}'");
-        }
-
-        // TODO: in the future, perform logic with Generics here for more dynamic type checking
-        if (outputParameterType != inputParameterType)
-        {
-            throw new System.Exception($"Output '{outputParameterName}' and input '{inputParameterName}' are not of the same Scrapset type");
-        }
-
-        var link = new GateLink()
-        {
-            OutputGateId = outputGateId,
-            OutputParameterName = outputParameterName,
-            InputGateId = inputGateId,
-            InputParameterName = inputParameterName,
-        };
-
-        if (!linksByGateIdInputParam.ContainsKey(inputGateId))
-        {
-            linksByGateIdInputParam.Add(inputGateId, new Dictionary<string, GateLink>());
-        }
-
-        var linkByInput = linksByGateIdInputParam[inputGateId];
-        if (!linkByInput.ContainsKey(inputParameterName))
-        {
-            linkByInput.Add(inputParameterName, link);
-        } else
-        {
-            // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
-            //  single source.
-            var existingLink = linksByGateIdInputParam[inputGateId][inputParameterName];
-            throw new System.Exception($"Input param '{inputParameterName}' for calling gate ID {inputGateId} is" +
-                $"already linked to output param '{existingLink.OutputParameterName}' of source gate ID {existingLink.OutputGateId}");
-        }
-
-        if (!linksByGateIdOutputParam.ContainsKey(outputGateId))
-        {
-            linksByGateIdOutputParam.Add(outputGateId, new Dictionary<string, List<GateLink>>());
-        }
-
-        var linkListByOutput = linksByGateIdOutputParam[outputGateId];
-        if (!linkListByOutput.ContainsKey(outputParameterName))
-        {
-            linkListByOutput.Add(outputParameterName, new List<GateLink>());
-        }
-
-        var linkList = linkListByOutput[outputParameterName];
-        if (linkList.Any(u => u.InputParameterName == inputParameterName))
-        {
-            // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
-            //  single source. We determined in the check above that the input doesn't have a source, so this could only result as a bug.
-            throw new System.Exception($"The output list for gate ID {outputGateId} already contains an entry for input param" +
-                $"'{inputParameterName}' of gate ID {inputGateId}. This is likely a bug in the Processor.");
-        } else
-        {
-            linkList.Add(link);
-        }
-
-        Debug.Log($"Linked gate '{outputGate.Name}' output '{outputParameterName}' to gate '{inputGate.Name}' input '{inputParameterName}'");
-    }
-
-    public void RemoveInputOutputLink(int inputGateId, string inputParameterName)
-    {
-        if (!linksByGateIdInputParam.TryGetValue(inputGateId, out var linksByInputParam))
-        {
-            throw new System.Exception($"Cannot remove I/O link: Gate ID {inputGateId} has no linked inputs");
-        }
-
-        if (!linksByInputParam.ContainsKey(inputParameterName))
-        {
-            throw new System.Exception($"Cannot remove I/O link: input '{inputParameterName}' of Gate ID {inputGateId} is not linked");
-        }
-
-        linksByInputParam.Remove(inputParameterName, out var gateLink);
-
-        var outputGateId = gateLink.OutputGateId;
-        var outputParameterName = gateLink.OutputParameterName;
-
-        if (!linksByGateIdOutputParam.TryGetValue(outputGateId, out var linksByOutputParam))
-        {
-            throw new System.Exception($"Cannot remove I/O link: Gate ID {outputGateId} has no linked outputs");
-        }
-
-        if (!linksByOutputParam.ContainsKey(outputParameterName))
-        {
-            throw new System.Exception($"Cannot remove I/O link: output '{outputParameterName}' of Gate ID {outputGateId} is not linked");
-        }
-
-        linksByOutputParam[outputParameterName].Remove(gateLink);
-
-        Debug.Log($"Removed link for gate ID {outputGateId} output '{outputParameterName}' and gate ID {inputGateId} input '{inputParameterName}'");
-    }
-
-    public void RemoveAllInputOutputLinks(int gateId)
-    {
-        var gate = FindGateById(gateId);
-        foreach (var input in gate.InputParameters)
-        {
-            RemoveInputOutputLink(gateId, input.Key);
-        }
-
-        // remove all links from this gate's outputs
-        if (linksByGateIdOutputParam.ContainsKey(gateId))
-        {
-            foreach (var kv in linksByGateIdOutputParam[gateId])
-            {
-                var gateLinks = kv.Value;
-
-                for (var i = gateLinks.Count - 1; i >= 0; i--)
-                {
-                    RemoveInputOutputLink(gateLinks[i].InputGateId, gateLinks[i].InputParameterName);
-                }
-            }
-
-            linksByGateIdOutputParam[gateId] = null;
-        }
-
-        Debug.Log($"Removed all I/O links for gate '{gate.Name}' with ID {gate.Id}");
+        gateIORegistry.CreateInputOutputLink(inputGateId, inputParameterName, outputGateId, outputParameterName);
     }
 
     public void CreateProgramFlowLink(int fromId, string flowName, int toId)
@@ -425,15 +278,7 @@ public class Processor : MonoBehaviour
     {
         Debug.Log($"Assigning gate '{assigningGate.Name}' input '{inputName}' with value {cachedInputValuesForGates[assigningGate.Id][inputName].Value} to output '{outputName}'");
 
-        if (!linksByGateIdOutputParam.TryGetValue(assigningGate.Id, out var linksByOutputParam))
-        {
-            throw new System.Exception($"Assigning gate '{assigningGate.Name}' with ID {assigningGate.Id} does not have any outbound links");
-        }
-
-        if (!linksByOutputParam.TryGetValue(outputName, out var gateLinks))
-        {
-            throw new System.Exception($"Assigning gate '{assigningGate.Name}' with ID {assigningGate.Id} output {outputName} is not linked to any inputs");
-        }
+        var gateLinks = gateIORegistry.GetOutputLinks(assigningGate.Id, outputName);
 
         foreach (var gateLink in gateLinks)
         {
