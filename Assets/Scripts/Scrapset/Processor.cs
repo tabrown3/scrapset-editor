@@ -5,6 +5,8 @@ using UnityEngine;
 public class Processor : MonoBehaviour
 {
     public int EntrypointId { get; private set; }
+
+    private ProgramFlowRegistry programFlowRegistry;
     private IStatement currentStatement;
     private IStatement nextStatement;
 
@@ -21,11 +23,15 @@ public class Processor : MonoBehaviour
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedInputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     // temporarily caches output values for all outputs of evaluated gates
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedOutputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
-    List<ProgramFlow> programFlows = new List<ProgramFlow>();
     // stores values that will persist during a single program execution before being wiped out
     Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
     // a dictionary of local variable name -> gate ID, representing all gate instances of a local variable
     Dictionary<string, List<int>> localVariableInstances = new Dictionary<string, List<int>>();
+
+    public Processor()
+    {
+        programFlowRegistry = new ProgramFlowRegistry(this);
+    }
 
     void Start()
     {
@@ -204,7 +210,7 @@ public class Processor : MonoBehaviour
         RemoveAllInputOutputLinks(gateId);
 
         // remove program flows where this gate is the source or destination
-        RemoveAllProgramFlowLinks(gateId);
+        programFlowRegistry.RemoveAllProgramFlowLinks(gateId);
 
         // destroy the game object and remove the gate reference from Processor
         Destroy(gateGameObjects[gateId]);
@@ -368,72 +374,19 @@ public class Processor : MonoBehaviour
         Debug.Log($"Removed all I/O links for gate '{gate.Name}' with ID {gate.Id}");
     }
 
-    // establish program execution order by linking statements together
     public void CreateProgramFlowLink(int fromId, string flowName, int toId)
     {
-        var fromGate = FindGateById(fromId);
-        if (fromGate == null)
-        {
-            throw new System.Exception($"Gate with ID {fromId} not found");
-        }
-
-        var toGate = FindGateById(toId);
-        if (toGate == null)
-        {
-            throw new System.Exception($"Gate with ID {toId} not found");
-        }
-
-        IStatement fromStatement = fromGate as IStatement;
-        if (fromStatement == null)
-        {
-            throw new System.Exception($"Gate with ID {fromId} does not implement IStatement");
-        }
-
-        IStatement toStatement = toGate as IStatement;
-        if (toStatement == null)
-        {
-            throw new System.Exception($"Gate with ID {toId} does not implement IStatement");
-        }
-
-        if (!fromStatement.OutwardPaths.Contains(flowName))
-        {
-            throw new System.Exception($"Gate with ID {fromId} does not have outward path of '${flowName}'");
-        }
-
-        var programFlow = new ProgramFlow()
-        {
-            FromGateId = fromGate.Id,
-            FromFlowName = flowName,
-            ToGateId = toGate.Id,
-        };
-
-        programFlows.Add(programFlow);
-
-        Debug.Log($"Linked program flow from gate '{fromGate.Name}' to gate '{toGate.Name}'");
+        programFlowRegistry.CreateProgramFlowLink(fromId, flowName, toId);
     }
 
     public void RemoveProgramFlowLink(int fromId, string flowName)
     {
-        var programFlow = programFlows.Find(u => u.FromGateId == fromId && u.FromFlowName == flowName);
-        if (programFlow == null)
-        {
-            throw new System.Exception($"Cannot remove program flow: no program flow links from path '{flowName}' of gate ID {fromId}");
-        }
-
-        programFlows.Remove(programFlow);
-
-        Debug.Log($"Removed program flow link from gate ID {fromId} path '{flowName}'");
+        programFlowRegistry.RemoveProgramFlowLink(fromId, flowName);
     }
 
     public void RemoveAllProgramFlowLinks(int gateId)
     {
-        var flowsForGate = programFlows.Where(u => u.FromGateId == gateId || u.ToGateId == gateId);
-        foreach (var programFlow in flowsForGate)
-        {
-            programFlows.Remove(programFlow);
-        }
-
-        Debug.Log($"Removed all program flow links for gate ID {gateId}");
+        programFlowRegistry.RemoveAllProgramFlowLinks(gateId);
     }
 
     public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
@@ -499,7 +452,7 @@ public class Processor : MonoBehaviour
     {
         Debug.Log($"Following outward path '{flowName}' from gate '{fromGate.Name}'");
 
-        var programFlow = programFlows.FirstOrDefault(u => u.FromGateId == fromGate.Id && u.FromFlowName == flowName);
+        var programFlow = programFlowRegistry.GetProgramFlowLink(fromGate, flowName);
         if (programFlow == null)
         {
             nextStatement = null;
