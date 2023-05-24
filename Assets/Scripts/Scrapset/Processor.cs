@@ -189,39 +189,29 @@ public class Processor : MonoBehaviour
 
     public void RemoveGate(int gateId)
     {
-        // remove all links from this gate's inputs
         var gate = FindGateById(gateId);
-        foreach (var input in gate.InputParameters)
+
+        if (gate == null)
         {
-            RemoveInputOutputLink(gateId, input.Key);
+            throw new System.Exception($"Cannot remove gate with ID {gateId}: gate does not exist");
         }
 
-        // remove all links from this gate's outputs
-        if (linksByGateIdOutputParam.ContainsKey(gateId))
-        {
-            foreach (var kv in linksByGateIdOutputParam[gateId])
-            {
-                var outputParamName = kv.Key;
-                var gateLinks = kv.Value;
+        var name = gate.Name;
+        var id = gate.Id;
+        Debug.Log($"Removing gate '{name}' with ID {id}");
 
-                foreach (var gateLink in gateLinks)
-                {
-
-                    RemoveInputOutputLink(gateLink.InputGateId, gateLink.InputParameterName);
-                }
-            }
-
-            linksByGateIdOutputParam[gateId] = null;
-        }
+        // remove all links where this gate acts as an input or output
+        RemoveAllInputOutputLinks(gateId);
 
         // remove program flows where this gate is the source or destination
-        // TODO: replace with program flow removal method
-        programFlows = programFlows.Where(u => u.FromGateId != gateId && u.ToGateId != gateId).ToList();
+        RemoveAllProgramFlowLinks(gateId);
 
         // destroy the game object and remove the gate reference from Processor
         Destroy(gateGameObjects[gateId]);
         gateGameObjects[gateId] = null;
         gates[gateId] = null;
+
+        Debug.Log($"Removed gate '{name}' with ID {id}");
     }
 
     public IGate FindGateById(int id)
@@ -316,7 +306,7 @@ public class Processor : MonoBehaviour
             linkList.Add(link);
         }
 
-        Debug.Log($"Linking gate '{outputGate.Name}' output '{outputParameterName}' to gate '{inputGate.Name}' input '{inputParameterName}'");
+        Debug.Log($"Linked gate '{outputGate.Name}' output '{outputParameterName}' to gate '{inputGate.Name}' input '{inputParameterName}'");
     }
 
     public void RemoveInputOutputLink(int inputGateId, string inputParameterName)
@@ -348,7 +338,34 @@ public class Processor : MonoBehaviour
 
         linksByOutputParam[outputParameterName].Remove(gateLink);
 
-        Debug.Log($"Deleting link for gate ID {outputGateId} output '{outputParameterName}' and gate ID {inputGateId} input '{inputParameterName}'");
+        Debug.Log($"Removed link for gate ID {outputGateId} output '{outputParameterName}' and gate ID {inputGateId} input '{inputParameterName}'");
+    }
+
+    public void RemoveAllInputOutputLinks(int gateId)
+    {
+        var gate = FindGateById(gateId);
+        foreach (var input in gate.InputParameters)
+        {
+            RemoveInputOutputLink(gateId, input.Key);
+        }
+
+        // remove all links from this gate's outputs
+        if (linksByGateIdOutputParam.ContainsKey(gateId))
+        {
+            foreach (var kv in linksByGateIdOutputParam[gateId])
+            {
+                var gateLinks = kv.Value;
+
+                for (var i = gateLinks.Count - 1; i >= 0; i--)
+                {
+                    RemoveInputOutputLink(gateLinks[i].InputGateId, gateLinks[i].InputParameterName);
+                }
+            }
+
+            linksByGateIdOutputParam[gateId] = null;
+        }
+
+        Debug.Log($"Removed all I/O links for gate '{gate.Name}' with ID {gate.Id}");
     }
 
     // establish program execution order by linking statements together
@@ -392,7 +409,7 @@ public class Processor : MonoBehaviour
 
         programFlows.Add(programFlow);
 
-        Debug.Log($"Linking program flow from gate '{fromGate.Name}' to gate '{toGate.Name}'");
+        Debug.Log($"Linked program flow from gate '{fromGate.Name}' to gate '{toGate.Name}'");
     }
 
     public void RemoveProgramFlowLink(int fromId, string flowName)
@@ -405,7 +422,18 @@ public class Processor : MonoBehaviour
 
         programFlows.Remove(programFlow);
 
-        Debug.Log($"Deleting program flow from gate ID {fromId} path '{flowName}'");
+        Debug.Log($"Removed program flow link from gate ID {fromId} path '{flowName}'");
+    }
+
+    public void RemoveAllProgramFlowLinks(int gateId)
+    {
+        var flowsForGate = programFlows.Where(u => u.FromGateId == gateId || u.ToGateId == gateId);
+        foreach (var programFlow in flowsForGate)
+        {
+            programFlows.Remove(programFlow);
+        }
+
+        Debug.Log($"Removed all program flow links for gate ID {gateId}");
     }
 
     public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
