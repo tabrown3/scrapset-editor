@@ -19,8 +19,10 @@ public class Processor : MonoBehaviour
     Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
     // a dictionary of local variable name -> gate ID, representing all gate instances of a local variable
     Dictionary<string, List<int>> localVariableInstances = new Dictionary<string, List<int>>();
+    // manages the gate I/O connections
     GateIORegistry gateIORegistry;
-    private ProgramFlowRegistry programFlowRegistry;
+    // manages the program flow connections
+    ProgramFlowRegistry programFlowRegistry;
 
     public Processor()
     {
