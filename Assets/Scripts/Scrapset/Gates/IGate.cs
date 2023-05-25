@@ -8,6 +8,7 @@ public interface IGate
     public Dictionary<string, ScrapsetTypes> InputParameters { get; }
     public Dictionary<string, ScrapsetTypes> OutputParameters { get; }
     public int Id { get; set; }
+    public GenericTypeReconciler GenericTypeReconciler { get; }
 
     public ScrapsetTypes GetInputParameter(string parameterName);
 

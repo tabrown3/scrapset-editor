@@ -72,17 +72,68 @@ public class GateIORegistry
         var outputParameterType = outputGate.GetOutputParameter(outputParameterName);
         if (outputParameterType == ScrapsetTypes.None)
         {
-            throw new System.Exception($"The output gate does not have an output parameter '{outputParameterName}'");
+            throw new System.Exception($"The output gate '{outputGate.Name}' with ID {outputGateId} does not have an output parameter '{outputParameterName}'");
         }
 
         var inputParameterType = inputGate.GetInputParameter(inputParameterName);
         if (inputParameterType == ScrapsetTypes.None)
         {
-            throw new System.Exception($"The input gate does not have an input parameter '{inputParameterName}'");
+            throw new System.Exception($"The input gate '{inputGate.Name}' with ID {inputGateId} does not have an input parameter '{inputParameterName}'");
         }
 
-        // TODO: in the future, perform logic with Generics here for more dynamic type checking
-        if (outputParameterType != inputParameterType)
+        var inferredInputParamType = inputParameterType;
+        var inferredOutputParamType = outputParameterType;
+        if (inputParameterType == ScrapsetTypes.Generic || outputParameterType == ScrapsetTypes.Generic)
+        {
+            // this scenario (connecting up two generic ports) is not currently supported, but likely will be in the future
+            if (inputParameterType == ScrapsetTypes.Generic && outputParameterType == ScrapsetTypes.Generic)
+            {
+                throw new System.Exception("Connecting two generic ports is not supported at this time, sorry!");
+            }
+
+            if (inputParameterType == ScrapsetTypes.Generic)
+            {
+                var genericIdentifier = inputGate.GenericTypeReconciler.GetGenericIdentifierOfInputParam(inputParameterName);
+                if (genericIdentifier == null)
+                {
+                    throw new System.Exception($"Cannot determine generic type: input param '{inputParameterName}' of gate '{inputGate.Name}' is set as generic but has no generic identifier (e.g. 'T')");
+                }
+
+                var genericType = inputGate.GenericTypeReconciler.GetTypeOfGenericIdentifier(genericIdentifier);
+                if (genericType == ScrapsetTypes.None)
+                {
+                    inputGate.GenericTypeReconciler.SetInputGenericTypeMapping(inputParameterName, outputParameterType);
+                    inferredInputParamType = outputParameterType;
+                    Debug.Log($"Input param '{inputParameterName}' of gate '{inputGate.Name}' with ID {inputGateId} had its generic type set to {outputParameterType} from the output param '{outputParameterName}' of gate '{outputGate.Name} with ID {outputGateId}'");
+                } else
+                {
+                    inferredInputParamType = genericType;
+                    Debug.Log($"Input param '{inputParameterName}' of gate '{inputGate.Name}' with ID {inputGateId} had its generic type inferred as {outputParameterType} from a previous connection involving generic identifier '{genericIdentifier}'");
+                }
+
+            } else
+            {
+                var genericIdentifier = outputGate.GenericTypeReconciler.GetGenericIdentifierOfOutputParam(outputParameterName);
+                if (genericIdentifier == null)
+                {
+                    throw new System.Exception($"Cannot determine generic type: output param '{outputParameterName}' of gate '{outputGate.Name}' is set as generic but has no generic identifier (e.g. 'T')");
+                }
+
+                var genericType = outputGate.GenericTypeReconciler.GetTypeOfGenericIdentifier(genericIdentifier);
+                if (genericType == ScrapsetTypes.None)
+                {
+                    outputGate.GenericTypeReconciler.SetOutputGenericTypeMapping(outputParameterName, inputParameterType);
+                    inferredOutputParamType = inputParameterType;
+                    Debug.Log($"Output param '{outputParameterName}' of gate '{outputGate.Name}' with ID {outputGateId} had its generic type set to {inputParameterType} from the input param '{inputParameterName}' of gate '{inputGate.Name} with ID {inputGateId}'");
+                } else
+                {
+                    inferredOutputParamType = genericType;
+                    Debug.Log($"Output param '{outputParameterName}' of gate '{outputGate.Name}' with ID {outputGateId} had its generic type inferred as {inputParameterType} from a previous connection involving generic identifier '{genericIdentifier}'");
+                }
+            }
+        }
+
+        if (inferredInputParamType != inferredOutputParamType)
         {
             throw new System.Exception($"Output '{outputParameterName}' and input '{inputParameterName}' are not of the same Scrapset type");
         }

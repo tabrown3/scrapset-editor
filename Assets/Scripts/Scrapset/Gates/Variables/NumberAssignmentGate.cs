@@ -12,8 +12,10 @@ public class NumberAssignmentGate : Gate, IStatement
 
     public NumberAssignmentGate()
     {
-        InputParameters.Add("In", ScrapsetTypes.Number);
-        OutputParameters.Add("Out", ScrapsetTypes.Number);
+        InputParameters.Add("In", ScrapsetTypes.Generic);
+        GenericTypeReconciler.AssignGenericIdentifierToInput("In", "T");
+        OutputParameters.Add("Out", ScrapsetTypes.Generic);
+        GenericTypeReconciler.AssignGenericIdentifierToOutput("Out", "T");
     }
 
     public void PerformSideEffect(Processor processor)

@@ -10,6 +10,11 @@ public class Entrypoint : Gate, IStatement
 
     override public string Category => "System";
 
+    public Entrypoint()
+    {
+
+    }
+
     public void PerformSideEffect(Processor processor)
     {
         processor.Goto(this, "Next");

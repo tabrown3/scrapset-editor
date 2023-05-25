@@ -11,6 +11,7 @@ public abstract class Gate : MonoBehaviour, IGate
 
     public Dictionary<string, ScrapsetTypes> InputParameters { get; private set; } = new Dictionary<string, ScrapsetTypes>();
     public Dictionary<string, ScrapsetTypes> OutputParameters { get; private set; } = new Dictionary<string, ScrapsetTypes>();
+    public GenericTypeReconciler GenericTypeReconciler { get; private set; } = new GenericTypeReconciler();
 
     public int Id { get; set; }
 
