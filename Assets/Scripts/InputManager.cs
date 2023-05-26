@@ -75,7 +75,7 @@ public class InputManager : MonoBehaviour
     int GenerateIfStatement(Processor processor)
     {
         var ifGateId = processor.SpawnGate<IfGate>("If"); // spawn If statement
-        var numberVariableId = processor.SpawnVariable("i"); // spawn Number Variable
+        var numberVariableId = processor.SpawnVariable<NumberVariableGate>("i"); // spawn Number Variable
         var constantValueId = processor.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
         var lessThanId = processor.SpawnGate<LessThanGate>("Less Than"); // spawn Less Than
 
@@ -88,8 +88,8 @@ public class InputManager : MonoBehaviour
 
     int GenerateIncrementStatement(Processor processor)
     {
-        var assignmentGateId = processor.SpawnGate<NumberAssignmentGate>("Number Assignment"); // spawn Number Assignment
-        var numberVariableId = processor.SpawnVariable("i"); // spawn Number Variable
+        var assignmentGateId = processor.SpawnGate<AssignmentGate>("Assignment"); // spawn Number Assignment
+        var numberVariableId = processor.SpawnVariable<NumberVariableGate>("i"); // spawn Number Variable
         var constantValueId = processor.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
         var addId = processor.SpawnGate<AddGate>("Add"); // spawn Add
 

@@ -254,14 +254,14 @@ public class Processor : MonoBehaviour
         localVariableValues.Add(variableName, new ScrapsetValue(scrapsetType));
     }
 
-    public int SpawnVariable(string variableName)
+    public int SpawnVariable<T>(string variableName) where T : IGate, IVariable
     {
         if (!localVariableValues.TryGetValue(variableName, out var scrapsetValue))
         {
             throw new System.Exception($"Cannot spawn gate for variable '{variableName}': variable has not been declared");
         }
 
-        var variableId = SpawnGate<NumberVariableGate>(variableName);
+        var variableId = SpawnGate<T>(variableName);
         var newVariable = FindGateById(variableId) as IVariable;
         newVariable.Reference = localVariableValues[variableName];
         newVariable.VariableName = variableName;

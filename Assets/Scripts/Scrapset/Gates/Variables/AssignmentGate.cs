@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 
-public class NumberAssignmentGate : Gate, IStatement
+public class AssignmentGate : Gate, IStatement
 {
     public List<string> OutwardPaths { get; set; } = new List<string>() { "Next" };
 
-    override public string Name => "Number Assignment";
+    override public string Name => "Assignment";
 
     override public string Description => "Assigns values to variables";
 
     override public string Category => "Variables";
 
-    public NumberAssignmentGate()
+    public AssignmentGate()
     {
         InputParameters.Add("In", ScrapsetTypes.Generic);
         GenericTypeReconciler.AssignGenericIdentifierToInput("In", "T");
