@@ -174,14 +174,11 @@ public class Processor : MonoBehaviour
         return cachedOutputValuesForGates.ContainsKey(gate.Id);
     }
 
-    public int SpawnGate<T>(string name) where T : IGate
+    public int SpawnGate<T>(string name) where T : IGate, new()
     {
-        var tempGameObj = new GameObject(name, typeof(T));
-        var gate = tempGameObj.GetComponent<IGate>();
+        var gate = new T();
         gate.Id = idCounter++;
         gates.Add(gate.Id, gate);
-        tempGameObj.transform.parent = transform;
-        gateGameObjects.Add(gate.Id, tempGameObj);
 
         Debug.Log($"Spawning gate '{gate.Name}' with ID {gate.Id}");
         return gate.Id;
@@ -254,7 +251,7 @@ public class Processor : MonoBehaviour
         localVariableValues.Add(variableName, new ScrapsetValue(scrapsetType));
     }
 
-    public int SpawnVariable<T>(string variableName) where T : IGate, IVariable
+    public int SpawnVariable<T>(string variableName) where T : IGate, IVariable, new()
     {
         if (!localVariableValues.TryGetValue(variableName, out var scrapsetValue))
         {

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
-public abstract class Gate : MonoBehaviour, IGate
+public abstract class Gate : IGate
 {
     abstract public string Name { get; }
 

@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 public class ConstantValueGate : Gate, IExpression
 {
-    [SerializeField] float constantValue = 1f;
+    float constantValue = 1f;
 
     override public string Name => "Constant Value";
 
