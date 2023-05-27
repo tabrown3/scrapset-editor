@@ -92,6 +92,15 @@ public class SubroutineDefinition : IInputOutput
         programFlowRegistry.RemoveAllProgramFlowLinks(gateId);
     }
 
+    private int CreateVariableGate<T>(string variableName) where T : IGate, new()
+    {
+        var variableId = CreateGate<T>();
+        var newVariable = FindGateById(variableId) as IIdentifiable;
+        newVariable.Identifier = variableName;
+
+        return variableId;
+    }
+
     public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
     {
         if (LocalVariableDeclarations.ContainsKey(variableName))
@@ -102,18 +111,54 @@ public class SubroutineDefinition : IInputOutput
         localVariableDeclarations.Add(variableName, scrapsetType);
     }
 
-    public int CreateVariableGate<T>(string variableName) where T : IGate, IVariable, new()
+    public int CreateLocalVariableGate<T>(string variableName) where T : IGate, IIdentifiable, new()
     {
         if (!LocalVariableDeclarations.ContainsKey(variableName))
         {
             throw new System.Exception($"Cannot spawn gate for variable '{variableName}': variable has not been declared");
         }
 
-        var variableId = CreateGate<T>();
-        var newVariable = FindGateById(variableId) as IVariable;
-        newVariable.VariableName = variableName;
+        return CreateVariableGate<T>(variableName);
+    }
 
-        return variableId;
+    public void DeclareInputVariable(string parameterName, ScrapsetTypes scrapsetType)
+    {
+        if (InputParameters.ContainsKey(parameterName))
+        {
+            throw new System.Exception($"Input parameter '{parameterName}' has already been declared in this scope");
+        }
+
+        InputParameters.Add(parameterName, scrapsetType);
+    }
+
+    public int CreateInputVariableGate<T>(string inputName) where T : IGate, IIdentifiable, IReadable, new()
+    {
+        if (!InputParameters.ContainsKey(inputName))
+        {
+            throw new System.Exception($"Cannot spawn gate for input '{inputName}': input has not been declared");
+        }
+
+        return CreateVariableGate<T>(inputName);
+    }
+
+    public void DeclareOutputVariable(string parameterName, ScrapsetTypes scrapsetType)
+    {
+        if (OutputParameters.ContainsKey(parameterName))
+        {
+            throw new System.Exception($"Output parameter '{parameterName}' has already been declared in this scope");
+        }
+
+        OutputParameters.Add(parameterName, scrapsetType);
+    }
+
+    public int CreateOutputVariableGate<T>(string outputName) where T : IGate, IIdentifiable, IWritable, new()
+    {
+        if (!OutputParameters.ContainsKey(outputName))
+        {
+            throw new System.Exception($"Cannot spawn gate for output '{outputName}': output has not been declared");
+        }
+
+        return CreateVariableGate<T>(outputName);
     }
 
     public bool HasInputLinks(int gateId)

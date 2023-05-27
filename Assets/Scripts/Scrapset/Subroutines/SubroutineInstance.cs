@@ -12,13 +12,15 @@ public class SubroutineInstance : MonoBehaviour
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedOutputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     // stores values that will persist during a single program execution before being wiped out
     Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
+    Dictionary<string, ScrapsetValue> inputVariableValues = new Dictionary<string, ScrapsetValue>();
+    Dictionary<string, ScrapsetValue> outputVariableValues = new Dictionary<string, ScrapsetValue>();
 
     public SubroutineDefinition SubroutineDefinition { get; set; }
 
     public void RunProgram()
     {
         Debug.Log("Program execution started!");
-        InstantiateVariables();
+        InstantiateAllVariables();
 
         // entrypoint acts as the first statement to run; it does little more than Goto the real first statement
         var entrypoint = SubroutineDefinition.FindGateById(SubroutineDefinition.EntrypointId);
@@ -92,7 +94,7 @@ public class SubroutineInstance : MonoBehaviour
             } else // otherwise the dependency needs to be evaluated and cached
             {
                 Dictionary<string, ScrapsetValue> expressionOutputValues;
-                var depIsAVariable = (dependency as IVariable) != null; // variables do not have dependencies
+                var depIsAVariable = (dependency as IIdentifiable) != null; // variables do not have dependencies
                 if (SubroutineDefinition.HasInputLinks(dependency.Id) && !depIsAVariable) // does it have dependencies that need evaluating?
                 {
                     // Situation 1)
@@ -116,22 +118,29 @@ public class SubroutineInstance : MonoBehaviour
         }
     }
 
-    private void InstantiateVariables()
+    private void InstantiateVariables(IReadOnlyDictionary<string, ScrapsetTypes> declarations, Dictionary<string, ScrapsetValue> variableStore)
     {
-        foreach (var kv in SubroutineDefinition.LocalVariableDeclarations)
+        foreach (var kv in declarations)
         {
             var variableName = kv.Key;
             var variableType = kv.Value;
 
             // basically allocating actual memory for the variables, one for each declared variable
-            if (!localVariableValues.ContainsKey(variableName))
+            if (!variableStore.ContainsKey(variableName))
             {
-                localVariableValues.Add(variableName, new ScrapsetValue(variableType));
+                variableStore.Add(variableName, new ScrapsetValue(variableType));
             }
 
             // zero out local variables
-            localVariableValues[variableName].Value = ScrapsetValue.GetDefaultForType(variableType);
+            variableStore[variableName].Value = ScrapsetValue.GetDefaultForType(variableType);
         }
+    }
+
+    private void InstantiateAllVariables()
+    {
+        InstantiateVariables(SubroutineDefinition.LocalVariableDeclarations, localVariableValues);
+        InstantiateVariables(SubroutineDefinition.InputParameters, inputVariableValues);
+        InstantiateVariables(SubroutineDefinition.OutputParameters, outputVariableValues);
     }
 
     // after a gate's dependency has been evaluated and its output values are available, this method
@@ -173,10 +182,10 @@ public class SubroutineInstance : MonoBehaviour
 
         foreach (var gateLink in gateLinks)
         {
-            var variable = SubroutineDefinition.FindGateById(gateLink.InputGateId) as IVariable;
+            var variable = SubroutineDefinition.FindGateById(gateLink.InputGateId) as IWritable;
             if (variable == null)
             {
-                throw new System.Exception($"Cannot assign to input '{gateLink.InputParameterName}' of Gate ID {gateLink.InputGateId}: Gate ID {gateLink.InputGateId} is not a variable");
+                throw new System.Exception($"Cannot assign to input '{gateLink.InputParameterName}' of Gate ID {gateLink.InputGateId}: Gate ID {gateLink.InputGateId} is not writable");
             }
 
             variable.Write(cachedInputValuesForGates[assigningGate.Id][inputName], localVariableValues);
