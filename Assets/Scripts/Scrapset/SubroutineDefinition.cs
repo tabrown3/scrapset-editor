@@ -4,11 +4,12 @@ using UnityEngine;
 public class SubroutineDefinition
 {
     public int EntrypointId { get; private set; }
-    public Dictionary<string, ScrapsetTypes> LocalVariableDeclarations { get; private set; } = new Dictionary<string, ScrapsetTypes>();
-    // a dictionary of local variable name -> gate ID, representing all gate instances of a local variable
-    public Dictionary<string, List<int>> LocalVariableReferencers { get; private set; } = new Dictionary<string, List<int>>();
+    // all variable names -> types that the user has declared as part of this subroutine declaration
+    Dictionary<string, ScrapsetTypes> localVariableDeclarations = new Dictionary<string, ScrapsetTypes>();
+    public IReadOnlyDictionary<string, ScrapsetTypes> LocalVariableDeclarations => localVariableDeclarations;
 
     int idCounter = 0;
+    // gate ID -> Gate instance
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
 
     // manages the gate I/O connections
@@ -94,7 +95,7 @@ public class SubroutineDefinition
             throw new System.Exception($"Variable '{variableName}' has already been declared in this scope");
         }
 
-        LocalVariableDeclarations.Add(variableName, scrapsetType);
+        localVariableDeclarations.Add(variableName, scrapsetType);
     }
 
     public int SpawnVariable<T>(string variableName) where T : IGate, IVariable, new()
@@ -106,15 +107,8 @@ public class SubroutineDefinition
 
         var variableId = SpawnGate<T>();
         var newVariable = FindGateById(variableId) as IVariable;
-        //newVariable.Reference = localVariableValues[variableName];
         newVariable.VariableName = variableName;
 
-        if (!LocalVariableReferencers.ContainsKey(variableName))
-        {
-            LocalVariableReferencers.Add(variableName, new List<int>());
-        }
-
-        LocalVariableReferencers[variableName].Add(variableId);
         return variableId;
     }
 
