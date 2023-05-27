@@ -48,15 +48,14 @@ public class InputManager : MonoBehaviour
 
     void OnRun()
     {
-        var processor = FindObjectOfType<Processor>();
+        var instance = FindObjectOfType<SubroutineInstance>();
 
-        /* Manual run - will eventually happen in Processor.Update */
-        processor.RunProgram();
+        instance.RunProgram();
     }
 
     void GenerateTestProgram()
     {
-        new GameObject("Processor", typeof(Processor));
+        new GameObject("SubroutineInstance", typeof(SubroutineInstance));
         var subroutineDefinition = new SubroutineDefinition();
         subroutineDefinition.DeclareLocalVariable("i", ScrapsetTypes.Number);
 
@@ -71,8 +70,8 @@ public class InputManager : MonoBehaviour
         subroutineDefinition.CreateProgramFlowLink(incrementStatementId, "Next", ifStatementId);
         // intentionally omitted the ELSE block
 
-        var processor = FindObjectOfType<Processor>();
-        processor.SubroutineDefinition = subroutineDefinition;
+        var instance = FindObjectOfType<SubroutineInstance>();
+        instance.SubroutineDefinition = subroutineDefinition;
     }
 
     int GenerateIfStatement(SubroutineDefinition subroutineDefinition)

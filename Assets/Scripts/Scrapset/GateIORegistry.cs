@@ -188,7 +188,7 @@ public class GateIORegistry
             // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
             //  single source. We determined in the check above that the input doesn't have a source, so this could only result as a bug.
             throw new System.Exception($"The output list for gate ID {outputGateId} already contains an entry for input param" +
-                $"'{inputParameterName}' of gate ID {inputGateId}. This is likely a bug in the Processor.");
+                $"'{inputParameterName}' of gate ID {inputGateId}. This is likely a bug in the SubroutineInstance class.");
         } else
         {
             linkList.Add(link);

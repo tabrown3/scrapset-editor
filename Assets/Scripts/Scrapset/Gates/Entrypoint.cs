@@ -15,8 +15,8 @@ public class Entrypoint : Gate, IStatement
 
     }
 
-    public void PerformSideEffect(Processor processor)
+    public void PerformSideEffect(SubroutineInstance instance)
     {
-        processor.Goto(this, "Next");
+        instance.Goto(this, "Next");
     }
 }

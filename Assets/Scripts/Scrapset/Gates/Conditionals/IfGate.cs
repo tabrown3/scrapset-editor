@@ -15,16 +15,16 @@ public class IfGate : Gate, IStatement
         InputParameters.Add("Condition", ScrapsetTypes.Bool);
     }
 
-    public void PerformSideEffect(Processor processor)
+    public void PerformSideEffect(SubroutineInstance instance)
     {
-        var result = processor.GetCachedInputValue(Id, "Condition");
+        var result = instance.GetCachedInputValue(Id, "Condition");
         var isTrue = (bool)result.Value;
         if (isTrue)
         {
-            processor.Goto(this, "Then");
+            instance.Goto(this, "Then");
         } else
         {
-            processor.Goto(this, "Else");
+            instance.Goto(this, "Else");
         }
     }
 }

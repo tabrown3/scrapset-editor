@@ -18,9 +18,9 @@ public class AssignmentGate : Gate, IStatement
         GenericTypeReconciler.AssignGenericIdentifierToOutput("Out", "T");
     }
 
-    public void PerformSideEffect(Processor processor)
+    public void PerformSideEffect(SubroutineInstance instance)
     {
-        processor.AssignInputToOutput(this, "In", "Out");
-        processor.Goto(this, "Next");
+        instance.AssignInputToOutput(this, "In", "Out");
+        instance.Goto(this, "Next");
     }
 }

@@ -4,5 +4,5 @@ public interface IStatement
 {
     public List<string> OutwardPaths { get; set; }
 
-    public void PerformSideEffect(Processor processor);
+    public void PerformSideEffect(SubroutineInstance instance);
 }

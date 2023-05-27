@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Processor : MonoBehaviour
+public class SubroutineInstance : MonoBehaviour
 {
     private IStatement currentStatement;
     private IStatement nextStatement;
@@ -13,12 +13,6 @@ public class Processor : MonoBehaviour
     // stores values that will persist during a single program execution before being wiped out
     Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
     public SubroutineDefinition SubroutineDefinition { get; set; }
-
-    public Processor()
-    {
-        // TODO: probably pass this in from the ctor or assign to public property
-        SubroutineDefinition = new SubroutineDefinition();
-    }
 
     public void RunProgram()
     {
@@ -39,7 +33,7 @@ public class Processor : MonoBehaviour
             var currentGate = currentStatement as IGate;
             if (currentGate == null)
             {
-                throw new System.Exception("Statements must also implement IGate to be executed by the Processor");
+                throw new System.Exception("Statements must also implement IGate to be executed as part of the subroutine");
             }
 
             Debug.Log($"Started statement execution for gate '{currentGate.Name}' with ID {currentGate.Id}");
