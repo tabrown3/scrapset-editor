@@ -9,7 +9,6 @@ public class NumberVariableGate : Gate, IVariable, IExpression
 
     override public string Category => "Variables";
 
-    public ScrapsetValue Reference { get; set; }
     public string VariableName { get; set; }
 
     public NumberVariableGate()
@@ -18,14 +17,19 @@ public class NumberVariableGate : Gate, IVariable, IExpression
         OutputParameters.Add("Out", ScrapsetTypes.Number);
     }
 
-    public ScrapsetValue Read()
+    // It might seem strange that you have to pass in the value store to get read by the variable,
+    //  but gates DO NOT STORE their own state- not even variables.
+    public ScrapsetValue Read(Dictionary<string, ScrapsetValue> variableStore)
     {
-        var outVal = new ScrapsetValue(ScrapsetTypes.Number);
-        outVal.Value = Reference.Value;
-        return outVal;
+        if (!variableStore.ContainsKey(VariableName))
+        {
+            throw new System.Exception($"Cannot read from variable store: store does not contain an entry for variable '{VariableName}'");
+        }
+
+        return variableStore[VariableName];
     }
 
-    public void Write(ScrapsetValue inVal)
+    public void Write(ScrapsetValue inVal, Dictionary<string, ScrapsetValue> variableStore)
     {
         if (inVal.Type != ScrapsetTypes.Number)
         {
@@ -37,15 +41,19 @@ public class NumberVariableGate : Gate, IVariable, IExpression
             throw new System.Exception("Cannot write value to NumberVariable: value cannot be null");
         }
 
+        if (!variableStore.ContainsKey(VariableName))
+        {
+            throw new System.Exception($"Cannot write to variable store: store does not contain an entry for variable '{VariableName}'");
+        }
+
         var fInVal = (float)inVal.Value;
+        variableStore[VariableName].Value = fInVal;
 
-        Reference.Value = fInVal;
-
-        Debug.Log($"Wrote value {Reference.Value} to variable gate '{Name}'");
+        Debug.Log($"Wrote value {fInVal} to variable gate '{Name}'");
     }
 
-    public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
+    public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> variableStore)
     {
-        return new Dictionary<string, ScrapsetValue>() { { "Out", Read() } };
+        return new Dictionary<string, ScrapsetValue>() { { "Out", Read(variableStore) } };
     }
 }

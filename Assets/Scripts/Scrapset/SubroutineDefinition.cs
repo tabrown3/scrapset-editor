@@ -4,6 +4,9 @@ using UnityEngine;
 public class SubroutineDefinition
 {
     public int EntrypointId { get; private set; }
+    public Dictionary<string, ScrapsetTypes> LocalVariableDeclarations { get; private set; } = new Dictionary<string, ScrapsetTypes>();
+    // a dictionary of local variable name -> gate ID, representing all gate instances of a local variable
+    public Dictionary<string, List<int>> LocalVariableReferencers { get; private set; } = new Dictionary<string, List<int>>();
 
     int idCounter = 0;
     Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
@@ -12,10 +15,6 @@ public class SubroutineDefinition
     GateIORegistry gateIORegistry;
     // manages the program flow connections
     ProgramFlowRegistry programFlowRegistry;
-    // stores values that will persist during a single program execution before being wiped out
-    Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
-    // a dictionary of local variable name -> gate ID, representing all gate instances of a local variable
-    Dictionary<string, List<int>> localVariableInstances = new Dictionary<string, List<int>>();
 
     public SubroutineDefinition()
     {
@@ -90,32 +89,32 @@ public class SubroutineDefinition
 
     public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
     {
-        if (localVariableValues.ContainsKey(variableName))
+        if (LocalVariableDeclarations.ContainsKey(variableName))
         {
             throw new System.Exception($"Variable '{variableName}' has already been declared in this scope");
         }
 
-        localVariableValues.Add(variableName, new ScrapsetValue(scrapsetType));
+        LocalVariableDeclarations.Add(variableName, scrapsetType);
     }
 
     public int SpawnVariable<T>(string variableName) where T : IGate, IVariable, new()
     {
-        if (!localVariableValues.ContainsKey(variableName))
+        if (!LocalVariableDeclarations.ContainsKey(variableName))
         {
             throw new System.Exception($"Cannot spawn gate for variable '{variableName}': variable has not been declared");
         }
 
         var variableId = SpawnGate<T>();
         var newVariable = FindGateById(variableId) as IVariable;
-        newVariable.Reference = localVariableValues[variableName];
+        //newVariable.Reference = localVariableValues[variableName];
         newVariable.VariableName = variableName;
 
-        if (!localVariableInstances.ContainsKey(variableName))
+        if (!LocalVariableReferencers.ContainsKey(variableName))
         {
-            localVariableInstances.Add(variableName, new List<int>());
+            LocalVariableReferencers.Add(variableName, new List<int>());
         }
 
-        localVariableInstances[variableName].Add(variableId);
+        LocalVariableReferencers[variableName].Add(variableId);
         return variableId;
     }
 
@@ -137,14 +136,5 @@ public class SubroutineDefinition
     public ProgramFlow GetProgramFlowLink(IGate fromGate, string flowName)
     {
         return programFlowRegistry.GetProgramFlowLink(fromGate, flowName);
-    }
-
-    public void ZeroOutLocalVariables()
-    {
-        // when program completes, resets all variables to the zero value
-        foreach (var variable in localVariableValues.Values)
-        {
-            variable.Value = ScrapsetValue.GetDefaultForType(variable.Type);
-        }
     }
 }

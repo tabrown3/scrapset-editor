@@ -10,6 +10,8 @@ public class Processor : MonoBehaviour
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedInputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     // temporarily caches output values for all outputs of evaluated gates
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedOutputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
+    // stores values that will persist during a single program execution before being wiped out
+    Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
     public SubroutineDefinition SubroutineDefinition { get; set; }
 
     public Processor()
@@ -21,6 +23,7 @@ public class Processor : MonoBehaviour
     public void RunProgram()
     {
         Debug.Log("Program execution started!");
+        InstantiateVariables();
 
         // entrypoint acts as the first statement to run; it does little more than Goto the real first statement
         var entrypoint = SubroutineDefinition.FindGateById(SubroutineDefinition.EntrypointId);
@@ -55,8 +58,6 @@ public class Processor : MonoBehaviour
             cachedOutputValuesForGates.Clear(); // clear the output value cache after each statement finishes
             Debug.Log($"Finished statement execution for gate '{currentGate.Name}' with ID {currentGate.Id}");
         }
-
-        SubroutineDefinition.ZeroOutLocalVariables();
 
         Debug.Log("Program execution finished!");
     }
@@ -103,16 +104,38 @@ public class Processor : MonoBehaviour
                     EvaluateDependencies(dependency); // update the global value store for all its dependencies
                     expressionOutputValues = dependencyAsExpression.Evaluate(cachedInputValuesForGates[dependency.Id]);
                     CacheOutputValuesForGate(dependency, expressionOutputValues);
-                } else // if not, just pass in an empty dict
+                } else
                 {
+                    // if the dep's a variable, it needs the localVariablesValues to pull from - gates do not maintain their own state, even variables
+                    //  otherwise just pass in an empty dict
+                    var inputValues = depIsAVariable ? localVariableValues : new Dictionary<string, ScrapsetValue>();
+
                     // Situation 2)
-                    expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>());
+                    expressionOutputValues = dependencyAsExpression.Evaluate(inputValues);
                     CacheOutputValuesForGate(dependency, expressionOutputValues);
                 }
 
                 var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
                 CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
             }
+        }
+    }
+
+    private void InstantiateVariables()
+    {
+        foreach (var kv in SubroutineDefinition.LocalVariableDeclarations)
+        {
+            var variableName = kv.Key;
+            var variableType = kv.Value;
+
+            // basically allocating actual memory for the variables, one for each declared variable
+            if (!localVariableValues.ContainsKey(variableName))
+            {
+                localVariableValues.Add(variableName, new ScrapsetValue(variableType));
+            }
+
+            // zero out local variables
+            localVariableValues[variableName].Value = ScrapsetValue.GetDefaultForType(variableType);
         }
     }
 
@@ -163,7 +186,7 @@ public class Processor : MonoBehaviour
                 throw new System.Exception($"Cannot assign to input '{gateLink.InputParameterName}' of Gate ID {gateLink.InputGateId}: Gate ID {gateLink.InputGateId} is not a variable");
             }
 
-            variable.Write(cachedInputValuesForGates[assigningGate.Id][inputName]);
+            variable.Write(cachedInputValuesForGates[assigningGate.Id][inputName], localVariableValues);
         }
     }
 
