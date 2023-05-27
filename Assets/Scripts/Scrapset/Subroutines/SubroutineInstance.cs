@@ -12,6 +12,7 @@ public class SubroutineInstance : MonoBehaviour
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedOutputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     // stores values that will persist during a single program execution before being wiped out
     Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
+
     public SubroutineDefinition SubroutineDefinition { get; set; }
 
     public void RunProgram()

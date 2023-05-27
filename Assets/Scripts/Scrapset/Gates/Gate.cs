@@ -8,11 +8,11 @@ public abstract class Gate : IGate
 
     abstract public string Category { get; }
 
+    public int Id { get; set; }
+
     public Dictionary<string, ScrapsetTypes> InputParameters { get; private set; } = new Dictionary<string, ScrapsetTypes>();
     public Dictionary<string, ScrapsetTypes> OutputParameters { get; private set; } = new Dictionary<string, ScrapsetTypes>();
     public GenericTypeReconciler GenericTypeReconciler { get; private set; } = new GenericTypeReconciler();
-
-    public int Id { get; set; }
 
     public ScrapsetTypes GetInputParameter(string parameterName)
     {

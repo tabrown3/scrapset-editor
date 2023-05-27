@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class SubroutineDefinition
+public class SubroutineDefinition : IInputOutput
 {
     public int EntrypointId { get; private set; }
     // all variable names -> types that the user has declared as part of this subroutine declaration
     Dictionary<string, ScrapsetTypes> localVariableDeclarations = new Dictionary<string, ScrapsetTypes>();
     public IReadOnlyDictionary<string, ScrapsetTypes> LocalVariableDeclarations => localVariableDeclarations;
+    // not only do subroutines contain gates with inputs/outputs, they have inputs/outputs themselves
+    public Dictionary<string, ScrapsetTypes> InputParameters { get; private set; } = new Dictionary<string, ScrapsetTypes>();
+    public Dictionary<string, ScrapsetTypes> OutputParameters { get; private set; } = new Dictionary<string, ScrapsetTypes>();
+    public GenericTypeReconciler GenericTypeReconciler { get; private set; } = new GenericTypeReconciler();
 
     int idCounter = 0;
     // gate ID -> Gate instance
@@ -130,5 +134,25 @@ public class SubroutineDefinition
     public ProgramFlow GetProgramFlowLink(IGate fromGate, string flowName)
     {
         return programFlowRegistry.GetProgramFlowLink(fromGate, flowName);
+    }
+
+    public ScrapsetTypes GetInputParameter(string parameterName)
+    {
+        if (!InputParameters.TryGetValue(parameterName, out var parameterType))
+        {
+            return ScrapsetTypes.None;
+        }
+
+        return parameterType;
+    }
+
+    public ScrapsetTypes GetOutputParameter(string parameterName)
+    {
+        if (!OutputParameters.TryGetValue(parameterName, out var parameterType))
+        {
+            return ScrapsetTypes.None;
+        }
+
+        return parameterType;
     }
 }
