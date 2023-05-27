@@ -51,17 +51,10 @@ public class InputManager : MonoBehaviour
     {
         var instance = FindObjectOfType<SubroutineInstance>();
 
-        var returnValues = instance.Execute(
-            new Dictionary<string, ScrapsetValue>()
-            {
-                {
-                    "InNumber",
-                    new ScrapsetValue(ScrapsetTypes.Number)
-                    {
-                        Value = 4f
-                    }
-                }
-            });
+        var subroutineInputs = new Dictionary<string, ScrapsetValue>();
+        var inVal = new ScrapsetValue(ScrapsetTypes.Number) { Value = 4f };
+        subroutineInputs.Add("InNumber", inVal);
+        var returnValues = instance.Execute(subroutineInputs);
 
         Debug.Log("Below are the subroutine's return values:");
         foreach (var kv in returnValues)
@@ -78,9 +71,6 @@ public class InputManager : MonoBehaviour
         subroutineDefinition.DeclareInputVariable("InNumber", ScrapsetTypes.Number);
         subroutineDefinition.DeclareOutputVariable("Return", ScrapsetTypes.Number);
 
-
-        var initializeId = GenerateInitializeStatement(subroutineDefinition);
-
         /* First statement */
         var ifStatementId = GenerateIfStatement(subroutineDefinition);
 
@@ -90,8 +80,7 @@ public class InputManager : MonoBehaviour
         /* Third statement */
         var outputAssignmentStatementId = GenerateOutputAssignmentStatement(subroutineDefinition);
 
-        subroutineDefinition.CreateProgramFlowLink(subroutineDefinition.EntrypointId, "Next", initializeId);
-        subroutineDefinition.CreateProgramFlowLink(initializeId, "Next", ifStatementId);
+        subroutineDefinition.CreateProgramFlowLink(subroutineDefinition.EntrypointId, "Next", ifStatementId);
         subroutineDefinition.CreateProgramFlowLink(ifStatementId, "Then", incrementStatementId);
         subroutineDefinition.CreateProgramFlowLink(incrementStatementId, "Next", outputAssignmentStatementId);
         subroutineDefinition.CreateProgramFlowLink(outputAssignmentStatementId, "Next", ifStatementId);
@@ -101,27 +90,15 @@ public class InputManager : MonoBehaviour
         instance.SubroutineDefinition = subroutineDefinition;
     }
 
-    int GenerateInitializeStatement(SubroutineDefinition subroutineDefinition)
-    {
-        var assignmentGateId = subroutineDefinition.CreateGate<AssignmentGate>(); // spawn Number Assignment
-        var numberVariableId = subroutineDefinition.CreateLocalVariableGate<NumberVariableGate>("i"); // spawn Number Variable
-        var subroutineInputNumberId = subroutineDefinition.CreateInputVariableGate<NumberVariableGate>("InNumber"); // spawn Number Variable
-
-        subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", subroutineInputNumberId, "Out");
-        subroutineDefinition.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out");
-
-        return assignmentGateId;
-    }
-
     int GenerateIfStatement(SubroutineDefinition subroutineDefinition)
     {
         var ifGateId = subroutineDefinition.CreateGate<IfGate>(); // spawn If statement
         var numberVariableId = subroutineDefinition.CreateLocalVariableGate<NumberVariableGate>("i"); // spawn Number Variable
-        var constantValueId = subroutineDefinition.CreateGate<ConstantValueGate>(); // spawn Constant Value
+        var subroutineInputId = subroutineDefinition.CreateInputVariableGate<NumberVariableGate>("InNumber"); // spawn Constant Value
         var lessThanId = subroutineDefinition.CreateGate<LessThanGate>(); // spawn Less Than
 
         subroutineDefinition.CreateInputOutputLink(lessThanId, "A", numberVariableId, "Out");
-        subroutineDefinition.CreateInputOutputLink(lessThanId, "B", constantValueId, "Out");
+        subroutineDefinition.CreateInputOutputLink(lessThanId, "B", subroutineInputId, "Out");
         subroutineDefinition.CreateInputOutputLink(ifGateId, "Condition", lessThanId, "Out");
 
         return ifGateId;

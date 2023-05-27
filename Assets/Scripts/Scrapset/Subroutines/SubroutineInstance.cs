@@ -111,31 +111,27 @@ public class SubroutineInstance : MonoBehaviour
                         CacheOutputValuesForGate(dependency, expressionOutputValues);
                     } else // it's some kind of variable or input/output gate
                     {
-                        var readableDep = dependency as IReadable;
-                        var writableDep = dependency as IWritable;
+                        var isLocalVariable = SubroutineDefinition.LocalVariableDeclarations.ContainsKey(identifiableDep.Identifier);
+                        var isSubroutineInput = SubroutineDefinition.InputParameters.ContainsKey(identifiableDep.Identifier);
 
-                        if (writableDep == null && readableDep == null)
+                        if (!isLocalVariable && !isSubroutineInput)
                         {
-                            throw new System.Exception($"Variable '{identifiableDep.Identifier}' is not readable or writable: should your Gate derived class implement IReadable or IWritable?");
+                            throw new System.Exception($"Variable '{identifiableDep.Identifier}' is not declared as a local variable or a subroutine input");
                         }
 
                         // it's a regular old variable
-                        if (writableDep != null && readableDep != null)
+                        if (isLocalVariable)
                         {
                             expressionOutputValues = dependencyAsExpression.Evaluate(localVariableValues);
                             CacheOutputValuesForGate(dependency, expressionOutputValues);
-                        } else if (readableDep != null)
+                        } else if (isSubroutineInput)
                         {
                             // it's a subroutine input gate
                             expressionOutputValues = dependencyAsExpression.Evaluate(inputVariableValues);
                             CacheOutputValuesForGate(dependency, expressionOutputValues);
                         } else
                         {
-                            // the proverbial "write-only value" - a subroutine output gate that can only be written to in this subroutine
-                            //  (and only read from outside the subroutine)
-
-                            // this state should not be possible as a "write-only value" cannot be set up as a dependency
-                            throw new System.Exception($"Subroutine output gate {identifiableDep.Identifier} cannot be a dependency: invalid state");
+                            throw new System.Exception($"The identifier {identifiableDep.Identifier} was declared as a local variable and a subroutine input: cannot be both");
                         }
                     }
                 }
