@@ -51,7 +51,17 @@ public class InputManager : MonoBehaviour
     {
         var instance = FindObjectOfType<SubroutineInstance>();
 
-        var returnValues = instance.Execute(new Dictionary<string, ScrapsetValue>());
+        var returnValues = instance.Execute(
+            new Dictionary<string, ScrapsetValue>()
+            {
+                {
+                    "InNumber",
+                    new ScrapsetValue(ScrapsetTypes.Number)
+                    {
+                        Value = 4f
+                    }
+                }
+            });
 
         Debug.Log("Below are the subroutine's return values:");
         foreach (var kv in returnValues)
@@ -65,7 +75,11 @@ public class InputManager : MonoBehaviour
         new GameObject("SubroutineInstance", typeof(SubroutineInstance));
         var subroutineDefinition = new SubroutineDefinition();
         subroutineDefinition.DeclareLocalVariable("i", ScrapsetTypes.Number);
+        subroutineDefinition.DeclareInputVariable("InNumber", ScrapsetTypes.Number);
         subroutineDefinition.DeclareOutputVariable("Return", ScrapsetTypes.Number);
+
+
+        var initializeId = GenerateInitializeStatement(subroutineDefinition);
 
         /* First statement */
         var ifStatementId = GenerateIfStatement(subroutineDefinition);
@@ -76,7 +90,8 @@ public class InputManager : MonoBehaviour
         /* Third statement */
         var outputAssignmentStatementId = GenerateOutputAssignmentStatement(subroutineDefinition);
 
-        subroutineDefinition.CreateProgramFlowLink(subroutineDefinition.EntrypointId, "Next", ifStatementId);
+        subroutineDefinition.CreateProgramFlowLink(subroutineDefinition.EntrypointId, "Next", initializeId);
+        subroutineDefinition.CreateProgramFlowLink(initializeId, "Next", ifStatementId);
         subroutineDefinition.CreateProgramFlowLink(ifStatementId, "Then", incrementStatementId);
         subroutineDefinition.CreateProgramFlowLink(incrementStatementId, "Next", outputAssignmentStatementId);
         subroutineDefinition.CreateProgramFlowLink(outputAssignmentStatementId, "Next", ifStatementId);
@@ -84,6 +99,18 @@ public class InputManager : MonoBehaviour
 
         var instance = FindObjectOfType<SubroutineInstance>();
         instance.SubroutineDefinition = subroutineDefinition;
+    }
+
+    int GenerateInitializeStatement(SubroutineDefinition subroutineDefinition)
+    {
+        var assignmentGateId = subroutineDefinition.CreateGate<AssignmentGate>(); // spawn Number Assignment
+        var numberVariableId = subroutineDefinition.CreateLocalVariableGate<NumberVariableGate>("i"); // spawn Number Variable
+        var subroutineInputNumberId = subroutineDefinition.CreateInputVariableGate<NumberVariableGate>("InNumber"); // spawn Number Variable
+
+        subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", subroutineInputNumberId, "Out");
+        subroutineDefinition.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out");
+
+        return assignmentGateId;
     }
 
     int GenerateIfStatement(SubroutineDefinition subroutineDefinition)

@@ -184,7 +184,7 @@ public class SubroutineInstance : MonoBehaviour
             }
 
             // set input value store to the values passed to the subroutine
-            variableStore[variableName].Value = subroutineInputs[variableName];
+            variableStore[variableName].Value = subroutineInputs[variableName].Value;
         }
     }
 
