@@ -17,7 +17,7 @@ public class SubroutineInstance : MonoBehaviour
 
     public SubroutineDefinition SubroutineDefinition { get; set; }
 
-    public void RunProgram()
+    public Dictionary<string, ScrapsetValue> Execute(Dictionary<string, ScrapsetValue> subroutineInputs)
     {
         Debug.Log("Program execution started!");
         InstantiateAllVariables();
@@ -57,6 +57,7 @@ public class SubroutineInstance : MonoBehaviour
         }
 
         Debug.Log("Program execution finished!");
+        return outputVariableValues;
     }
 
     // EvaluateDependencies will recurse over the calling gate's expression dependency tree depth-first.

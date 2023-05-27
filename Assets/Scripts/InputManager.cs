@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -50,7 +51,7 @@ public class InputManager : MonoBehaviour
     {
         var instance = FindObjectOfType<SubroutineInstance>();
 
-        instance.RunProgram();
+        instance.Execute(new Dictionary<string, ScrapsetValue>());
     }
 
     void GenerateTestProgram()
