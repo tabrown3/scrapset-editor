@@ -49,7 +49,7 @@ public class NumberVariableGate : Gate, IIdentifiable, IReadable, IWritable, IEx
         var fInVal = (float)inVal.Value;
         variableStore[Identifier].Value = fInVal;
 
-        Debug.Log($"Wrote value {fInVal} to variable gate '{Name}'");
+        Debug.Log($"Wrote value {fInVal} to variable '{Identifier}'");
     }
 
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> variableStore)

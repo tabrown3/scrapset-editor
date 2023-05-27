@@ -48,7 +48,7 @@ public class StringVariableGate : Gate, IIdentifiable, IReadable, IWritable, IEx
 
         var sInVal = (string)inVal.Value;
 
-        Debug.Log($"Wrote value '{sInVal}' to variable gate '{Name}'");
+        Debug.Log($"Wrote value '{sInVal}' to variable '{Identifier}'");
     }
 
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> variableStore)

@@ -51,7 +51,13 @@ public class InputManager : MonoBehaviour
     {
         var instance = FindObjectOfType<SubroutineInstance>();
 
-        instance.Execute(new Dictionary<string, ScrapsetValue>());
+        var returnValues = instance.Execute(new Dictionary<string, ScrapsetValue>());
+
+        Debug.Log("Below are the subroutine's return values:");
+        foreach (var kv in returnValues)
+        {
+            Debug.Log($"Identifier: '{kv.Key}', Value: {kv.Value.Value}, Type: {kv.Value.Type}");
+        }
     }
 
     void GenerateTestProgram()
@@ -59,6 +65,7 @@ public class InputManager : MonoBehaviour
         new GameObject("SubroutineInstance", typeof(SubroutineInstance));
         var subroutineDefinition = new SubroutineDefinition();
         subroutineDefinition.DeclareLocalVariable("i", ScrapsetTypes.Number);
+        subroutineDefinition.DeclareOutputVariable("Return", ScrapsetTypes.Number);
 
         /* First statement */
         var ifStatementId = GenerateIfStatement(subroutineDefinition);
@@ -66,9 +73,13 @@ public class InputManager : MonoBehaviour
         /* Second statement */
         var incrementStatementId = GenerateIncrementStatement(subroutineDefinition);
 
+        /* Third statement */
+        var outputAssignmentStatementId = GenerateOutputAssignmentStatement(subroutineDefinition);
+
         subroutineDefinition.CreateProgramFlowLink(subroutineDefinition.EntrypointId, "Next", ifStatementId);
         subroutineDefinition.CreateProgramFlowLink(ifStatementId, "Then", incrementStatementId);
-        subroutineDefinition.CreateProgramFlowLink(incrementStatementId, "Next", ifStatementId);
+        subroutineDefinition.CreateProgramFlowLink(incrementStatementId, "Next", outputAssignmentStatementId);
+        subroutineDefinition.CreateProgramFlowLink(outputAssignmentStatementId, "Next", ifStatementId);
         // intentionally omitted the ELSE block
 
         var instance = FindObjectOfType<SubroutineInstance>();
@@ -100,6 +111,18 @@ public class InputManager : MonoBehaviour
         subroutineDefinition.CreateInputOutputLink(addId, "B", numberVariableId, "Out");
         subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", addId, "Out");
         subroutineDefinition.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out");
+
+        return assignmentGateId;
+    }
+
+    int GenerateOutputAssignmentStatement(SubroutineDefinition subroutineDefinition)
+    {
+        var assignmentGateId = subroutineDefinition.CreateGate<AssignmentGate>(); // spawn Number Assignment
+        var constantValueId = subroutineDefinition.CreateGate<ConstantValueGate>(); // spawn Constant Value
+        var subroutineNumberOutput = subroutineDefinition.CreateOutputVariableGate<NumberVariableGate>("Return"); // spawn Number Variable
+
+        subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", constantValueId, "Out");
+        subroutineDefinition.CreateInputOutputLink(subroutineNumberOutput, "In", assignmentGateId, "Out");
 
         return assignmentGateId;
     }
