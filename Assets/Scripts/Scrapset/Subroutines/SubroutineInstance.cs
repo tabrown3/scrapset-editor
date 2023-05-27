@@ -20,7 +20,7 @@ public class SubroutineInstance : MonoBehaviour
     public Dictionary<string, ScrapsetValue> Execute(Dictionary<string, ScrapsetValue> subroutineInputs)
     {
         Debug.Log("Program execution started!");
-        InstantiateAllVariables();
+        InstantiateAllVariables(subroutineInputs);
 
         // entrypoint acts as the first statement to run; it does little more than Goto the real first statement
         var entrypoint = SubroutineDefinition.FindGateById(SubroutineDefinition.EntrypointId);
@@ -137,10 +137,34 @@ public class SubroutineInstance : MonoBehaviour
         }
     }
 
-    private void InstantiateAllVariables()
+    // the input variable store needs to be updated with whatever's pass into Execute
+    private void InstantiateInputVariables(IReadOnlyDictionary<string, ScrapsetTypes> declarations, Dictionary<string, ScrapsetValue> variableStore, Dictionary<string, ScrapsetValue> subroutineInputs)
+    {
+        InstantiateVariables(declarations, variableStore);
+        foreach (var kv in variableStore)
+        {
+            var variableName = kv.Key;
+
+            // if the input wasn't linked to, it'll be blank - skip this iteration and just use the default zero'd value for variableName
+            if (!subroutineInputs.ContainsKey(variableName))
+            {
+                continue;
+            }
+
+            if (!declarations.ContainsKey(variableName))
+            {
+                throw new System.Exception($"The variable '{variableName}' was pass to the subroutine but was never declared... how did that happen?");
+            }
+
+            // set input value store to the values passed to the subroutine
+            variableStore[variableName].Value = subroutineInputs[variableName];
+        }
+    }
+
+    private void InstantiateAllVariables(Dictionary<string, ScrapsetValue> subroutineInputs)
     {
         InstantiateVariables(SubroutineDefinition.LocalVariableDeclarations, localVariableValues);
-        InstantiateVariables(SubroutineDefinition.InputParameters, inputVariableValues);
+        InstantiateInputVariables(SubroutineDefinition.InputParameters, inputVariableValues, subroutineInputs);
         InstantiateVariables(SubroutineDefinition.OutputParameters, outputVariableValues);
     }
 
