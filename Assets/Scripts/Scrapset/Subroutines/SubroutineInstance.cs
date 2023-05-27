@@ -159,7 +159,7 @@ public class SubroutineInstance : MonoBehaviour
                 variableStore.Add(variableName, new ScrapsetValue(variableType));
             }
 
-            // zero out local variables
+            // zero-out local variables
             variableStore[variableName].Value = ScrapsetValue.GetDefaultForType(variableType);
         }
     }
@@ -180,7 +180,7 @@ public class SubroutineInstance : MonoBehaviour
 
             if (!declarations.ContainsKey(variableName))
             {
-                throw new System.Exception($"The variable '{variableName}' was pass to the subroutine but was never declared... how did that happen?");
+                throw new System.Exception($"The variable '{variableName}' was passed to the subroutine but was never declared... how did that happen?");
             }
 
             // set input value store to the values passed to the subroutine
@@ -235,12 +235,23 @@ public class SubroutineInstance : MonoBehaviour
         foreach (var gateLink in gateLinks)
         {
             var variable = SubroutineDefinition.FindGateById(gateLink.InputGateId) as IWritable;
+            var identifable = variable as IIdentifiable;
             if (variable == null)
             {
                 throw new System.Exception($"Cannot assign to input '{gateLink.InputParameterName}' of Gate ID {gateLink.InputGateId}: Gate ID {gateLink.InputGateId} is not writable");
             }
 
-            variable.Write(cachedInputValuesForGates[assigningGate.Id][inputName], localVariableValues);
+            // are we assigning to a local variable or a subroutine output gate?
+            Dictionary<string, ScrapsetValue> variableStore;
+            if (SubroutineDefinition.OutputParameters.ContainsKey(identifable.Identifier))
+            {
+                variableStore = outputVariableValues;
+            } else
+            {
+                variableStore = localVariableValues;
+            }
+
+            variable.Write(cachedInputValuesForGates[assigningGate.Id][inputName], variableStore);
         }
 
         Debug.Log($"Assigned gate '{assigningGate.Name}' input '{inputName}' with value {cachedInputValuesForGates[assigningGate.Id][inputName].Value} to output '{outputName}'");
