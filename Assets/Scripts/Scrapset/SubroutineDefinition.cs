@@ -21,7 +21,7 @@ public class SubroutineDefinition
     {
         gateIORegistry = new GateIORegistry(this);
         programFlowRegistry = new ProgramFlowRegistry(this);
-        EntrypointId = SpawnGate<Entrypoint>();
+        EntrypointId = CreateGate<Entrypoint>();
     }
 
     public IGate FindGateById(int id)
@@ -34,13 +34,13 @@ public class SubroutineDefinition
         return gate;
     }
 
-    public int SpawnGate<T>() where T : IGate, new()
+    public int CreateGate<T>() where T : IGate, new()
     {
         var gate = new T();
         gate.Id = idCounter++;
         gates.Add(gate.Id, gate);
 
-        Debug.Log($"Spawning gate '{gate.Name}' with ID {gate.Id}");
+        Debug.Log($"Created gate '{gate.Name}' with ID {gate.Id}");
         return gate.Id;
     }
 
@@ -55,7 +55,7 @@ public class SubroutineDefinition
 
         var name = gate.Name;
         var id = gate.Id;
-        Debug.Log($"Removing gate '{name}' with ID {id}");
+        Debug.Log($"Removed gate '{name}' with ID {id}");
 
         // remove all links where this gate acts as an input or output
         gateIORegistry.RemoveAllInputOutputLinks(gateId);
@@ -98,14 +98,14 @@ public class SubroutineDefinition
         localVariableDeclarations.Add(variableName, scrapsetType);
     }
 
-    public int SpawnVariable<T>(string variableName) where T : IGate, IVariable, new()
+    public int CreateVariableGate<T>(string variableName) where T : IGate, IVariable, new()
     {
         if (!LocalVariableDeclarations.ContainsKey(variableName))
         {
             throw new System.Exception($"Cannot spawn gate for variable '{variableName}': variable has not been declared");
         }
 
-        var variableId = SpawnGate<T>();
+        var variableId = CreateGate<T>();
         var newVariable = FindGateById(variableId) as IVariable;
         newVariable.VariableName = variableName;
 

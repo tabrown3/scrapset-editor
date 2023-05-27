@@ -76,10 +76,10 @@ public class InputManager : MonoBehaviour
 
     int GenerateIfStatement(SubroutineDefinition subroutineDefinition)
     {
-        var ifGateId = subroutineDefinition.SpawnGate<IfGate>(); // spawn If statement
-        var numberVariableId = subroutineDefinition.SpawnVariable<NumberVariableGate>("i"); // spawn Number Variable
-        var constantValueId = subroutineDefinition.SpawnGate<ConstantValueGate>(); // spawn Constant Value
-        var lessThanId = subroutineDefinition.SpawnGate<LessThanGate>(); // spawn Less Than
+        var ifGateId = subroutineDefinition.CreateGate<IfGate>(); // spawn If statement
+        var numberVariableId = subroutineDefinition.CreateVariableGate<NumberVariableGate>("i"); // spawn Number Variable
+        var constantValueId = subroutineDefinition.CreateGate<ConstantValueGate>(); // spawn Constant Value
+        var lessThanId = subroutineDefinition.CreateGate<LessThanGate>(); // spawn Less Than
 
         subroutineDefinition.CreateInputOutputLink(lessThanId, "A", numberVariableId, "Out");
         subroutineDefinition.CreateInputOutputLink(lessThanId, "B", constantValueId, "Out");
@@ -90,10 +90,10 @@ public class InputManager : MonoBehaviour
 
     int GenerateIncrementStatement(SubroutineDefinition subroutineDefinition)
     {
-        var assignmentGateId = subroutineDefinition.SpawnGate<AssignmentGate>(); // spawn Number Assignment
-        var numberVariableId = subroutineDefinition.SpawnVariable<NumberVariableGate>("i"); // spawn Number Variable
-        var constantValueId = subroutineDefinition.SpawnGate<ConstantValueGate>(); // spawn Constant Value
-        var addId = subroutineDefinition.SpawnGate<AddGate>(); // spawn Add
+        var assignmentGateId = subroutineDefinition.CreateGate<AssignmentGate>(); // spawn Number Assignment
+        var numberVariableId = subroutineDefinition.CreateVariableGate<NumberVariableGate>("i"); // spawn Number Variable
+        var constantValueId = subroutineDefinition.CreateGate<ConstantValueGate>(); // spawn Constant Value
+        var addId = subroutineDefinition.CreateGate<AddGate>(); // spawn Add
 
         subroutineDefinition.CreateInputOutputLink(addId, "A", constantValueId, "Out");
         subroutineDefinition.CreateInputOutputLink(addId, "B", numberVariableId, "Out");

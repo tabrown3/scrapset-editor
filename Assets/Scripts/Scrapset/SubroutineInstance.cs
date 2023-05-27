@@ -87,7 +87,7 @@ public class SubroutineInstance : MonoBehaviour
                 // use the cached values instead of re-evaluating the dependency
                 var evaluatedValue = cachedOutputValuesForGates[dependency.Id][gateLink.OutputParameterName];
                 CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
-                Debug.Log($"Using cached value of gate '{dependency.Name}' output '{gateLink.OutputParameterName}'");
+                Debug.Log($"Used cached value of gate '{dependency.Name}' output '{gateLink.OutputParameterName}'");
             } else // otherwise the dependency needs to be evaluated and cached
             {
                 Dictionary<string, ScrapsetValue> expressionOutputValues;
@@ -168,8 +168,6 @@ public class SubroutineInstance : MonoBehaviour
     // directly assign the value of inputName to outputName
     public void AssignInputToOutput<T>(T assigningGate, string inputName, string outputName) where T : IGate, IStatement
     {
-        Debug.Log($"Assigning gate '{assigningGate.Name}' input '{inputName}' with value {cachedInputValuesForGates[assigningGate.Id][inputName].Value} to output '{outputName}'");
-
         var gateLinks = SubroutineDefinition.GetOutputLinks(assigningGate.Id, outputName);
 
         foreach (var gateLink in gateLinks)
@@ -182,17 +180,18 @@ public class SubroutineInstance : MonoBehaviour
 
             variable.Write(cachedInputValuesForGates[assigningGate.Id][inputName], localVariableValues);
         }
+
+        Debug.Log($"Assigned gate '{assigningGate.Name}' input '{inputName}' with value {cachedInputValuesForGates[assigningGate.Id][inputName].Value} to output '{outputName}'");
     }
 
     // follow the program flow from the source statement to the statement it's linked to via the named flow link
     public void Goto<T>(T fromGate, string flowName) where T : IGate, IStatement
     {
-        Debug.Log($"Following outward path '{flowName}' from gate '{fromGate.Name}'");
-
         var programFlow = SubroutineDefinition.GetProgramFlowLink(fromGate, flowName);
         if (programFlow == null)
         {
             nextStatement = null;
+            Debug.Log($"Followed outward path '{flowName}' from gate '{fromGate.Name}' with ID {fromGate.Id} to subroutine termination");
         } else
         {
             var toGateId = programFlow.ToGateId;
@@ -209,6 +208,7 @@ public class SubroutineInstance : MonoBehaviour
             }
 
             nextStatement = toStatement;
+            Debug.Log($"Followed outward path '{flowName}' from gate '{fromGate.Name}' with ID {fromGate.Id} to gate '{toGate.Name}' with ID {toGate.Id}");
         }
     }
 
