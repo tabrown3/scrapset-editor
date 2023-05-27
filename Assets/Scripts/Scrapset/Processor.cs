@@ -3,41 +3,19 @@ using UnityEngine;
 
 public class Processor : MonoBehaviour
 {
-    public int EntrypointId { get; private set; }
-
     private IStatement currentStatement;
     private IStatement nextStatement;
 
-    int idCounter = 0;
-    Dictionary<int, IGate> gates = new Dictionary<int, IGate>();
-    Dictionary<int, GameObject> gateGameObjects = new Dictionary<int, GameObject>();
     // temporarily caches input values for all inputs of gates with dependencies
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedInputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
     // temporarily caches output values for all outputs of evaluated gates
     Dictionary<int, Dictionary<string, ScrapsetValue>> cachedOutputValuesForGates = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
-    // stores values that will persist during a single program execution before being wiped out
-    Dictionary<string, ScrapsetValue> localVariableValues = new Dictionary<string, ScrapsetValue>();
-    // a dictionary of local variable name -> gate ID, representing all gate instances of a local variable
-    Dictionary<string, List<int>> localVariableInstances = new Dictionary<string, List<int>>();
-    // manages the gate I/O connections
-    GateIORegistry gateIORegistry;
-    // manages the program flow connections
-    ProgramFlowRegistry programFlowRegistry;
+    public SubroutineDefinition SubroutineDefinition { get; set; }
 
     public Processor()
     {
-        gateIORegistry = new GateIORegistry(this);
-        programFlowRegistry = new ProgramFlowRegistry(this);
-    }
-
-    void Start()
-    {
-        EntrypointId = SpawnGate<Entrypoint>("Entrypoint");
-    }
-
-    void Update()
-    {
-
+        // TODO: probably pass this in from the ctor or assign to public property
+        SubroutineDefinition = new SubroutineDefinition();
     }
 
     public void RunProgram()
@@ -45,7 +23,7 @@ public class Processor : MonoBehaviour
         Debug.Log("Program execution started!");
 
         // entrypoint acts as the first statement to run; it does little more than Goto the real first statement
-        var entrypoint = FindGateById(EntrypointId);
+        var entrypoint = SubroutineDefinition.FindGateById(SubroutineDefinition.EntrypointId);
         currentStatement = entrypoint as IStatement;
         nextStatement = null;
         currentStatement.PerformSideEffect(this);
@@ -78,11 +56,7 @@ public class Processor : MonoBehaviour
             Debug.Log($"Finished statement execution for gate '{currentGate.Name}' with ID {currentGate.Id}");
         }
 
-        // when program completes, resets all variables to the zero value
-        foreach (var variable in localVariableValues.Values)
-        {
-            variable.Value = ScrapsetValue.GetDefaultForType(variable.Type);
-        }
+        SubroutineDefinition.ZeroOutLocalVariables();
 
         Debug.Log("Program execution finished!");
     }
@@ -98,11 +72,11 @@ public class Processor : MonoBehaviour
     private void EvaluateDependencies(IGate callingGate)
     {
         // this executes once for every output feeding into the gate's inputs
-        foreach (var kv in gateIORegistry.GetInputLinks(callingGate.Id))
+        foreach (var kv in SubroutineDefinition.GetInputLinks(callingGate.Id))
         {
             var inputParamName = kv.Key;
             var gateLink = kv.Value;
-            var dependency = FindGateById(gateLink.OutputGateId);
+            var dependency = SubroutineDefinition.FindGateById(gateLink.OutputGateId);
             Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
 
             var dependencyAsExpression = dependency as IExpression;
@@ -123,7 +97,7 @@ public class Processor : MonoBehaviour
             {
                 Dictionary<string, ScrapsetValue> expressionOutputValues;
                 var depIsAVariable = (dependency as IVariable) != null; // variables do not have dependencies
-                if (gateIORegistry.HasInputLinks(dependency.Id) && !depIsAVariable) // does it have dependencies that need evaluating?
+                if (SubroutineDefinition.HasInputLinks(dependency.Id) && !depIsAVariable) // does it have dependencies that need evaluating?
                 {
                     // Situation 1)
                     EvaluateDependencies(dependency); // update the global value store for all its dependencies
@@ -174,114 +148,16 @@ public class Processor : MonoBehaviour
         return cachedOutputValuesForGates.ContainsKey(gate.Id);
     }
 
-    public int SpawnGate<T>(string name) where T : IGate, new()
-    {
-        var gate = new T();
-        gate.Id = idCounter++;
-        gates.Add(gate.Id, gate);
-
-        Debug.Log($"Spawning gate '{gate.Name}' with ID {gate.Id}");
-        return gate.Id;
-    }
-
-    public void RemoveGate(int gateId)
-    {
-        var gate = FindGateById(gateId);
-
-        if (gate == null)
-        {
-            throw new System.Exception($"Cannot remove gate with ID {gateId}: gate does not exist");
-        }
-
-        var name = gate.Name;
-        var id = gate.Id;
-        Debug.Log($"Removing gate '{name}' with ID {id}");
-
-        // remove all links where this gate acts as an input or output
-        gateIORegistry.RemoveAllInputOutputLinks(gateId);
-
-        // remove program flows where this gate is the source or destination
-        programFlowRegistry.RemoveAllProgramFlowLinks(gateId);
-
-        // destroy the game object and remove the gate reference from Processor
-        Destroy(gateGameObjects[gateId]);
-        gateGameObjects[gateId] = null;
-        gates[gateId] = null;
-
-        Debug.Log($"Removed gate '{name}' with ID {id}");
-    }
-
-    public IGate FindGateById(int id)
-    {
-        if (!gates.TryGetValue(id, out var gate))
-        {
-            return null;
-        }
-
-        return gate;
-    }
-
-    public void CreateInputOutputLink(int inputGateId, string inputParameterName, int outputGateId, string outputParameterName)
-    {
-        gateIORegistry.CreateInputOutputLink(inputGateId, inputParameterName, outputGateId, outputParameterName);
-    }
-
-    public void CreateProgramFlowLink(int fromId, string flowName, int toId)
-    {
-        programFlowRegistry.CreateProgramFlowLink(fromId, flowName, toId);
-    }
-
-    public void RemoveProgramFlowLink(int fromId, string flowName)
-    {
-        programFlowRegistry.RemoveProgramFlowLink(fromId, flowName);
-    }
-
-    public void RemoveAllProgramFlowLinks(int gateId)
-    {
-        programFlowRegistry.RemoveAllProgramFlowLinks(gateId);
-    }
-
-    public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
-    {
-        if (localVariableValues.ContainsKey(variableName))
-        {
-            throw new System.Exception($"Variable '{variableName}' has already been declared in this scope");
-        }
-
-        localVariableValues.Add(variableName, new ScrapsetValue(scrapsetType));
-    }
-
-    public int SpawnVariable<T>(string variableName) where T : IGate, IVariable, new()
-    {
-        if (!localVariableValues.TryGetValue(variableName, out var scrapsetValue))
-        {
-            throw new System.Exception($"Cannot spawn gate for variable '{variableName}': variable has not been declared");
-        }
-
-        var variableId = SpawnGate<T>(variableName);
-        var newVariable = FindGateById(variableId) as IVariable;
-        newVariable.Reference = localVariableValues[variableName];
-        newVariable.VariableName = variableName;
-
-        if (!localVariableInstances.ContainsKey(variableName))
-        {
-            localVariableInstances.Add(variableName, new List<int>());
-        }
-
-        localVariableInstances[variableName].Add(variableId);
-        return variableId;
-    }
-
     // directly assign the value of inputName to outputName
     public void AssignInputToOutput<T>(T assigningGate, string inputName, string outputName) where T : IGate, IStatement
     {
         Debug.Log($"Assigning gate '{assigningGate.Name}' input '{inputName}' with value {cachedInputValuesForGates[assigningGate.Id][inputName].Value} to output '{outputName}'");
 
-        var gateLinks = gateIORegistry.GetOutputLinks(assigningGate.Id, outputName);
+        var gateLinks = SubroutineDefinition.GetOutputLinks(assigningGate.Id, outputName);
 
         foreach (var gateLink in gateLinks)
         {
-            var variable = FindGateById(gateLink.InputGateId) as IVariable;
+            var variable = SubroutineDefinition.FindGateById(gateLink.InputGateId) as IVariable;
             if (variable == null)
             {
                 throw new System.Exception($"Cannot assign to input '{gateLink.InputParameterName}' of Gate ID {gateLink.InputGateId}: Gate ID {gateLink.InputGateId} is not a variable");
@@ -296,14 +172,14 @@ public class Processor : MonoBehaviour
     {
         Debug.Log($"Following outward path '{flowName}' from gate '{fromGate.Name}'");
 
-        var programFlow = programFlowRegistry.GetProgramFlowLink(fromGate, flowName);
+        var programFlow = SubroutineDefinition.GetProgramFlowLink(fromGate, flowName);
         if (programFlow == null)
         {
             nextStatement = null;
         } else
         {
             var toGateId = programFlow.ToGateId;
-            var toGate = FindGateById(toGateId);
+            var toGate = SubroutineDefinition.FindGateById(toGateId);
             if (toGate == null)
             {
                 throw new System.Exception($"Gate with ID {toGateId} not found");

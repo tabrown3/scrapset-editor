@@ -12,11 +12,11 @@ public class GateIORegistry
     //  Outer key is IGate.Id, inner key is InputParameterName, value is a list of all GateLinks for which this output is a data source
     Dictionary<int, Dictionary<string, List<GateLink>>> linksByGateIdOutputParam = new Dictionary<int, Dictionary<string, List<GateLink>>>();
 
-    Processor parentProcessor;
+    SubroutineDefinition subroutineDefinition;
 
-    public GateIORegistry(Processor processor)
+    public GateIORegistry(SubroutineDefinition _subroutineDefinition)
     {
-        parentProcessor = processor;
+        subroutineDefinition = _subroutineDefinition;
     }
 
     public bool HasInputLinks(int gateId)
@@ -57,13 +57,13 @@ public class GateIORegistry
     // create an I/O link between gates
     public void CreateInputOutputLink(int inputGateId, string inputParameterName, int outputGateId, string outputParameterName)
     {
-        var outputGate = parentProcessor.FindGateById(outputGateId);
+        var outputGate = subroutineDefinition.FindGateById(outputGateId);
         if (outputGate == null)
         {
             throw new System.Exception($"Could not find gate with ID ${outputGateId}");
         }
 
-        var inputGate = parentProcessor.FindGateById(inputGateId);
+        var inputGate = subroutineDefinition.FindGateById(inputGateId);
         if (inputGate == null)
         {
             throw new System.Exception($"Could not find gate with ID ${inputGateId}");
@@ -231,7 +231,7 @@ public class GateIORegistry
 
     public void RemoveAllInputOutputLinks(int gateId)
     {
-        var gate = parentProcessor.FindGateById(gateId);
+        var gate = subroutineDefinition.FindGateById(gateId);
         foreach (var input in gate.InputParameters)
         {
             RemoveInputOutputLink(gateId, input.Key);

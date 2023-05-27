@@ -4,24 +4,24 @@ using UnityEngine;
 
 public class ProgramFlowRegistry
 {
-    private List<ProgramFlow> programFlows = new List<ProgramFlow>();
-    private Processor parentProcessor;
+    List<ProgramFlow> programFlows = new List<ProgramFlow>();
+    SubroutineDefinition subroutineDefinition;
 
-    public ProgramFlowRegistry(Processor processor)
+    public ProgramFlowRegistry(SubroutineDefinition _subroutineDefinition)
     {
-        parentProcessor = processor;
+        subroutineDefinition = _subroutineDefinition;
     }
 
     // establish program execution order by linking statements together
     public void CreateProgramFlowLink(int fromId, string flowName, int toId)
     {
-        var fromGate = parentProcessor.FindGateById(fromId);
+        var fromGate = subroutineDefinition.FindGateById(fromId);
         if (fromGate == null)
         {
             throw new System.Exception($"Gate with ID {fromId} not found");
         }
 
-        var toGate = parentProcessor.FindGateById(toId);
+        var toGate = subroutineDefinition.FindGateById(toId);
         if (toGate == null)
         {
             throw new System.Exception($"Gate with ID {toId} not found");

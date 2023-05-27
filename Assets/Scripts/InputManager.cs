@@ -14,7 +14,6 @@ public class InputManager : MonoBehaviour
 
     bool prevIsPanningByDrag;
 
-
     void OnPan(InputValue value)
     {
         PanDirection = value.Get<Vector2>();
@@ -57,46 +56,50 @@ public class InputManager : MonoBehaviour
 
     void GenerateTestProgram()
     {
-        var processor = FindObjectOfType<Processor>();
-        processor.DeclareLocalVariable("i", ScrapsetTypes.Number);
+        new GameObject("Processor", typeof(Processor));
+        var subroutineDefinition = new SubroutineDefinition();
+        subroutineDefinition.DeclareLocalVariable("i", ScrapsetTypes.Number);
 
         /* First statement */
-        var ifStatementId = GenerateIfStatement(processor);
+        var ifStatementId = GenerateIfStatement(subroutineDefinition);
 
         /* Second statement */
-        var incrementStatementId = GenerateIncrementStatement(processor);
+        var incrementStatementId = GenerateIncrementStatement(subroutineDefinition);
 
-        processor.CreateProgramFlowLink(processor.EntrypointId, "Next", ifStatementId);
-        processor.CreateProgramFlowLink(ifStatementId, "Then", incrementStatementId);
-        processor.CreateProgramFlowLink(incrementStatementId, "Next", ifStatementId);
+        subroutineDefinition.CreateProgramFlowLink(subroutineDefinition.EntrypointId, "Next", ifStatementId);
+        subroutineDefinition.CreateProgramFlowLink(ifStatementId, "Then", incrementStatementId);
+        subroutineDefinition.CreateProgramFlowLink(incrementStatementId, "Next", ifStatementId);
         // intentionally omitted the ELSE block
+
+        var processor = FindObjectOfType<Processor>();
+        processor.SubroutineDefinition = subroutineDefinition;
     }
 
-    int GenerateIfStatement(Processor processor)
+    int GenerateIfStatement(SubroutineDefinition subroutineDefinition)
     {
-        var ifGateId = processor.SpawnGate<IfGate>("If"); // spawn If statement
-        var numberVariableId = processor.SpawnVariable<NumberVariableGate>("i"); // spawn Number Variable
-        var constantValueId = processor.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
-        var lessThanId = processor.SpawnGate<LessThanGate>("Less Than"); // spawn Less Than
+        var ifGateId = subroutineDefinition.SpawnGate<IfGate>("If"); // spawn If statement
+        var numberVariableId = subroutineDefinition.SpawnVariable<NumberVariableGate>("i"); // spawn Number Variable
+        var constantValueId = subroutineDefinition.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
+        var lessThanId = subroutineDefinition.SpawnGate<LessThanGate>("Less Than"); // spawn Less Than
 
-        processor.CreateInputOutputLink(lessThanId, "A", numberVariableId, "Out");
-        processor.CreateInputOutputLink(lessThanId, "B", constantValueId, "Out");
-        processor.CreateInputOutputLink(ifGateId, "Condition", lessThanId, "Out");
+        subroutineDefinition.CreateInputOutputLink(lessThanId, "A", numberVariableId, "Out");
+        subroutineDefinition.CreateInputOutputLink(lessThanId, "B", constantValueId, "Out");
+        subroutineDefinition.CreateInputOutputLink(ifGateId, "Condition", lessThanId, "Out");
 
         return ifGateId;
     }
 
-    int GenerateIncrementStatement(Processor processor)
+    int GenerateIncrementStatement(SubroutineDefinition subroutineDefinition)
     {
-        var assignmentGateId = processor.SpawnGate<AssignmentGate>("Assignment"); // spawn Number Assignment
-        var numberVariableId = processor.SpawnVariable<NumberVariableGate>("i"); // spawn Number Variable
-        var constantValueId = processor.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
-        var addId = processor.SpawnGate<AddGate>("Add"); // spawn Add
+        var assignmentGateId = subroutineDefinition.SpawnGate<AssignmentGate>("Assignment"); // spawn Number Assignment
+        var numberVariableId = subroutineDefinition.SpawnVariable<NumberVariableGate>("i"); // spawn Number Variable
+        var constantValueId = subroutineDefinition.SpawnGate<ConstantValueGate>("Constant Value"); // spawn Constant Value
+        var addId = subroutineDefinition.SpawnGate<AddGate>("Add"); // spawn Add
 
-        processor.CreateInputOutputLink(addId, "A", constantValueId, "Out");
-        processor.CreateInputOutputLink(addId, "B", numberVariableId, "Out");
-        processor.CreateInputOutputLink(assignmentGateId, "In", addId, "Out");
-        processor.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out");
+        subroutineDefinition.CreateInputOutputLink(addId, "A", constantValueId, "Out");
+        subroutineDefinition.CreateInputOutputLink(addId, "B", numberVariableId, "Out");
+        subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", addId, "Out");
+        subroutineDefinition.CreateInputOutputLink(numberVariableId, "In", assignmentGateId, "Out");
 
         return assignmentGateId;
     }
