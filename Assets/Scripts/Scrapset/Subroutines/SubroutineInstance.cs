@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SubroutineInstance : MonoBehaviour
+public class SubroutineInstance
 {
     private IStatement currentStatement;
     private IStatement nextStatement;

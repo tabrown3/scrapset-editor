@@ -49,11 +49,16 @@ public class InputManager : MonoBehaviour
 
     void OnRun()
     {
-        var instance = FindObjectOfType<SubroutineInstance>();
+        var subroutineManager = FindObjectOfType<SubroutineManager>();
+        var definition = subroutineManager.GetSubroutineDefinition("top-level");
 
         var subroutineInputs = new Dictionary<string, ScrapsetValue>();
         var inVal = new ScrapsetValue(ScrapsetTypes.Number) { Value = 4f };
         subroutineInputs.Add("InNumber", inVal);
+
+        var instance = new SubroutineInstance();
+        instance.SubroutineDefinition = definition;
+
         var returnValues = instance.Execute(subroutineInputs);
 
         Debug.Log("Below are the subroutine's return values:");
@@ -65,7 +70,6 @@ public class InputManager : MonoBehaviour
 
     void GenerateTestProgram()
     {
-        new GameObject("SubroutineInstance", typeof(SubroutineInstance));
         var subroutineDefinition = new SubroutineDefinition();
         subroutineDefinition.DeclareLocalVariable("i", ScrapsetTypes.Number);
         subroutineDefinition.DeclareInputVariable("InNumber", ScrapsetTypes.Number);
@@ -86,8 +90,8 @@ public class InputManager : MonoBehaviour
         subroutineDefinition.CreateProgramFlowLink(outputAssignmentStatementId, "Next", ifStatementId);
         // intentionally omitted the ELSE block
 
-        var instance = FindObjectOfType<SubroutineInstance>();
-        instance.SubroutineDefinition = subroutineDefinition;
+        var subroutineManager = FindObjectOfType<SubroutineManager>();
+        subroutineManager.AddSubroutineDefinition("top-level", subroutineDefinition);
     }
 
     int GenerateIfStatement(SubroutineDefinition subroutineDefinition)
