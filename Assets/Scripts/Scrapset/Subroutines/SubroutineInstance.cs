@@ -95,8 +95,8 @@ public class SubroutineInstance : MonoBehaviour
             } else // otherwise the dependency needs to be evaluated and cached
             {
                 Dictionary<string, ScrapsetValue> expressionOutputValues;
-                var depIsAVariable = (dependency as IIdentifiable) != null; // variables do not have dependencies
-                if (SubroutineDefinition.HasInputLinks(dependency.Id) && !depIsAVariable) // does it have dependencies that need evaluating?
+                var identifiableDep = dependency as IIdentifiable; // variables do not have dependencies
+                if (SubroutineDefinition.HasInputLinks(dependency.Id) && identifiableDep == null) // does it have dependencies that need evaluating?
                 {
                     // Situation 1)
                     EvaluateDependencies(dependency); // update the global value store for all its dependencies
@@ -104,13 +104,40 @@ public class SubroutineInstance : MonoBehaviour
                     CacheOutputValuesForGate(dependency, expressionOutputValues);
                 } else
                 {
-                    // if the dep's a variable, it needs the localVariablesValues to pull from - gates do not maintain their own state, even variables
-                    //  otherwise just pass in an empty dict
-                    var inputValues = depIsAVariable ? localVariableValues : new Dictionary<string, ScrapsetValue>();
+                    if (identifiableDep == null)
+                    {
+                        // if the gate isn't identifiable, then it's just a gate that doesn't have dependencies, so pass in an empty dict
+                        expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>());
+                        CacheOutputValuesForGate(dependency, expressionOutputValues);
+                    } else // it's some kind of variable or input/output gate
+                    {
+                        var readableDep = dependency as IReadable;
+                        var writableDep = dependency as IWritable;
 
-                    // Situation 2)
-                    expressionOutputValues = dependencyAsExpression.Evaluate(inputValues);
-                    CacheOutputValuesForGate(dependency, expressionOutputValues);
+                        if (writableDep == null && readableDep == null)
+                        {
+                            throw new System.Exception($"Variable '{identifiableDep.Identifier}' is not readable or writable: should your Gate derived class implement IReadable or IWritable?");
+                        }
+
+                        // it's a regular old variable
+                        if (writableDep != null && readableDep != null)
+                        {
+                            expressionOutputValues = dependencyAsExpression.Evaluate(localVariableValues);
+                            CacheOutputValuesForGate(dependency, expressionOutputValues);
+                        } else if (readableDep != null)
+                        {
+                            // it's a subroutine input gate
+                            expressionOutputValues = dependencyAsExpression.Evaluate(inputVariableValues);
+                            CacheOutputValuesForGate(dependency, expressionOutputValues);
+                        } else
+                        {
+                            // the proverbial "write-only value" - a subroutine output gate that can only be written to in this subroutine
+                            //  (and only read from outside the subroutine)
+
+                            // this state should not be possible as a "write-only value" cannot be set up as a dependency
+                            throw new System.Exception($"Subroutine output gate {identifiableDep.Identifier} cannot be a dependency: invalid state");
+                        }
+                    }
                 }
 
                 var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
