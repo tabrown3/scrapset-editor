@@ -110,7 +110,7 @@ public class GateIORegistry
                     // if "T" doesn't have an inferred type set, set one based on the other param's type
                     inputGate.GenericTypeReconciler.SetInputGenericTypeMapping(inputParameterName, outputParameterType);
                     inferredInputParamType = outputParameterType;
-                    Debug.Log($"Input param '{inputParameterName}' of gate '{inputGate.Name}' with ID {inputGateId} had its generic identifier '{genericIdentifier}' set to {outputParameterType} from the output param '{outputParameterName}' of gate '{outputGate.Name} with ID {outputGateId}'");
+                    Debug.Log($"Input param '{inputParameterName}' of gate '{inputGate.Name}' with ID {inputGateId} had its generic identifier '{genericIdentifier}' set to {outputParameterType} from the output param '{outputParameterName}' of gate '{outputGate.Name}' with ID {outputGateId}");
                 } else
                 {
                     // otherwise use the existing inferred type

@@ -102,7 +102,8 @@ public class SubroutineInstance
         Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
 
         var dependencyAsExpression = dependency as IExpression;
-        if (dependencyAsExpression == null)
+        var dependencyAsMultipartExpression = dependency as IMultiPartExpression;
+        if (dependencyAsExpression == null && dependencyAsMultipartExpression == null)
         {
             throw new System.Exception($"Error with dependency feeding Gate {callingGate.Name}: Gate {dependency.Name} is not an expression");
         }
@@ -123,11 +124,10 @@ public class SubroutineInstance
             var identifiableDep = dependency as IIdentifiable; // variables do not have dependencies
             if (SubroutineDefinition.HasInputLinks(dependency.Id) && identifiableDep == null) // does it have dependencies that need evaluating?
             {
-                var multiPartExpression = dependency as IMultiPartExpression;
-                if (multiPartExpression != null) // surrenders control of dep eval to the gate, allowing for short-circuiting (e.g. ternary x?y:z, logical &&, ||, etc)
+                if (dependencyAsMultipartExpression != null) // surrenders control of dep eval to the gate, allowing for short-circuiting (e.g. ternary x?y:z, logical &&, ||, etc)
                 {
                     var lazyEvalCallbacks = LazyEvaluateDependencies(dependency);
-                    expressionOutputValues = multiPartExpression.EvaluateMultiPart(lazyEvalCallbacks);
+                    expressionOutputValues = dependencyAsMultipartExpression.EvaluateMultiPart(lazyEvalCallbacks);
                     CacheOutputValuesForGate(dependency, expressionOutputValues);
                 } else
                 {

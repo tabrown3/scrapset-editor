@@ -2,11 +2,11 @@
 
 public class AndGate : Gate, IMultiPartExpression
 {
-    public override string Name => throw new System.NotImplementedException();
+    public override string Name => "And";
 
-    public override string Description => throw new System.NotImplementedException();
+    public override string Description => "Performs logical AND on A and B";
 
-    public override string Category => throw new System.NotImplementedException();
+    public override string Category => "Conditionals";
 
     public AndGate()
     {

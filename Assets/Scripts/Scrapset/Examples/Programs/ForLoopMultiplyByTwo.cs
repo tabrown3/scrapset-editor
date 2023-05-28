@@ -81,7 +81,7 @@ namespace Scrapset.Examples
         {
             var assignmentGateId = subroutineDefinition.CreateGate<AssignmentGate>(); // spawn Number Assignment
             var numberVariableId = subroutineDefinition.CreateLocalVariableGate<NumberVariableGate>("i"); // spawn Number Variable
-            var constantValueId = subroutineDefinition.CreateGate<ConstantValueGate>(); // spawn Constant Value
+            var constantValueId = subroutineDefinition.CreateGate<NumberConstantValueGate>(); // spawn Constant Value
             var addId = subroutineDefinition.CreateGate<AddGate>(); // spawn Add
 
             subroutineDefinition.CreateInputOutputLink(addId, "A", constantValueId, "Out");

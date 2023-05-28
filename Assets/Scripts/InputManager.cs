@@ -44,13 +44,13 @@ public class InputManager : MonoBehaviour
 
     void OnBuild()
     {
-        IProgram program = ExamplePrograms.ForLoopMultiplyByTwo;
+        IProgram program = ExamplePrograms.ShortCircuit;
         program.Build();
     }
 
     void OnRun()
     {
-        IProgram program = ExamplePrograms.ForLoopMultiplyByTwo;
+        IProgram program = ExamplePrograms.ShortCircuit;
         var returnValues = program.Run();
 
         Debug.Log("Below are the subroutine's return values:");

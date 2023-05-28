@@ -1,8 +1,8 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-public class ConstantValueGate : Gate, IExpression
+public class BoolConstantValueGate : Gate, IExpression
 {
-    float constantValue = 1f;
+    bool constantValue = false;
 
     override public string Name => "Constant Value";
 
@@ -10,15 +10,21 @@ public class ConstantValueGate : Gate, IExpression
 
     override public string Category => "Variables";
 
-    public ConstantValueGate()
+    public BoolConstantValueGate()
     {
-        OutputParameters.Add("Out", ScrapsetTypes.Number);
+        OutputParameters.Add("Out", ScrapsetTypes.Bool);
+    }
+
+    public BoolConstantValueGate(bool _constantValue) : this()
+    {
+        constantValue = _constantValue;
     }
 
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
     {
-        var outVal = new ScrapsetValue(ScrapsetTypes.Number);
+        var outVal = new ScrapsetValue(ScrapsetTypes.Bool);
         outVal.Value = constantValue;
+
         return new Dictionary<string, ScrapsetValue>() { { "Out", outVal } };
     }
 }
