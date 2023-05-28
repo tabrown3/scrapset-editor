@@ -4,7 +4,7 @@ public class NumberConstantValueGate : Gate, IExpression
 {
     float constantValue = 1f;
 
-    override public string Name => "Constant Value";
+    override public string Name => "Number Constant Value";
 
     override public string Description => "Returns a constant value";
 

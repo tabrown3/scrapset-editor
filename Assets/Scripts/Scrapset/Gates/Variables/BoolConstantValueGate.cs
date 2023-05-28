@@ -4,7 +4,7 @@ public class BoolConstantValueGate : Gate, IExpression
 {
     bool constantValue = false;
 
-    override public string Name => "Constant Value";
+    override public string Name => "Bool Constant Value";
 
     override public string Description => "Returns a constant value";
 

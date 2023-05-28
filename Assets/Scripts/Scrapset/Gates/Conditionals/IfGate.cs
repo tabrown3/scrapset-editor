@@ -4,7 +4,7 @@ public class IfGate : Gate, IStatement
 {
     public override string Name => "If";
 
-    public override string Description => "Branches one way or the other based whether the input is True or False";
+    public override string Description => "Branches one way or the other based on whether the input is True or False";
 
     public override string Category => "Conditionals";
 
