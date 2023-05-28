@@ -73,72 +73,75 @@ public class SubroutineInstance
         // this executes once for every output feeding into the gate's inputs
         foreach (var kv in SubroutineDefinition.GetInputLinks(callingGate.Id))
         {
-            var inputParamName = kv.Key;
-            var gateLink = kv.Value;
-            var dependency = SubroutineDefinition.FindGateById(gateLink.OutputGateId);
-            Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
+            EvaluateDependency(callingGate, kv.Key, kv.Value);
+        }
+    }
 
-            var dependencyAsExpression = dependency as IExpression;
-            if (dependencyAsExpression == null)
-            {
-                throw new System.Exception($"Error with dependency feeding Gate {callingGate.Name}: Gate {dependency.Name} is not an expression");
-            }
+    private void EvaluateDependency(IGate callingGate, string inputParamName, GateLink gateLink)
+    {
+        var dependency = SubroutineDefinition.FindGateById(gateLink.OutputGateId);
+        Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
 
-            // check to see if this dependency has already been evaluated and had its outputs cached
-            if (DependencyHasBeenEvaluated(dependency))
+        var dependencyAsExpression = dependency as IExpression;
+        if (dependencyAsExpression == null)
+        {
+            throw new System.Exception($"Error with dependency feeding Gate {callingGate.Name}: Gate {dependency.Name} is not an expression");
+        }
+
+        // check to see if this dependency has already been evaluated and had its outputs cached
+        if (DependencyHasBeenEvaluated(dependency))
+        {
+            // Situation 3)
+            // use the cached values instead of re-evaluating the dependency
+            var evaluatedValue = cachedOutputValuesForGates[dependency.Id][gateLink.OutputParameterName];
+            CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
+            Debug.Log($"Used cached value of gate '{dependency.Name}' output '{gateLink.OutputParameterName}'");
+        } else // otherwise the dependency needs to be evaluated and cached
+        {
+            Dictionary<string, ScrapsetValue> expressionOutputValues;
+            var identifiableDep = dependency as IIdentifiable; // variables do not have dependencies
+            if (SubroutineDefinition.HasInputLinks(dependency.Id) && identifiableDep == null) // does it have dependencies that need evaluating?
             {
-                // Situation 3)
-                // use the cached values instead of re-evaluating the dependency
-                var evaluatedValue = cachedOutputValuesForGates[dependency.Id][gateLink.OutputParameterName];
-                CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
-                Debug.Log($"Used cached value of gate '{dependency.Name}' output '{gateLink.OutputParameterName}'");
-            } else // otherwise the dependency needs to be evaluated and cached
+                // Situation 1)
+                EvaluateDependencies(dependency); // update the global value store for all its dependencies
+                expressionOutputValues = dependencyAsExpression.Evaluate(cachedInputValuesForGates[dependency.Id]);
+                CacheOutputValuesForGate(dependency, expressionOutputValues);
+            } else
             {
-                Dictionary<string, ScrapsetValue> expressionOutputValues;
-                var identifiableDep = dependency as IIdentifiable; // variables do not have dependencies
-                if (SubroutineDefinition.HasInputLinks(dependency.Id) && identifiableDep == null) // does it have dependencies that need evaluating?
+                if (identifiableDep == null)
                 {
-                    // Situation 1)
-                    EvaluateDependencies(dependency); // update the global value store for all its dependencies
-                    expressionOutputValues = dependencyAsExpression.Evaluate(cachedInputValuesForGates[dependency.Id]);
+                    // if the gate isn't identifiable, then it's just a gate that doesn't have dependencies, so pass in an empty dict
+                    expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>());
                     CacheOutputValuesForGate(dependency, expressionOutputValues);
-                } else
+                } else // it's some kind of variable or input/output gate
                 {
-                    if (identifiableDep == null)
+                    var isLocalVariable = SubroutineDefinition.LocalVariableDeclarations.ContainsKey(identifiableDep.Identifier);
+                    var isSubroutineInput = SubroutineDefinition.InputParameters.ContainsKey(identifiableDep.Identifier);
+
+                    if (!isLocalVariable && !isSubroutineInput)
                     {
-                        // if the gate isn't identifiable, then it's just a gate that doesn't have dependencies, so pass in an empty dict
-                        expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>());
+                        throw new System.Exception($"Variable '{identifiableDep.Identifier}' is not declared as a local variable or a subroutine input");
+                    }
+
+                    // it's a regular old variable
+                    if (isLocalVariable)
+                    {
+                        expressionOutputValues = dependencyAsExpression.Evaluate(localVariableValues);
                         CacheOutputValuesForGate(dependency, expressionOutputValues);
-                    } else // it's some kind of variable or input/output gate
+                    } else if (isSubroutineInput)
                     {
-                        var isLocalVariable = SubroutineDefinition.LocalVariableDeclarations.ContainsKey(identifiableDep.Identifier);
-                        var isSubroutineInput = SubroutineDefinition.InputParameters.ContainsKey(identifiableDep.Identifier);
-
-                        if (!isLocalVariable && !isSubroutineInput)
-                        {
-                            throw new System.Exception($"Variable '{identifiableDep.Identifier}' is not declared as a local variable or a subroutine input");
-                        }
-
-                        // it's a regular old variable
-                        if (isLocalVariable)
-                        {
-                            expressionOutputValues = dependencyAsExpression.Evaluate(localVariableValues);
-                            CacheOutputValuesForGate(dependency, expressionOutputValues);
-                        } else if (isSubroutineInput)
-                        {
-                            // it's a subroutine input gate
-                            expressionOutputValues = dependencyAsExpression.Evaluate(inputVariableValues);
-                            CacheOutputValuesForGate(dependency, expressionOutputValues);
-                        } else
-                        {
-                            throw new System.Exception($"The identifier {identifiableDep.Identifier} was declared as a local variable and a subroutine input: cannot be both");
-                        }
+                        // it's a subroutine input gate
+                        expressionOutputValues = dependencyAsExpression.Evaluate(inputVariableValues);
+                        CacheOutputValuesForGate(dependency, expressionOutputValues);
+                    } else
+                    {
+                        throw new System.Exception($"The identifier {identifiableDep.Identifier} was declared as a local variable and a subroutine input: cannot be both");
                     }
                 }
-
-                var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
-                CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
             }
+
+            var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
+            CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
         }
     }
 
