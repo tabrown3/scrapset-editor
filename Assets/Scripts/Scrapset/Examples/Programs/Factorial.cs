@@ -84,9 +84,9 @@ namespace Scrapset.Examples
             var constantValueGateId = subroutineDefinition.CreateGate(new NumberConstantValueGate(5f));
             var subroutineOutputGateId = subroutineDefinition.CreateOutputVariableGate<NumberVariableGate>("Return");
 
-            subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", factorialGateId, "Out");
+            subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", factorialGateId, "Return");
             subroutineDefinition.CreateInputOutputLink(factorialGateId, "N", constantValueGateId, "Out");
-            subroutineDefinition.CreateInputOutputLink(subroutineOutputGateId, "Return", assignmentGateId, "Out");
+            subroutineDefinition.CreateInputOutputLink(subroutineOutputGateId, "In", assignmentGateId, "Out");
 
             subroutineDefinition.CreateProgramFlowLink(subroutineDefinition.EntrypointId, "Next", assignmentGateId);
         }

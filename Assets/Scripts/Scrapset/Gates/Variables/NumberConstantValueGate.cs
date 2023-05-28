@@ -15,7 +15,7 @@ public class NumberConstantValueGate : Gate, IExpression
         OutputParameters.Add("Out", ScrapsetTypes.Number);
     }
 
-    public NumberConstantValueGate(float _constantValue)
+    public NumberConstantValueGate(float _constantValue) : this()
     {
         constantValue = _constantValue;
     }

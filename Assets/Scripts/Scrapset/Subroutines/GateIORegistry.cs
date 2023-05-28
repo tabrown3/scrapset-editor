@@ -183,7 +183,7 @@ public class GateIORegistry
         }
 
         var linkList = linkListByOutput[outputParameterName];
-        if (linkList.Any(u => u.InputParameterName == inputParameterName))
+        if (linkList.Any(u => u.InputParameterName == inputParameterName && u.InputGateId == inputGateId))
         {
             // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
             //  single source. We determined in the check above that the input doesn't have a source, so this could only result as a bug.
