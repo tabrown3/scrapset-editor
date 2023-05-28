@@ -44,7 +44,8 @@ public class InputManager : MonoBehaviour
 
     void OnBuild()
     {
-        GenerateTestProgram();
+        GenerateMultiplyByTwoSubroutine();
+        GenerateForLoopSubroutine();
     }
 
     void OnRun()
@@ -73,7 +74,7 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    void GenerateTestProgram()
+    void GenerateForLoopSubroutine()
     {
         var subroutineManager = FindObjectOfType<SubroutineManager>();
         var subroutineDefinition = subroutineManager.DeclareSubroutine("top-level");
@@ -137,9 +138,41 @@ public class InputManager : MonoBehaviour
         var constantValueId = subroutineDefinition.CreateGate<ConstantValueGate>(); // spawn Constant Value
         var subroutineNumberOutput = subroutineDefinition.CreateOutputVariableGate<NumberVariableGate>("Return"); // spawn Number Variable
 
-        subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", constantValueId, "Out");
+        // find the multiply-by-two subroutine
+        var subroutineManager = FindObjectOfType<SubroutineManager>();
+        var multiplyByTwoDefinition = subroutineManager.GetDefinition("multiply-by-two");
+
+        // create a gate for the subroutine
+        var subroutineGate = new SubroutineGate(multiplyByTwoDefinition);
+        subroutineDefinition.CreateGate(subroutineGate);
+
+        subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", subroutineGate.Id, "Return");
+        subroutineDefinition.CreateInputOutputLink(subroutineGate.Id, "InNumber", constantValueId, "Out");
         subroutineDefinition.CreateInputOutputLink(subroutineNumberOutput, "In", assignmentGateId, "Out");
 
         return assignmentGateId;
+    }
+
+    // accepts Number input "InNumber", multiplies it by two, and returns in output "Return"
+    void GenerateMultiplyByTwoSubroutine()
+    {
+        var subroutineManager = FindObjectOfType<SubroutineManager>();
+        var subroutineDefinition = subroutineManager.DeclareSubroutine("multiply-by-two");
+
+        // declare subroutine inputs and output
+        subroutineDefinition.DeclareInputVariable("InNumber", ScrapsetTypes.Number);
+        subroutineDefinition.DeclareOutputVariable("Return", ScrapsetTypes.Number);
+
+        var assignmentGateId = subroutineDefinition.CreateGate<AssignmentGate>(); // spawn Number Assignment
+        var addId = subroutineDefinition.CreateGate<AddGate>(); // spawn Add
+        var subroutineInputId = subroutineDefinition.CreateInputVariableGate<NumberVariableGate>("InNumber"); // spawn Constant Value
+        var subroutineNumberOutput = subroutineDefinition.CreateOutputVariableGate<NumberVariableGate>("Return"); // spawn Number Variable
+
+        subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", addId, "Out");
+        subroutineDefinition.CreateInputOutputLink(addId, "A", subroutineInputId, "Out");
+        subroutineDefinition.CreateInputOutputLink(addId, "B", subroutineInputId, "Out");
+        subroutineDefinition.CreateInputOutputLink(subroutineNumberOutput, "In", assignmentGateId, "Out");
+
+        subroutineDefinition.CreateProgramFlowLink(subroutineDefinition.EntrypointId, "Next", assignmentGateId);
     }
 }
