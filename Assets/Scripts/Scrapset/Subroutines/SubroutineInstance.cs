@@ -123,10 +123,19 @@ public class SubroutineInstance
             var identifiableDep = dependency as IIdentifiable; // variables do not have dependencies
             if (SubroutineDefinition.HasInputLinks(dependency.Id) && identifiableDep == null) // does it have dependencies that need evaluating?
             {
-                // Situation 1)
-                EvaluateDependencies(dependency); // update the global value store for all its dependencies
-                expressionOutputValues = dependencyAsExpression.Evaluate(cachedInputValuesForGates[dependency.Id]);
-                CacheOutputValuesForGate(dependency, expressionOutputValues);
+                var multiPartExpression = dependency as IMultiPartExpression;
+                if (multiPartExpression != null) // surrenders control of dep eval to the gate, allowing for short-circuiting (e.g. ternary x?y:z, logical &&, ||, etc)
+                {
+                    var lazyEvalCallbacks = LazyEvaluateDependencies(dependency);
+                    expressionOutputValues = multiPartExpression.EvaluateMultiPart(lazyEvalCallbacks);
+                    CacheOutputValuesForGate(dependency, expressionOutputValues);
+                } else
+                {
+                    // Situation 1)
+                    EvaluateDependencies(dependency); // update the global value store for all its dependencies
+                    expressionOutputValues = dependencyAsExpression.Evaluate(cachedInputValuesForGates[dependency.Id]);
+                    CacheOutputValuesForGate(dependency, expressionOutputValues);
+                }
             } else
             {
                 if (identifiableDep == null)
