@@ -21,14 +21,8 @@ public class AndGate : Gate, IMultiPartExpression
         var outDict = new Dictionary<string, ScrapsetValue>();
         var outVal = new ScrapsetValue(ScrapsetTypes.Bool);
 
-        var valA = (bool)evalCallbacks["A"]().Value;
-        if (valA) // since A is true, we must evaluate B - the result will just be B
-        {
-            outVal.Value = (bool)evalCallbacks["B"]().Value;
-        } else // since A is false, no reason to even evaluate B - the result is false (short-circuit)
-        {
-            outVal.Value = false;
-        }
+        // only eval B if A is true
+        outVal.Value = (bool)evalCallbacks["A"]().Value && (bool)evalCallbacks["B"]().Value;
 
         outDict["Out"] = outVal;
         return outDict;
