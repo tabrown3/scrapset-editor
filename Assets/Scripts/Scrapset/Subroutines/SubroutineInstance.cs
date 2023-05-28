@@ -77,6 +77,20 @@ public class SubroutineInstance
         }
     }
 
+    private Dictionary<string, LazyEvaluateDependency> LazyEvaluateDependencies(IGate callingGate)
+    {
+        var evalDepCallbacksByInputName = new Dictionary<string, LazyEvaluateDependency>();
+        // this executes once for every output feeding into the gate's inputs
+        foreach (var kv in SubroutineDefinition.GetInputLinks(callingGate.Id))
+        {
+            evalDepCallbacksByInputName[kv.Key] = () => EvaluateDependency(callingGate, kv.Key, kv.Value);
+        }
+
+        return evalDepCallbacksByInputName;
+    }
+
+    private delegate void LazyEvaluateDependency();
+
     private void EvaluateDependency(IGate callingGate, string inputParamName, GateLink gateLink)
     {
         var dependency = SubroutineDefinition.FindGateById(gateLink.OutputGateId);
