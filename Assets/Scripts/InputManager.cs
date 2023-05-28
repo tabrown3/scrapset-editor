@@ -44,6 +44,7 @@ public class InputManager : MonoBehaviour
 
     void OnBuild()
     {
+        // multiply-by-two is called as an expression from within top-level
         GenerateMultiplyByTwoSubroutine();
         GenerateForLoopSubroutine();
     }
@@ -57,7 +58,7 @@ public class InputManager : MonoBehaviour
 
         // build the subroutine's input object
         var subroutineInputs = new Dictionary<string, ScrapsetValue>();
-        var inVal = new ScrapsetValue(ScrapsetTypes.Number) { Value = 4f };
+        var inVal = new ScrapsetValue(ScrapsetTypes.Number) { Value = 3f };
         subroutineInputs.Add("InNumber", inVal);
 
         // create an instance (runner) for the definition
@@ -98,8 +99,8 @@ public class InputManager : MonoBehaviour
 
         subroutineDefinition.CreateProgramFlowLink(subroutineDefinition.EntrypointId, "Next", ifStatementId);
         subroutineDefinition.CreateProgramFlowLink(ifStatementId, "Then", incrementStatementId);
-        subroutineDefinition.CreateProgramFlowLink(incrementStatementId, "Next", outputAssignmentStatementId);
-        subroutineDefinition.CreateProgramFlowLink(outputAssignmentStatementId, "Next", ifStatementId);
+        subroutineDefinition.CreateProgramFlowLink(incrementStatementId, "Next", ifStatementId);
+        subroutineDefinition.CreateProgramFlowLink(ifStatementId, "Else", outputAssignmentStatementId);
         // intentionally omitted the ELSE block
     }
 
@@ -135,8 +136,8 @@ public class InputManager : MonoBehaviour
     int GenerateOutputAssignmentStatement(SubroutineDefinition subroutineDefinition)
     {
         var assignmentGateId = subroutineDefinition.CreateGate<AssignmentGate>(); // spawn Number Assignment
-        var constantValueId = subroutineDefinition.CreateGate<ConstantValueGate>(); // spawn Constant Value
         var subroutineNumberOutput = subroutineDefinition.CreateOutputVariableGate<NumberVariableGate>("Return"); // spawn Number Variable
+        var numberVariableId = subroutineDefinition.CreateLocalVariableGate<NumberVariableGate>("i"); // spawn Number Variable
 
         // find the multiply-by-two subroutine
         var subroutineManager = FindObjectOfType<SubroutineManager>();
@@ -147,7 +148,7 @@ public class InputManager : MonoBehaviour
         subroutineDefinition.CreateGate(subroutineGate);
 
         subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", subroutineGate.Id, "Return");
-        subroutineDefinition.CreateInputOutputLink(subroutineGate.Id, "InNumber", constantValueId, "Out");
+        subroutineDefinition.CreateInputOutputLink(subroutineGate.Id, "InNumber", numberVariableId, "Out");
         subroutineDefinition.CreateInputOutputLink(subroutineNumberOutput, "In", assignmentGateId, "Out");
 
         return assignmentGateId;
