@@ -15,6 +15,11 @@ public class NumberConstantValueGate : Gate, IExpression
         OutputParameters.Add("Out", ScrapsetTypes.Number);
     }
 
+    public NumberConstantValueGate(float _constantValue)
+    {
+        constantValue = _constantValue;
+    }
+
     public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
     {
         var outVal = new ScrapsetValue(ScrapsetTypes.Number);

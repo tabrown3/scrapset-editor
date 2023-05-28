@@ -44,13 +44,13 @@ public class InputManager : MonoBehaviour
 
     void OnBuild()
     {
-        IProgram program = ExamplePrograms.ShortCircuit;
+        IProgram program = ExamplePrograms.Factorial;
         program.Build();
     }
 
     void OnRun()
     {
-        IProgram program = ExamplePrograms.ShortCircuit;
+        IProgram program = ExamplePrograms.Factorial;
         var returnValues = program.Run();
 
         Debug.Log("Below are the subroutine's return values:");
