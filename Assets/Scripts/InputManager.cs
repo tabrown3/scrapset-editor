@@ -44,12 +44,14 @@ public class InputManager : MonoBehaviour
 
     void OnBuild()
     {
-        ExamplePrograms.ForLoopMultiplyByTwo.Build();
+        IProgram program = ExamplePrograms.ForLoopMultiplyByTwo;
+        program.Build();
     }
 
     void OnRun()
     {
-        var returnValues = ExamplePrograms.ForLoopMultiplyByTwo.Run();
+        IProgram program = ExamplePrograms.ForLoopMultiplyByTwo;
+        var returnValues = program.Run();
 
         Debug.Log("Below are the subroutine's return values:");
         foreach (var kv in returnValues)

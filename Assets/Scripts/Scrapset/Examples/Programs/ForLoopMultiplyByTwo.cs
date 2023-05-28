@@ -3,8 +3,15 @@ using UnityEngine;
 
 namespace Scrapset.Examples
 {
-    public class ForLoopMultiplyByTwo : MonoBehaviour
+    public class ForLoopMultiplyByTwo : MonoBehaviour, IProgram
     {
+        public void Build()
+        {
+            // multiply-by-two is called as an expression from within top-level
+            GenerateMultiplyByTwoSubroutine();
+            GenerateForLoopSubroutine();
+        }
+
         public Dictionary<string, ScrapsetValue> Run()
         {
             // find the subroutine manager
@@ -25,13 +32,6 @@ namespace Scrapset.Examples
             var returnValues = instance.Execute(subroutineInputs);
 
             return returnValues;
-        }
-
-        public void Build()
-        {
-            // multiply-by-two is called as an expression from within top-level
-            GenerateMultiplyByTwoSubroutine();
-            GenerateForLoopSubroutine();
         }
 
         void GenerateForLoopSubroutine()
