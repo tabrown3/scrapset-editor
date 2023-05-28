@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using static SubroutineInstance;
 
-public interface IMultiPartExpression : IExpression
+public interface IMultiPartExpression
 {
-    IEnumerable<IList<string>> GetParts();
+    Dictionary<string, ScrapsetValue> EvaluateMultiPart(Dictionary<string, LazyEvaluateDependency> evalCallbacks);
 }

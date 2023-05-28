@@ -15,16 +15,22 @@ public class AndGate : Gate, IMultiPartExpression
         OutputParameters.Add("Out", ScrapsetTypes.Bool);
     }
 
-    public IEnumerable<IList<string>> GetParts()
+    // allows for short circuiting, you must pass in callbacks that evaluate one of this gate's deps when executed
+    public Dictionary<string, ScrapsetValue> EvaluateMultiPart(Dictionary<string, SubroutineInstance.LazyEvaluateDependency> evalCallbacks)
     {
-        var outerList = new List<IList<string>>();
-        outerList.Add(new List<string>() { "A" });
-        outerList.Add(new List<string>() { "B" });
-        return outerList;
-    }
+        var outDict = new Dictionary<string, ScrapsetValue>();
+        var outVal = new ScrapsetValue(ScrapsetTypes.Bool);
 
-    public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
-    {
-        throw new System.NotImplementedException();
+        var valA = (bool)evalCallbacks["A"]().Value;
+        if (valA) // since A is true, we must evaluate B - the result will just be B
+        {
+            outVal.Value = (bool)evalCallbacks["B"]().Value;
+        } else // since A is false, no reason to even evaluate B - the result is false (short-circuit)
+        {
+            outVal.Value = false;
+        }
+
+        outDict["Out"] = outVal;
+        return outDict;
     }
 }

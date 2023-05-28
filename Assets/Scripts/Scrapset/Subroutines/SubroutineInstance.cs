@@ -68,30 +68,35 @@ public class SubroutineInstance
     //     and cache the results
     //  3) The expression has already been evaluated and cached - it will not re-evaluate but instead
     //     use the cached value
-    private void EvaluateDependencies(IGate callingGate)
+    private Dictionary<int, Dictionary<string, ScrapsetValue>> EvaluateDependencies(IGate callingGate)
     {
+        var allDeps = new Dictionary<int, Dictionary<string, ScrapsetValue>>();
         // this executes once for every output feeding into the gate's inputs
         foreach (var kv in SubroutineDefinition.GetInputLinks(callingGate.Id))
         {
-            EvaluateDependency(callingGate, kv.Key, kv.Value);
+            allDeps[callingGate.Id] = EvaluateDependency(callingGate, kv.Key, kv.Value);
         }
+
+        return allDeps;
     }
 
+    // creates a kv pair from output param names -> dep eval callbacks
     private Dictionary<string, LazyEvaluateDependency> LazyEvaluateDependencies(IGate callingGate)
     {
         var evalDepCallbacksByInputName = new Dictionary<string, LazyEvaluateDependency>();
         // this executes once for every output feeding into the gate's inputs
         foreach (var kv in SubroutineDefinition.GetInputLinks(callingGate.Id))
         {
-            evalDepCallbacksByInputName[kv.Key] = () => EvaluateDependency(callingGate, kv.Key, kv.Value);
+            // evaluates the dep when cb is called and selects out the desired dep output, assigning it to the desired input in the out dict
+            evalDepCallbacksByInputName[kv.Key] = () => EvaluateDependency(callingGate, kv.Key, kv.Value)[kv.Value.OutputParameterName];
         }
 
         return evalDepCallbacksByInputName;
     }
 
-    private delegate void LazyEvaluateDependency();
+    public delegate ScrapsetValue LazyEvaluateDependency();
 
-    private void EvaluateDependency(IGate callingGate, string inputParamName, GateLink gateLink)
+    private Dictionary<string, ScrapsetValue> EvaluateDependency(IGate callingGate, string inputParamName, GateLink gateLink)
     {
         var dependency = SubroutineDefinition.FindGateById(gateLink.OutputGateId);
         Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
@@ -107,9 +112,11 @@ public class SubroutineInstance
         {
             // Situation 3)
             // use the cached values instead of re-evaluating the dependency
-            var evaluatedValue = cachedOutputValuesForGates[dependency.Id][gateLink.OutputParameterName];
+            var cachedExpressionOutputValues = cachedOutputValuesForGates[dependency.Id];
+            var evaluatedValue = cachedExpressionOutputValues[gateLink.OutputParameterName];
             CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
             Debug.Log($"Used cached value of gate '{dependency.Name}' output '{gateLink.OutputParameterName}'");
+            return cachedExpressionOutputValues;
         } else // otherwise the dependency needs to be evaluated and cached
         {
             Dictionary<string, ScrapsetValue> expressionOutputValues;
@@ -156,6 +163,7 @@ public class SubroutineInstance
 
             var evaluatedValue = expressionOutputValues[gateLink.OutputParameterName];
             CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
+            return expressionOutputValues;
         }
     }
 
