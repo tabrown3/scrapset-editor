@@ -54,6 +54,7 @@ namespace Scrapset.Examples
             subroutineDefinition.CreateInputOutputLink(subroutineOutputGateId, "In", assignmentGateId, "Out");
 
             // else Return = N * factorial(N-1) return
+            var subroutineOutputGate2Id = subroutineDefinition.CreateOutputVariableGate<NumberVariableGate>("Return");
             var assignmentGate2Id = subroutineDefinition.CreateGate<AssignmentGate>();
             var multiplyGateId = subroutineDefinition.CreateGate<MultiplyGate>();
             var factorialGateId = subroutineDefinition.CreateSubroutineGate(subroutineDefinition);
@@ -65,6 +66,7 @@ namespace Scrapset.Examples
             subroutineDefinition.CreateInputOutputLink(factorialGateId, "N", subtractGateId, "Out");
             subroutineDefinition.CreateInputOutputLink(subtractGateId, "A", subroutineInputGateId, "Out");
             subroutineDefinition.CreateInputOutputLink(subtractGateId, "B", constantValueGateId, "Out");
+            subroutineDefinition.CreateInputOutputLink(subroutineOutputGate2Id, "In", assignmentGate2Id, "Out");
 
             subroutineDefinition.CreateProgramFlowLink(subroutineDefinition.EntrypointId, "Next", ifGateId);
             subroutineDefinition.CreateProgramFlowLink(ifGateId, "Then", assignmentGateId);
