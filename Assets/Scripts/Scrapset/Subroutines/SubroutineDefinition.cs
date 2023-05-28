@@ -46,6 +46,11 @@ public class SubroutineDefinition : IInputOutput
     public int CreateGate<T>() where T : IGate, new()
     {
         var gate = new T();
+        return CreateGate(gate);
+    }
+
+    public int CreateGate<T>(T gate) where T : IGate
+    {
         gate.Id = idCounter++;
         gates.Add(gate.Id, gate);
 
@@ -164,6 +169,12 @@ public class SubroutineDefinition : IInputOutput
         }
 
         return CreateVariableGate<T>(outputName);
+    }
+
+    public int CreateSubroutineGate(SubroutineDefinition subroutineDefinition)
+    {
+        var subroutineGate = new SubroutineGate(subroutineDefinition);
+        return CreateGate(subroutineGate);
     }
 
     public bool HasInputLinks(int gateId)
