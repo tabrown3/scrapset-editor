@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class SubroutineDefinition : IInputOutput
 {
+    public string Name { get; private set; }
     public int EntrypointId { get; private set; }
     // all variable names -> types that the user has declared as part of this subroutine declaration
     Dictionary<string, ScrapsetTypes> localVariableDeclarations = new Dictionary<string, ScrapsetTypes>();
@@ -20,12 +21,16 @@ public class SubroutineDefinition : IInputOutput
     GateIORegistry gateIORegistry;
     // manages the program flow connections
     ProgramFlowRegistry programFlowRegistry;
+    // the manager storing this definition
+    SubroutineManager subroutineManager;
 
-    public SubroutineDefinition()
+    public SubroutineDefinition(string _name, SubroutineManager _subroutineManager)
     {
         gateIORegistry = new GateIORegistry(this);
         programFlowRegistry = new ProgramFlowRegistry(this);
         EntrypointId = CreateGate<Entrypoint>();
+        subroutineManager = _subroutineManager;
+        Name = _name;
     }
 
     public IGate FindGateById(int id)

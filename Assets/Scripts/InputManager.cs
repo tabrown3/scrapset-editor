@@ -75,10 +75,8 @@ public class InputManager : MonoBehaviour
 
     void GenerateTestProgram()
     {
-        var subroutineDefinition = new SubroutineDefinition();
-
         var subroutineManager = FindObjectOfType<SubroutineManager>();
-        subroutineManager.DeclareSubroutine("top-level", subroutineDefinition);
+        var subroutineDefinition = subroutineManager.DeclareSubroutine("top-level");
 
         // declare subroutine inputs and output
         subroutineDefinition.DeclareInputVariable("InNumber", ScrapsetTypes.Number);
