@@ -15,7 +15,7 @@ public class SubroutineManager : MonoBehaviour
         return subroutineDefinition;
     }
 
-    public void AddSubroutineDefinition(string name, SubroutineDefinition subroutineDefinition)
+    public void DeclareSubroutine(string name, SubroutineDefinition subroutineDefinition)
     {
         subroutineDefinitions[name] = subroutineDefinition;
     }

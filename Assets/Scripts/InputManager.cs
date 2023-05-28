@@ -76,9 +76,17 @@ public class InputManager : MonoBehaviour
     void GenerateTestProgram()
     {
         var subroutineDefinition = new SubroutineDefinition();
-        subroutineDefinition.DeclareLocalVariable("i", ScrapsetTypes.Number);
+
+        var subroutineManager = FindObjectOfType<SubroutineManager>();
+        subroutineManager.DeclareSubroutine("top-level", subroutineDefinition);
+
+        // declare subroutine inputs and output
         subroutineDefinition.DeclareInputVariable("InNumber", ScrapsetTypes.Number);
         subroutineDefinition.DeclareOutputVariable("Return", ScrapsetTypes.Number);
+
+        // declare local variables
+        subroutineDefinition.DeclareLocalVariable("i", ScrapsetTypes.Number);
+
 
         /* First statement */
         var ifStatementId = GenerateIfStatement(subroutineDefinition);
@@ -94,9 +102,6 @@ public class InputManager : MonoBehaviour
         subroutineDefinition.CreateProgramFlowLink(incrementStatementId, "Next", outputAssignmentStatementId);
         subroutineDefinition.CreateProgramFlowLink(outputAssignmentStatementId, "Next", ifStatementId);
         // intentionally omitted the ELSE block
-
-        var subroutineManager = FindObjectOfType<SubroutineManager>();
-        subroutineManager.AddSubroutineDefinition("top-level", subroutineDefinition);
     }
 
     int GenerateIfStatement(SubroutineDefinition subroutineDefinition)
