@@ -5,7 +5,7 @@ public class SubroutineManager : MonoBehaviour
 {
     Dictionary<string, SubroutineDefinition> subroutineDefinitions = new Dictionary<string, SubroutineDefinition>();
 
-    public SubroutineDefinition GetSubroutineDefinition(string name)
+    public SubroutineDefinition GetDefinition(string name)
     {
         if (!subroutineDefinitions.TryGetValue(name, out var subroutineDefinition))
         {

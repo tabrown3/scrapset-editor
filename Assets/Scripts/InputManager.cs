@@ -49,16 +49,21 @@ public class InputManager : MonoBehaviour
 
     void OnRun()
     {
+        // find the subroutine manager
         var subroutineManager = FindObjectOfType<SubroutineManager>();
-        var definition = subroutineManager.GetSubroutineDefinition("top-level");
+        // get one of the stored subroutine definitions
+        var definition = subroutineManager.GetDefinition("top-level");
 
+        // build the subroutine's input object
         var subroutineInputs = new Dictionary<string, ScrapsetValue>();
         var inVal = new ScrapsetValue(ScrapsetTypes.Number) { Value = 4f };
         subroutineInputs.Add("InNumber", inVal);
 
+        // create an instance (runner) for the definition
         var instance = new SubroutineInstance();
         instance.SubroutineDefinition = definition;
 
+        // pass in the input args and execute the subroutine - hold on to the output
         var returnValues = instance.Execute(subroutineInputs);
 
         Debug.Log("Below are the subroutine's return values:");
