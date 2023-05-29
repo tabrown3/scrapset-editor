@@ -6,7 +6,7 @@ public class LessThanGate : Gate, IExpression
 
     public override string Description => "Compares inputs A and B and returns true if A is less than B";
 
-    public override LanguageCategory Category => LanguageCategory.Expression;
+    public override LanguageCategory Category { get; set; } = LanguageCategory.Expression;
 
     public LessThanGate()
     {

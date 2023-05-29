@@ -8,7 +8,7 @@ public class AssignmentGate : Gate, IStatement
 
     override public string Description => "Assigns values to variables";
 
-    override public LanguageCategory Category => LanguageCategory.Statement;
+    override public LanguageCategory Category { get; set; } = LanguageCategory.Statement;
 
     public AssignmentGate()
     {

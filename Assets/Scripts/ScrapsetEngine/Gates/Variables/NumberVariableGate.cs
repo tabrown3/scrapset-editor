@@ -7,7 +7,7 @@ public class NumberVariableGate : Gate, IIdentifiable, IReadable, IWritable, IEx
 
     override public string Description => "Stores a value of type Number";
 
-    override public LanguageCategory Category => LanguageCategory.Variable;
+    override public LanguageCategory Category { get; set; } = LanguageCategory.Variable;
 
     public string Identifier { get; set; }
 

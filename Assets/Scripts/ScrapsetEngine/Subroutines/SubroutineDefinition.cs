@@ -109,13 +109,20 @@ public class SubroutineDefinition : IInputOutput
         programFlowRegistry.RemoveAllProgramFlowLinks(gateId);
     }
 
-    private int CreateVariableGate<T>(string variableName) where T : IGate, new()
+    private int CreateVariableGate<T>(string variableName, LanguageCategory category) where T : IGate, new()
     {
         var variableId = CreateGate<T>();
-        var newVariable = GetGateById(variableId) as IIdentifiable;
+        var newGate = GetGateById(variableId);
+        newGate.Category = category;
+        var newVariable = newGate as IIdentifiable;
         newVariable.Identifier = variableName;
 
         return variableId;
+    }
+
+    private int CreateVariableGate<T>(string variableName) where T : IGate, new()
+    {
+        return CreateVariableGate<T>(variableName, LanguageCategory.Variable);
     }
 
     public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
@@ -155,7 +162,7 @@ public class SubroutineDefinition : IInputOutput
             throw new System.Exception($"Cannot spawn gate for input '{inputName}': input has not been declared");
         }
 
-        return CreateVariableGate<T>(inputName);
+        return CreateVariableGate<T>(inputName, LanguageCategory.SRInput);
     }
 
     public void DeclareOutputVariable(string parameterName, ScrapsetTypes scrapsetType)
@@ -175,7 +182,7 @@ public class SubroutineDefinition : IInputOutput
             throw new System.Exception($"Cannot spawn gate for output '{outputName}': output has not been declared");
         }
 
-        return CreateVariableGate<T>(outputName);
+        return CreateVariableGate<T>(outputName, LanguageCategory.SROutput);
     }
 
     public int CreateSubroutineGate(SubroutineDefinition subroutineDefinition)

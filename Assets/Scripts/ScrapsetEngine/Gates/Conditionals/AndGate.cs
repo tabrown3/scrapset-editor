@@ -6,7 +6,7 @@ public class AndGate : Gate, IMultiPartExpression
 
     public override string Description => "Performs logical AND on A and B";
 
-    public override LanguageCategory Category => LanguageCategory.Expression;
+    public override LanguageCategory Category { get; set; } = LanguageCategory.Expression;
 
     public AndGate()
     {

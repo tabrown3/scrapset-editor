@@ -6,7 +6,7 @@ public abstract class Gate : IGate
 
     abstract public string Description { get; }
 
-    abstract public LanguageCategory Category { get; }
+    abstract public LanguageCategory Category { get; set; }
 
     public int Id { get; set; }
 
