@@ -6,7 +6,7 @@ public class SubtractGate : Gate, IExpression
 
     override public string Description => "Subtract two numbers";
 
-    override public string Category => "Arithmetic";
+    override public LanguageCategory Category => LanguageCategory.Expression;
 
     public SubtractGate()
     {

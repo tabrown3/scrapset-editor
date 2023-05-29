@@ -7,7 +7,7 @@ public class BoolVariableGate : Gate, IIdentifiable, IReadable, IWritable, IExpr
 
     override public string Description => "Stores a value of type Bool";
 
-    override public string Category => "Variables";
+    override public LanguageCategory Category => LanguageCategory.Variable;
 
     public string Identifier { get; set; }
 

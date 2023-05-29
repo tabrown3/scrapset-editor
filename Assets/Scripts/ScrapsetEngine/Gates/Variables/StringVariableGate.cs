@@ -7,7 +7,7 @@ public class StringVariableGate : Gate, IIdentifiable, IReadable, IWritable, IEx
 
     override public string Description => "Stores a value of type String";
 
-    override public string Category => "Variables";
+    override public LanguageCategory Category => LanguageCategory.Variable;
 
     public string Identifier { get; set; }
 

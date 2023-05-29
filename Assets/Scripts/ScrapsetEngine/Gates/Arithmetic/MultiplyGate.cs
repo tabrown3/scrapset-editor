@@ -6,7 +6,7 @@ public class MultiplyGate : Gate, IExpression
 
     override public string Description => "Multiplies numbers together";
 
-    override public string Category => "Arithmetic";
+    override public LanguageCategory Category => LanguageCategory.Expression;
 
     public MultiplyGate()
     {

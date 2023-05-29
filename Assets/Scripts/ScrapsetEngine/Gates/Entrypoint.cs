@@ -8,7 +8,7 @@ public class Entrypoint : Gate, IStatement
 
     override public string Description => "The program's starting point";
 
-    override public string Category => "System";
+    override public LanguageCategory Category => LanguageCategory.Entrypoint;
 
     public Entrypoint()
     {

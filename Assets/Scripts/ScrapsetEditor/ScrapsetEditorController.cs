@@ -15,16 +15,26 @@ public class ScrapsetEditorController : MonoBehaviour
     [SerializeField] GameObject VariablePrefab;
 
     Dictionary<string, GameObject> srGameObjects = new Dictionary<string, GameObject>();
+    SubroutineDefinition activeSRDefinition;
 
     void Start()
     {
         var mainName = "Main";
         if (!SubroutineManager.HasDefinition(mainName))
         {
-            SubroutineManager.DeclareSubroutine(mainName);
+            activeSRDefinition = SubroutineManager.DeclareSubroutine(mainName);
+            CreateSubroutineRef(mainName);
+        }
+    }
+
+    private void SetActiveSubroutine(string name)
+    {
+        if (!SubroutineManager.HasDefinition(name))
+        {
+            throw new System.Exception($"Unable to set active subroutine: '{name}' does not exist");
         }
 
-        CreateSubroutineRef(mainName);
+        activeSRDefinition = SubroutineManager.GetDefinition(name);
     }
 
     void CreateSubroutineRef(string name)
@@ -37,5 +47,11 @@ public class ScrapsetEditorController : MonoBehaviour
         subroutineRef.SubroutineName = name;
 
         srGameObjects.Add(name, gameObject);
+    }
+
+    void CreateGateRef(int id)
+    {
+        var gate = activeSRDefinition.GetGateById(id);
+
     }
 }

@@ -143,7 +143,7 @@ public class SubroutineInstance
                     // if the gate isn't identifiable, then it's just a gate that doesn't have dependencies, so pass in an empty dict
                     expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>());
                     CacheOutputValuesForGate(dependency, expressionOutputValues);
-                } else // it's some kind of variable or input/output gate
+                } else // it's some kind of variable or sr input
                 {
                     var isLocalVariable = SubroutineDefinition.LocalVariableDeclarations.ContainsKey(identifiableDep.Identifier);
                     var isSubroutineInput = SubroutineDefinition.InputParameters.ContainsKey(identifiableDep.Identifier);

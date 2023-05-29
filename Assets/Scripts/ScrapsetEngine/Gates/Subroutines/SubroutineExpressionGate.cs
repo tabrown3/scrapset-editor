@@ -6,7 +6,7 @@ public class SubroutineExpressionGate : Gate, IExpression
 
     public override string Description => $"An instance of '{Name}' (subroutine)";
 
-    public override string Category { get; } = "Subroutines";
+    override public LanguageCategory Category => LanguageCategory.Subroutine;
 
     SubroutineDefinition subroutineDefinition;
 

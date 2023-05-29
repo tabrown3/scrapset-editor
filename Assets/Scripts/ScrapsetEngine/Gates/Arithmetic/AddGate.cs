@@ -6,7 +6,7 @@ public class AddGate : Gate, IExpression
 
     override public string Description => "Adds numbers together";
 
-    override public string Category => "Arithmetic";
+    override public LanguageCategory Category => LanguageCategory.Expression;
 
     public AddGate()
     {

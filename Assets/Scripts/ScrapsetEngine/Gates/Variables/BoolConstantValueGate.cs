@@ -8,7 +8,7 @@ public class BoolConstantValueGate : Gate, IExpression
 
     override public string Description => "Returns a constant value";
 
-    override public string Category => "Variables";
+    override public LanguageCategory Category => LanguageCategory.Variable;
 
     public BoolConstantValueGate()
     {
