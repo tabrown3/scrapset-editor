@@ -3,7 +3,16 @@ using UnityEngine;
 
 public class SubroutineManager : MonoBehaviour
 {
+    [SerializeField] GameObject EntrypointPrefab;
+    [SerializeField] GameObject ExpressionPrefab;
+    [SerializeField] GameObject SRInputPrefab;
+    [SerializeField] GameObject SROutputPrefab;
+    [SerializeField] GameObject StatementPrefab;
+    [SerializeField] GameObject SubroutinePrefab;
+    [SerializeField] GameObject VariablePrefab;
+
     Dictionary<string, SubroutineDefinition> subroutineDefinitions = new Dictionary<string, SubroutineDefinition>();
+    Dictionary<string, GameObject> srGameObjects = new Dictionary<string, GameObject>();
 
     public SubroutineDefinition GetDefinition(string name)
     {
