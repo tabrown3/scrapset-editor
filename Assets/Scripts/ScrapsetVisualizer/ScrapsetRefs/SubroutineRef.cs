@@ -1,11 +1,10 @@
 using UnityEngine;
 
-public class GateRef : MonoBehaviour
+public class SubroutineRef : MonoBehaviour
 {
     public string SubroutineName { get; set; }
-    public int GateId { get; set; }
 
-    static SubroutineManager subroutineManager;
+    SubroutineManager subroutineManager;
 
     void Start()
     {
