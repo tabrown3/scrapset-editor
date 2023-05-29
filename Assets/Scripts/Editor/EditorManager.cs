@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ScrapsetVisualizer : MonoBehaviour
+public class EditorManager : MonoBehaviour
 {
     [SerializeField] GameObject EntrypointPrefab;
     [SerializeField] GameObject ExpressionPrefab;
