@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public class SubroutineGate : Gate, IExpression
+public class SubroutineExpressionGate : Gate, IExpression
 {
     public override string Name => subroutineDefinition.Name;
 
@@ -10,7 +10,7 @@ public class SubroutineGate : Gate, IExpression
 
     SubroutineDefinition subroutineDefinition;
 
-    public SubroutineGate(SubroutineDefinition _subroutineDefinition)
+    public SubroutineExpressionGate(SubroutineDefinition _subroutineDefinition)
     {
         subroutineDefinition = _subroutineDefinition;
         InputParameters = _subroutineDefinition.InputParameters;

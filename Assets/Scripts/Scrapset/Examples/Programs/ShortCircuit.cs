@@ -13,7 +13,7 @@ namespace Scrapset.Examples
 
             var assignmentGateId = subroutineDefinition.CreateGate<AssignmentGate>();
             var falseValueGateId = subroutineDefinition.CreateGate<BoolConstantValueGate>();
-            var trueValueGateId = subroutineDefinition.CreateGate(new BoolConstantValueGate(true));
+            var trueValueGateId = subroutineDefinition.RegisterGate(new BoolConstantValueGate(true));
             var andGateId = subroutineDefinition.CreateGate<AndGate>();
             var boolOutputId = subroutineDefinition.CreateOutputVariableGate<BoolVariableGate>("Return");
 
@@ -29,16 +29,8 @@ namespace Scrapset.Examples
         {
             // find the subroutine manager
             var subroutineManager = FindObjectOfType<SubroutineManager>();
-            // get one of the stored subroutine definitions
-            var definition = subroutineManager.GetDefinition("top-level");
 
-            // create an instance (runner) for the definition
-            var instance = new SubroutineInstance();
-            instance.SubroutineDefinition = definition;
-
-            // pass in the input args and execute the subroutine - hold on to the output
-            var returnValues = instance.Execute(new Dictionary<string, ScrapsetValue>());
-
+            var returnValues = subroutineManager.CallSubroutine("top-level", new Dictionary<string, ScrapsetValue>());
             return returnValues;
         }
     }

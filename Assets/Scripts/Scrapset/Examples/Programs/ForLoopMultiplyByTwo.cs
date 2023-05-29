@@ -16,21 +16,14 @@ namespace Scrapset.Examples
         {
             // find the subroutine manager
             var subroutineManager = FindObjectOfType<SubroutineManager>();
-            // get one of the stored subroutine definitions
-            var definition = subroutineManager.GetDefinition("top-level");
 
             // build the subroutine's input object
             var subroutineInputs = new Dictionary<string, ScrapsetValue>();
             var inVal = new ScrapsetValue(ScrapsetTypes.Number) { Value = 3f };
             subroutineInputs.Add("InNumber", inVal);
 
-            // create an instance (runner) for the definition
-            var instance = new SubroutineInstance();
-            instance.SubroutineDefinition = definition;
-
             // pass in the input args and execute the subroutine - hold on to the output
-            var returnValues = instance.Execute(subroutineInputs);
-
+            var returnValues = subroutineManager.CallSubroutine("top-level", subroutineInputs);
             return returnValues;
         }
 
@@ -100,14 +93,11 @@ namespace Scrapset.Examples
 
             // find the multiply-by-two subroutine
             var subroutineManager = FindObjectOfType<SubroutineManager>();
-            var multiplyByTwoDefinition = subroutineManager.GetDefinition("multiply-by-two");
+            var definition = subroutineManager.GetDefinition("multiply-by-two");
+            var subroutineGateId = subroutineDefinition.CreateSubroutineGate(definition);
 
-            // create a gate for the subroutine
-            var subroutineGate = new SubroutineGate(multiplyByTwoDefinition);
-            subroutineDefinition.CreateGate(subroutineGate);
-
-            subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", subroutineGate.Id, "Return");
-            subroutineDefinition.CreateInputOutputLink(subroutineGate.Id, "InNumber", numberVariableId, "Out");
+            subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", subroutineGateId, "Return");
+            subroutineDefinition.CreateInputOutputLink(subroutineGateId, "InNumber", numberVariableId, "Out");
             subroutineDefinition.CreateInputOutputLink(subroutineNumberOutput, "In", assignmentGateId, "Out");
 
             return assignmentGateId;

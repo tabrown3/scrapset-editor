@@ -22,7 +22,7 @@ public class SubroutineManager : MonoBehaviour
         return subroutineDefinition;
     }
 
-    public SubroutineDefinition DeleteSubroutineDefinition(string name)
+    public SubroutineDefinition DeleteDefinition(string name)
     {
         if (!subroutineDefinitions.TryGetValue(name, out var subroutineDefinition))
         {
@@ -34,8 +34,22 @@ public class SubroutineManager : MonoBehaviour
         return subroutineDefinition;
     }
 
-    public IReadOnlyDictionary<string, SubroutineDefinition> GetAllSubroutineDefinitions()
+    public IReadOnlyDictionary<string, SubroutineDefinition> GetAllDefinitions()
     {
         return subroutineDefinitions;
+    }
+
+    public SubroutineInstance CreateInstance(string name)
+    {
+        var definition = GetDefinition(name);
+        var instance = new SubroutineInstance();
+        instance.SubroutineDefinition = definition;
+        return instance;
+    }
+
+    public Dictionary<string, ScrapsetValue> CallSubroutine(string name, Dictionary<string, ScrapsetValue> inputArgs)
+    {
+        var instance = CreateInstance(name);
+        return instance.Execute(inputArgs);
     }
 }

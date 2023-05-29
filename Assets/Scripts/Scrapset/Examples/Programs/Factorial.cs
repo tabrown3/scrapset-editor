@@ -15,17 +15,9 @@ namespace Scrapset.Examples
         {
             // find the subroutine manager
             var subroutineManager = FindObjectOfType<SubroutineManager>();
-            // get one of the stored subroutine definitions
-            var definition = subroutineManager.GetDefinition("top-level");
 
-            // create an instance (runner) for the definition
-            var instance = new SubroutineInstance();
-            instance.SubroutineDefinition = definition;
-
-            // pass in the input args and execute the subroutine - hold on to the output
-            var returnValues = instance.Execute(new Dictionary<string, ScrapsetValue>());
-
-            return returnValues;
+            // looks up the definition for "top-level", creates an instance from the definition, and executes it, passing in the args
+            return subroutineManager.CallSubroutine("top-level", new Dictionary<string, ScrapsetValue>());
         }
 
         void BuildFactorial()
@@ -83,7 +75,7 @@ namespace Scrapset.Examples
 
             var factorialGateId = subroutineDefinition.CreateSubroutineGate(factorialSubroutine);
             var assignmentGateId = subroutineDefinition.CreateGate<AssignmentGate>();
-            var constantValueGateId = subroutineDefinition.CreateGate(new NumberConstantValueGate(5f));
+            var constantValueGateId = subroutineDefinition.RegisterGate(new NumberConstantValueGate(5f));
             var subroutineOutputGateId = subroutineDefinition.CreateOutputVariableGate<NumberVariableGate>("Return");
 
             subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", factorialGateId, "Return");
