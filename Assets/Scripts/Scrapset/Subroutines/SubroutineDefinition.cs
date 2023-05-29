@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class SubroutineDefinition : MonoBehaviour, IInputOutput
+public class SubroutineDefinition : IInputOutput
 {
     public string Name { get; private set; }
     public int EntrypointId { get; private set; }
