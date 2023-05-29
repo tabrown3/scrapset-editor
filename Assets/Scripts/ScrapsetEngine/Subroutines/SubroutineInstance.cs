@@ -23,7 +23,7 @@ public class SubroutineInstance
         InstantiateAllVariables(subroutineInputs);
 
         // entrypoint acts as the first statement to run; it does little more than Goto the real first statement
-        var entrypoint = SubroutineDefinition.FindGateById(SubroutineDefinition.EntrypointId);
+        var entrypoint = SubroutineDefinition.GetGateById(SubroutineDefinition.EntrypointId);
         currentStatement = entrypoint as IStatement;
         nextStatement = null;
         currentStatement.PerformSideEffect(this);
@@ -98,7 +98,7 @@ public class SubroutineInstance
 
     private Dictionary<string, ScrapsetValue> EvaluateDependency(IGate callingGate, string inputParamName, GateLink gateLink)
     {
-        var dependency = SubroutineDefinition.FindGateById(gateLink.OutputGateId);
+        var dependency = SubroutineDefinition.GetGateById(gateLink.OutputGateId);
         Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
 
         var dependencyAsExpression = dependency as IExpression;
@@ -264,7 +264,7 @@ public class SubroutineInstance
 
         foreach (var gateLink in gateLinks)
         {
-            var variable = SubroutineDefinition.FindGateById(gateLink.InputGateId) as IWritable;
+            var variable = SubroutineDefinition.GetGateById(gateLink.InputGateId) as IWritable;
             var identifable = variable as IIdentifiable;
             if (variable == null)
             {
@@ -298,7 +298,7 @@ public class SubroutineInstance
         } else
         {
             var toGateId = programFlow.ToGateId;
-            var toGate = SubroutineDefinition.FindGateById(toGateId);
+            var toGate = SubroutineDefinition.GetGateById(toGateId);
             if (toGate == null)
             {
                 throw new System.Exception($"Gate with ID {toGateId} not found");

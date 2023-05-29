@@ -57,13 +57,13 @@ public class GateIORegistry
     // create an I/O link between gates
     public void CreateInputOutputLink(int inputGateId, string inputParameterName, int outputGateId, string outputParameterName)
     {
-        var outputGate = subroutineDefinition.FindGateById(outputGateId);
+        var outputGate = subroutineDefinition.GetGateById(outputGateId);
         if (outputGate == null)
         {
             throw new System.Exception($"Could not find gate with ID ${outputGateId}");
         }
 
-        var inputGate = subroutineDefinition.FindGateById(inputGateId);
+        var inputGate = subroutineDefinition.GetGateById(inputGateId);
         if (inputGate == null)
         {
             throw new System.Exception($"Could not find gate with ID ${inputGateId}");
@@ -231,7 +231,7 @@ public class GateIORegistry
 
     public void RemoveAllInputOutputLinks(int gateId)
     {
-        var gate = subroutineDefinition.FindGateById(gateId);
+        var gate = subroutineDefinition.GetGateById(gateId);
         foreach (var input in gate.InputParameters)
         {
             RemoveInputOutputLink(gateId, input.Key);

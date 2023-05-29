@@ -530,6 +530,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SubroutineManager: {fileID: 411458758}
+  SubroutineDefinitionPrefab: {fileID: 3304032504848182575, guid: aea2916cb2380a84ea8c239aa4644771, type: 3}
   EntrypointPrefab: {fileID: 6072672012342526287, guid: 92d485eec460777408773096e25dd375, type: 3}
   ExpressionPrefab: {fileID: 7319916072830854709, guid: a7b236da3f528e748b84b77acdb7d59e, type: 3}
   SRInputPrefab: {fileID: 6055869467265577679, guid: eef897959003b7242ad071455da88ed4, type: 3}

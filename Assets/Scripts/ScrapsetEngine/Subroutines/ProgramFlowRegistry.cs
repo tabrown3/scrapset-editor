@@ -15,13 +15,13 @@ public class ProgramFlowRegistry
     // establish program execution order by linking statements together
     public void CreateProgramFlowLink(int fromId, string flowName, int toId)
     {
-        var fromGate = subroutineDefinition.FindGateById(fromId);
+        var fromGate = subroutineDefinition.GetGateById(fromId);
         if (fromGate == null)
         {
             throw new System.Exception($"Gate with ID {fromId} not found");
         }
 
-        var toGate = subroutineDefinition.FindGateById(toId);
+        var toGate = subroutineDefinition.GetGateById(toId);
         if (toGate == null)
         {
             throw new System.Exception($"Gate with ID {toId} not found");

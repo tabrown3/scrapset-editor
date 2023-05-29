@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class SubroutineDefinition : IInputOutput
@@ -33,7 +34,7 @@ public class SubroutineDefinition : IInputOutput
         Name = _name;
     }
 
-    public IGate FindGateById(int id)
+    public IGate GetGateById(int id)
     {
         if (!gates.TryGetValue(id, out var gate))
         {
@@ -42,6 +43,12 @@ public class SubroutineDefinition : IInputOutput
 
         return gate;
     }
+
+    public IList<IGate> GetAllGates()
+    {
+        return gates.Values.ToList();
+    }
+
 
     public int CreateGate<T>() where T : IGate, new()
     {
@@ -60,7 +67,7 @@ public class SubroutineDefinition : IInputOutput
 
     public void RemoveGate(int gateId)
     {
-        var gate = FindGateById(gateId);
+        var gate = GetGateById(gateId);
 
         if (gate == null)
         {
@@ -105,7 +112,7 @@ public class SubroutineDefinition : IInputOutput
     private int CreateVariableGate<T>(string variableName) where T : IGate, new()
     {
         var variableId = CreateGate<T>();
-        var newVariable = FindGateById(variableId) as IIdentifiable;
+        var newVariable = GetGateById(variableId) as IIdentifiable;
         newVariable.Identifier = variableName;
 
         return variableId;
