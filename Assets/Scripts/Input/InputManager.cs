@@ -13,7 +13,7 @@ namespace Scrapset
         public bool IsPanningByDrag { get; private set; }
         public Vector3 InitDragPosWorld { get; private set; }
 
-        [SerializeField] UnityEngine.Camera cam;
+        [SerializeField] Camera cam;
 
         bool prevIsPanningByDrag;
 
