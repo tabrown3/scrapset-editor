@@ -2,7 +2,7 @@ using Scrapset.Examples;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Scrapset.Input
+namespace Scrapset
 {
     public class InputManager : MonoBehaviour
     {

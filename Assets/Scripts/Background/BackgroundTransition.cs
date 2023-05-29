@@ -1,12 +1,11 @@
-using Scrapset.Camera;
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace Scrapset.Background
+namespace Scrapset
 {
     public class BackgroundTransition : MonoBehaviour
     {
-        [SerializeField] UnityEngine.Camera cam;
+        [SerializeField] Camera cam;
         [SerializeField] float transitionStartSize = 9f;
         [SerializeField] float transitionEndSize = 22f;
 

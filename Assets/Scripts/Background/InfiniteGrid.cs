@@ -1,7 +1,6 @@
-using Scrapset.Camera;
 using UnityEngine;
 
-namespace Scrapset.Background
+namespace Scrapset
 {
     public class InfiniteGrid : MonoBehaviour
     {
@@ -9,7 +8,7 @@ namespace Scrapset.Background
         [SerializeField] float tileHeight = 1f; // in Unity units
         [SerializeField] float gridWidth = 32f; // in Scrapset Editor tiles
         [SerializeField] float gridHeight = 32f; // in Scrapset Editor tiles
-        [SerializeField] UnityEngine.Camera cam;
+        [SerializeField] Camera cam;
 
         CameraController camController;
         float halfWidth;

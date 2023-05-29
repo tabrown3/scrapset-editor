@@ -1,7 +1,6 @@
-using Scrapset.Input;
 using UnityEngine;
 
-namespace Scrapset.Camera
+namespace Scrapset
 {
     public class CameraController : MonoBehaviour
     {
