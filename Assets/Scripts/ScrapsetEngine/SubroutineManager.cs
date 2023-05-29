@@ -17,7 +17,7 @@ public class SubroutineManager : MonoBehaviour
             throw new System.Exception($"Could not find subroutine defintion '{name}'");
         }
 
-        Debug.Log($"Got definition for subroutine definition '{name}'");
+        Debug.Log($"Got definition for subroutine '{name}'");
         return subroutineDefinition;
     }
 

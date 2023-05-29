@@ -23,7 +23,9 @@ public class ScrapsetEditorController : MonoBehaviour
         if (!SubroutineManager.HasDefinition(mainName))
         {
             activeSRDefinition = SubroutineManager.DeclareSubroutine(mainName);
+            SetActiveSubroutine(mainName);
             CreateSubroutineRef(mainName);
+            CreateGateRef(activeSRDefinition.EntrypointId);
         }
     }
 
@@ -51,7 +53,35 @@ public class ScrapsetEditorController : MonoBehaviour
 
     void CreateGateRef(int id)
     {
+        if (activeSRDefinition == null)
+        {
+            throw new System.Exception($"Could not create GateRef for Gate ID {id}: no subroutine is active");
+        }
+
         var gate = activeSRDefinition.GetGateById(id);
 
+        var gameObject = Instantiate(GetGatePrefab(gate.Category));
+        gameObject.name = gate.Name;
+        var subroutineRef = srGameObjects[activeSRDefinition.Name];
+        gameObject.transform.SetParent(subroutineRef.transform);
+
+        var gateRef = gameObject.GetComponent<GateRef>();
+        gateRef.SubroutineName = activeSRDefinition.Name;
+        gateRef.GateId = id;
+    }
+
+    GameObject GetGatePrefab(LanguageCategory category)
+    {
+        switch (category)
+        {
+            case LanguageCategory.Entrypoint: return EntrypointPrefab;
+            case LanguageCategory.Expression: return ExpressionPrefab;
+            case LanguageCategory.SRInput: return SRInputPrefab;
+            case LanguageCategory.SROutput: return SROutputPrefab;
+            case LanguageCategory.Statement: return StatementPrefab;
+            case LanguageCategory.Subroutine: return SubroutinePrefab;
+            case LanguageCategory.Variable: return VariablePrefab;
+            default: throw new System.Exception($"Could not find prefab for gate language category: category {category} is not recognized");
+        }
     }
 }
