@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
-using static SubroutineInstance;
+using static Scrapset.Engine.SubroutineInstance;
 
-public interface IMultiPartExpression
+namespace Scrapset.Engine
 {
-    Dictionary<string, ScrapsetValue> EvaluateMultiPart(Dictionary<string, LazyEvaluateDependency> evalCallbacks);
+    public interface IMultiPartExpression
+    {
+        Dictionary<string, ScrapsetValue> EvaluateMultiPart(Dictionary<string, LazyEvaluateDependency> evalCallbacks);
+    }
 }

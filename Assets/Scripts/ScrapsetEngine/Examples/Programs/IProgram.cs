@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Scrapset.Engine;
+using System.Collections.Generic;
 
 namespace Scrapset.Examples
 {

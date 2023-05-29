@@ -1,6 +1,9 @@
-public class ProgramFlow
+namespace Scrapset.Engine
 {
-    public int FromGateId { get; set; }
-    public string FromFlowName { get; set; }
-    public int ToGateId { get; set; }
+    public class ProgramFlow
+    {
+        public int FromGateId { get; set; }
+        public string FromFlowName { get; set; }
+        public int ToGateId { get; set; }
+    }
 }

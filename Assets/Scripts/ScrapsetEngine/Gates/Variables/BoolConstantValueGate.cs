@@ -1,30 +1,33 @@
 ﻿using System.Collections.Generic;
 
-public class BoolConstantValueGate : Gate, IExpression
+namespace Scrapset.Engine
 {
-    bool constantValue = false;
-
-    override public string Name => "Bool Constant Value";
-
-    override public string Description => "Returns a constant value";
-
-    override public LanguageCategory Category { get; set; } = LanguageCategory.Variable;
-
-    public BoolConstantValueGate()
+    public class BoolConstantValueGate : Gate, IExpression
     {
-        OutputParameters.Add("Out", ScrapsetTypes.Bool);
-    }
+        bool constantValue = false;
 
-    public BoolConstantValueGate(bool _constantValue) : this()
-    {
-        constantValue = _constantValue;
-    }
+        override public string Name => "Bool Constant Value";
 
-    public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
-    {
-        var outVal = new ScrapsetValue(ScrapsetTypes.Bool);
-        outVal.Value = constantValue;
+        override public string Description => "Returns a constant value";
 
-        return new Dictionary<string, ScrapsetValue>() { { "Out", outVal } };
+        override public LanguageCategory Category { get; set; } = LanguageCategory.Variable;
+
+        public BoolConstantValueGate()
+        {
+            OutputParameters.Add("Out", ScrapsetTypes.Bool);
+        }
+
+        public BoolConstantValueGate(bool _constantValue) : this()
+        {
+            constantValue = _constantValue;
+        }
+
+        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
+        {
+            var outVal = new ScrapsetValue(ScrapsetTypes.Bool);
+            outVal.Value = constantValue;
+
+            return new Dictionary<string, ScrapsetValue>() { { "Out", outVal } };
+        }
     }
 }

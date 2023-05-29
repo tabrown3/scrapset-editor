@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 
-public interface IExpression
+namespace Scrapset.Engine
 {
-    public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs);
+    public interface IExpression
+    {
+        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs);
+    }
 }

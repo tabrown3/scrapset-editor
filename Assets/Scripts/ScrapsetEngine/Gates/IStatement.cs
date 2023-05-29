@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 
-public interface IStatement
+namespace Scrapset.Engine
 {
-    public List<string> OutwardPaths { get; set; }
+    public interface IStatement
+    {
+        public List<string> OutwardPaths { get; set; }
 
-    public void PerformSideEffect(SubroutineInstance instance);
+        public void PerformSideEffect(SubroutineInstance instance);
+    }
 }

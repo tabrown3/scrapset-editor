@@ -1,16 +1,20 @@
+using Scrapset.Engine;
 using UnityEngine;
 
-public class SubroutineRef : MonoBehaviour
+namespace Scrapset.Editor
 {
-    public string SubroutineName { get; set; }
-
-    SubroutineManager subroutineManager;
-
-    void Start()
+    public class SubroutineRef : MonoBehaviour
     {
-        if (subroutineManager == null)
+        public string SubroutineName { get; set; }
+
+        SubroutineManager subroutineManager;
+
+        void Start()
         {
-            subroutineManager = FindObjectOfType<SubroutineManager>();
+            if (subroutineManager == null)
+            {
+                subroutineManager = FindObjectOfType<SubroutineManager>();
+            }
         }
     }
 }

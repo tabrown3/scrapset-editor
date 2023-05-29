@@ -1,29 +1,32 @@
 using System.Collections.Generic;
 
-public class NumberConstantValueGate : Gate, IExpression
+namespace Scrapset.Engine
 {
-    float constantValue = 1f;
-
-    override public string Name => "Number Constant Value";
-
-    override public string Description => "Returns a constant value";
-
-    override public LanguageCategory Category { get; set; } = LanguageCategory.Expression;
-
-    public NumberConstantValueGate()
+    public class NumberConstantValueGate : Gate, IExpression
     {
-        OutputParameters.Add("Out", ScrapsetTypes.Number);
-    }
+        float constantValue = 1f;
 
-    public NumberConstantValueGate(float _constantValue) : this()
-    {
-        constantValue = _constantValue;
-    }
+        override public string Name => "Number Constant Value";
 
-    public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
-    {
-        var outVal = new ScrapsetValue(ScrapsetTypes.Number);
-        outVal.Value = constantValue;
-        return new Dictionary<string, ScrapsetValue>() { { "Out", outVal } };
+        override public string Description => "Returns a constant value";
+
+        override public LanguageCategory Category { get; set; } = LanguageCategory.Expression;
+
+        public NumberConstantValueGate()
+        {
+            OutputParameters.Add("Out", ScrapsetTypes.Number);
+        }
+
+        public NumberConstantValueGate(float _constantValue) : this()
+        {
+            constantValue = _constantValue;
+        }
+
+        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
+        {
+            var outVal = new ScrapsetValue(ScrapsetTypes.Number);
+            outVal.Value = constantValue;
+            return new Dictionary<string, ScrapsetValue>() { { "Out", outVal } };
+        }
     }
 }

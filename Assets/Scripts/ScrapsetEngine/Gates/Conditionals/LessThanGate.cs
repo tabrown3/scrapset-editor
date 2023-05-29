@@ -1,37 +1,40 @@
 using System.Collections.Generic;
 
-public class LessThanGate : Gate, IExpression
+namespace Scrapset.Engine
 {
-    public override string Name => "Less Than";
-
-    public override string Description => "Compares inputs A and B and returns true if A is less than B";
-
-    public override LanguageCategory Category { get; set; } = LanguageCategory.Expression;
-
-    public LessThanGate()
+    public class LessThanGate : Gate, IExpression
     {
-        InputParameters.Add("A", ScrapsetTypes.Number);
-        InputParameters.Add("B", ScrapsetTypes.Number);
-        OutputParameters.Add("Out", ScrapsetTypes.Bool);
-    }
+        public override string Name => "Less Than";
 
-    public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
-    {
-        var a = (float)ScrapsetValue.GetDefaultForType(ScrapsetTypes.Number);
-        if (inputs.ContainsKey("A"))
+        public override string Description => "Compares inputs A and B and returns true if A is less than B";
+
+        public override LanguageCategory Category { get; set; } = LanguageCategory.Expression;
+
+        public LessThanGate()
         {
-            a = (float)inputs["A"].Value;
+            InputParameters.Add("A", ScrapsetTypes.Number);
+            InputParameters.Add("B", ScrapsetTypes.Number);
+            OutputParameters.Add("Out", ScrapsetTypes.Bool);
         }
 
-        var b = (float)ScrapsetValue.GetDefaultForType(ScrapsetTypes.Number);
-        if (inputs.ContainsKey("B"))
+        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
         {
-            b = (float)inputs["B"].Value;
-        }
+            var a = (float)ScrapsetValue.GetDefaultForType(ScrapsetTypes.Number);
+            if (inputs.ContainsKey("A"))
+            {
+                a = (float)inputs["A"].Value;
+            }
 
-        var result = a < b;
-        var outVal = new ScrapsetValue(ScrapsetTypes.Bool);
-        outVal.Value = result;
-        return new Dictionary<string, ScrapsetValue>() { { "Out", outVal } };
+            var b = (float)ScrapsetValue.GetDefaultForType(ScrapsetTypes.Number);
+            if (inputs.ContainsKey("B"))
+            {
+                b = (float)inputs["B"].Value;
+            }
+
+            var result = a < b;
+            var outVal = new ScrapsetValue(ScrapsetTypes.Bool);
+            outVal.Value = result;
+            return new Dictionary<string, ScrapsetValue>() { { "Out", outVal } };
+        }
     }
 }

@@ -1,22 +1,25 @@
 using System.Collections.Generic;
 
-public class Entrypoint : Gate, IStatement
+namespace Scrapset.Engine
 {
-    public List<string> OutwardPaths { get; set; } = new List<string>() { "Next" };
-
-    override public string Name => "Entrypoint";
-
-    override public string Description => "The program's starting point";
-
-    override public LanguageCategory Category { get; set; } = LanguageCategory.Entrypoint;
-
-    public Entrypoint()
+    public class Entrypoint : Gate, IStatement
     {
+        public List<string> OutwardPaths { get; set; } = new List<string>() { "Next" };
 
-    }
+        override public string Name => "Entrypoint";
 
-    public void PerformSideEffect(SubroutineInstance instance)
-    {
-        instance.Goto(this, "Next");
+        override public string Description => "The program's starting point";
+
+        override public LanguageCategory Category { get; set; } = LanguageCategory.Entrypoint;
+
+        public Entrypoint()
+        {
+
+        }
+
+        public void PerformSideEffect(SubroutineInstance instance)
+        {
+            instance.Goto(this, "Next");
+        }
     }
 }

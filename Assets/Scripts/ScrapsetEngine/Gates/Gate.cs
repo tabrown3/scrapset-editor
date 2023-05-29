@@ -1,36 +1,39 @@
 ﻿using System.Collections.Generic;
 
-public abstract class Gate : IGate
+namespace Scrapset.Engine
 {
-    abstract public string Name { get; }
-
-    abstract public string Description { get; }
-
-    abstract public LanguageCategory Category { get; set; }
-
-    public int Id { get; set; }
-
-    public Dictionary<string, ScrapsetTypes> InputParameters { get; protected set; } = new Dictionary<string, ScrapsetTypes>();
-    public Dictionary<string, ScrapsetTypes> OutputParameters { get; protected set; } = new Dictionary<string, ScrapsetTypes>();
-    public GenericTypeReconciler GenericTypeReconciler { get; private set; } = new GenericTypeReconciler();
-
-    public ScrapsetTypes GetInputParameter(string parameterName)
+    public abstract class Gate : IGate
     {
-        if (!InputParameters.TryGetValue(parameterName, out var parameterType))
+        abstract public string Name { get; }
+
+        abstract public string Description { get; }
+
+        abstract public LanguageCategory Category { get; set; }
+
+        public int Id { get; set; }
+
+        public Dictionary<string, ScrapsetTypes> InputParameters { get; protected set; } = new Dictionary<string, ScrapsetTypes>();
+        public Dictionary<string, ScrapsetTypes> OutputParameters { get; protected set; } = new Dictionary<string, ScrapsetTypes>();
+        public GenericTypeReconciler GenericTypeReconciler { get; private set; } = new GenericTypeReconciler();
+
+        public ScrapsetTypes GetInputParameter(string parameterName)
         {
-            return ScrapsetTypes.None;
+            if (!InputParameters.TryGetValue(parameterName, out var parameterType))
+            {
+                return ScrapsetTypes.None;
+            }
+
+            return parameterType;
         }
 
-        return parameterType;
-    }
-
-    public ScrapsetTypes GetOutputParameter(string parameterName)
-    {
-        if (!OutputParameters.TryGetValue(parameterName, out var parameterType))
+        public ScrapsetTypes GetOutputParameter(string parameterName)
         {
-            return ScrapsetTypes.None;
-        }
+            if (!OutputParameters.TryGetValue(parameterName, out var parameterType))
+            {
+                return ScrapsetTypes.None;
+            }
 
-        return parameterType;
+            return parameterType;
+        }
     }
 }

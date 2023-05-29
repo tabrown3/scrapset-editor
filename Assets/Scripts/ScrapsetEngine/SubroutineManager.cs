@@ -1,74 +1,77 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class SubroutineManager : MonoBehaviour
+namespace Scrapset.Engine
 {
-    Dictionary<string, SubroutineDefinition> subroutineDefinitions = new Dictionary<string, SubroutineDefinition>();
-
-    public bool HasDefinition(string name)
+    public class SubroutineManager : MonoBehaviour
     {
-        return subroutineDefinitions.ContainsKey(name);
-    }
+        Dictionary<string, SubroutineDefinition> subroutineDefinitions = new Dictionary<string, SubroutineDefinition>();
 
-    public SubroutineDefinition GetDefinition(string name)
-    {
-        if (!subroutineDefinitions.TryGetValue(name, out var subroutineDefinition))
+        public bool HasDefinition(string name)
         {
-            throw new System.Exception($"Could not find subroutine defintion '{name}'");
+            return subroutineDefinitions.ContainsKey(name);
         }
 
-        Debug.Log($"Got definition for subroutine '{name}'");
-        return subroutineDefinition;
-    }
-
-    public SubroutineDefinition DeclareSubroutine(string name)
-    {
-        var subroutineDefinition = new SubroutineDefinition(name, this);
-
-        if (subroutineDefinitions.ContainsKey(name))
+        public SubroutineDefinition GetDefinition(string name)
         {
-            throw new System.Exception($"Could not declare subroutine: a subroutine named '{name}' already exists");
+            if (!subroutineDefinitions.TryGetValue(name, out var subroutineDefinition))
+            {
+                throw new System.Exception($"Could not find subroutine defintion '{name}'");
+            }
+
+            Debug.Log($"Got definition for subroutine '{name}'");
+            return subroutineDefinition;
         }
 
-        subroutineDefinitions[name] = subroutineDefinition;
-
-        Debug.Log($"Declared subroutine '{name}'");
-        return subroutineDefinition;
-    }
-
-    public SubroutineDefinition DeleteDefinition(string name)
-    {
-        if (!subroutineDefinitions.TryGetValue(name, out var subroutineDefinition))
+        public SubroutineDefinition DeclareSubroutine(string name)
         {
-            throw new System.Exception($"Could not delete subroutine defintion '{name}': definition does not exist");
+            var subroutineDefinition = new SubroutineDefinition(name, this);
+
+            if (subroutineDefinitions.ContainsKey(name))
+            {
+                throw new System.Exception($"Could not declare subroutine: a subroutine named '{name}' already exists");
+            }
+
+            subroutineDefinitions[name] = subroutineDefinition;
+
+            Debug.Log($"Declared subroutine '{name}'");
+            return subroutineDefinition;
         }
 
-        subroutineDefinitions.Remove(name);
+        public SubroutineDefinition DeleteDefinition(string name)
+        {
+            if (!subroutineDefinitions.TryGetValue(name, out var subroutineDefinition))
+            {
+                throw new System.Exception($"Could not delete subroutine defintion '{name}': definition does not exist");
+            }
 
-        Debug.Log($"Deleted subroutine '{name}'");
-        return subroutineDefinition;
-    }
+            subroutineDefinitions.Remove(name);
 
-    public IReadOnlyDictionary<string, SubroutineDefinition> GetAllDefinitions()
-    {
-        return subroutineDefinitions;
-    }
+            Debug.Log($"Deleted subroutine '{name}'");
+            return subroutineDefinition;
+        }
 
-    public SubroutineInstance CreateInstance(string name)
-    {
-        var definition = GetDefinition(name);
-        var instance = new SubroutineInstance();
-        instance.SubroutineDefinition = definition;
+        public IReadOnlyDictionary<string, SubroutineDefinition> GetAllDefinitions()
+        {
+            return subroutineDefinitions;
+        }
 
-        Debug.Log($"Created subroutine instance for '{name}'");
-        return instance;
-    }
+        public SubroutineInstance CreateInstance(string name)
+        {
+            var definition = GetDefinition(name);
+            var instance = new SubroutineInstance();
+            instance.SubroutineDefinition = definition;
 
-    public Dictionary<string, ScrapsetValue> CallSubroutine(string name, Dictionary<string, ScrapsetValue> inputArgs)
-    {
-        var instance = CreateInstance(name);
+            Debug.Log($"Created subroutine instance for '{name}'");
+            return instance;
+        }
 
-        Debug.Log($"Called subroutine '{name}'");
-        return instance.Execute(inputArgs);
+        public Dictionary<string, ScrapsetValue> CallSubroutine(string name, Dictionary<string, ScrapsetValue> inputArgs)
+        {
+            var instance = CreateInstance(name);
+
+            Debug.Log($"Called subroutine '{name}'");
+            return instance.Execute(inputArgs);
+        }
     }
 }

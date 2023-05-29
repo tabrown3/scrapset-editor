@@ -1,11 +1,14 @@
-﻿public enum LanguageCategory
+﻿namespace Scrapset.Engine
 {
-    None,
-    Entrypoint,
-    Expression,
-    SRInput,
-    SROutput,
-    Statement,
-    Subroutine,
-    Variable
+    public enum LanguageCategory
+    {
+        None,
+        Entrypoint,
+        Expression,
+        SRInput,
+        SROutput,
+        Statement,
+        Subroutine,
+        Variable
+    }
 }

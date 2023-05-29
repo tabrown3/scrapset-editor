@@ -2,61 +2,64 @@ using Scrapset.Examples;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InputManager : MonoBehaviour
+namespace Scrapset.Input
 {
-    public Vector2 PanDirection { get; private set; }
-    public float ZoomDelta { get; private set; }
-    public Vector2 CursorPosScreen { get; private set; }
-    public Vector3 CursorPosWorld { get; private set; }
-    public bool IsPanningByDrag { get; private set; }
-    public Vector3 InitDragPosWorld { get; private set; }
-
-    [SerializeField] Camera cam;
-
-    bool prevIsPanningByDrag;
-
-    void OnPan(InputValue value)
+    public class InputManager : MonoBehaviour
     {
-        PanDirection = value.Get<Vector2>();
-    }
+        public Vector2 PanDirection { get; private set; }
+        public float ZoomDelta { get; private set; }
+        public Vector2 CursorPosScreen { get; private set; }
+        public Vector3 CursorPosWorld { get; private set; }
+        public bool IsPanningByDrag { get; private set; }
+        public Vector3 InitDragPosWorld { get; private set; }
 
-    void OnZoom(InputValue value)
-    {
-        ZoomDelta = value.Get<Vector2>().y;
-    }
+        [SerializeField] UnityEngine.Camera cam;
 
-    void OnCursorPosition(InputValue value)
-    {
-        var screenPos = value.Get<Vector2>();
-        CursorPosScreen = screenPos;
-        CursorPosWorld = cam.ScreenToWorldPoint(screenPos);
-    }
+        bool prevIsPanningByDrag;
 
-    void OnActivatePanByDrag(InputValue value)
-    {
-        IsPanningByDrag = value.Get<float>() != 0f;
-        if (IsPanningByDrag && !prevIsPanningByDrag)
+        void OnPan(InputValue value)
         {
-            InitDragPosWorld = CursorPosWorld;
+            PanDirection = value.Get<Vector2>();
         }
-        prevIsPanningByDrag = IsPanningByDrag;
-    }
 
-    void OnBuild()
-    {
-        IProgram program = ExamplePrograms.Factorial;
-        program.Build();
-    }
-
-    void OnRun()
-    {
-        IProgram program = ExamplePrograms.Factorial;
-        var returnValues = program.Run();
-
-        Debug.Log("Below are the subroutine's return values:");
-        foreach (var kv in returnValues)
+        void OnZoom(InputValue value)
         {
-            Debug.Log($"Identifier: '{kv.Key}', Value: {kv.Value.Value}, Type: {kv.Value.Type}");
+            ZoomDelta = value.Get<Vector2>().y;
+        }
+
+        void OnCursorPosition(InputValue value)
+        {
+            var screenPos = value.Get<Vector2>();
+            CursorPosScreen = screenPos;
+            CursorPosWorld = cam.ScreenToWorldPoint(screenPos);
+        }
+
+        void OnActivatePanByDrag(InputValue value)
+        {
+            IsPanningByDrag = value.Get<float>() != 0f;
+            if (IsPanningByDrag && !prevIsPanningByDrag)
+            {
+                InitDragPosWorld = CursorPosWorld;
+            }
+            prevIsPanningByDrag = IsPanningByDrag;
+        }
+
+        void OnBuild()
+        {
+            IProgram program = ExamplePrograms.Factorial;
+            program.Build();
+        }
+
+        void OnRun()
+        {
+            IProgram program = ExamplePrograms.Factorial;
+            var returnValues = program.Run();
+
+            Debug.Log("Below are the subroutine's return values:");
+            foreach (var kv in returnValues)
+            {
+                Debug.Log($"Identifier: '{kv.Key}', Value: {kv.Value.Value}, Type: {kv.Value.Type}");
+            }
         }
     }
 }

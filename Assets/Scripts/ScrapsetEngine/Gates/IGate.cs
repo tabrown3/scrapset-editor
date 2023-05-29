@@ -1,7 +1,10 @@
-public interface IGate : IInputOutput
+namespace Scrapset.Engine
 {
-    public string Name { get; }
-    public string Description { get; }
-    public LanguageCategory Category { get; set; }
-    public int Id { get; set; }
+    public interface IGate : IInputOutput
+    {
+        public string Name { get; }
+        public string Description { get; }
+        public LanguageCategory Category { get; set; }
+        public int Id { get; set; }
+    }
 }

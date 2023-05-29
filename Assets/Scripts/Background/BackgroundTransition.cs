@@ -1,42 +1,46 @@
+using Scrapset.Camera;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class BackgroundTransition : MonoBehaviour
+namespace Scrapset.Background
 {
-    [SerializeField] Camera cam;
-    [SerializeField] float transitionStartSize = 9f;
-    [SerializeField] float transitionEndSize = 22f;
-
-    SpriteRenderer mySpriteRenderer;
-    CameraController camController;
-
-    void Start()
+    public class BackgroundTransition : MonoBehaviour
     {
-        mySpriteRenderer = GetComponent<SpriteRenderer>();
-        camController = cam.GetComponent<CameraController>();
+        [SerializeField] UnityEngine.Camera cam;
+        [SerializeField] float transitionStartSize = 9f;
+        [SerializeField] float transitionEndSize = 22f;
 
-    }
+        SpriteRenderer mySpriteRenderer;
+        CameraController camController;
 
-    void Update()
-    {
-        if (camController.SizeHasChanged)
+        void Start()
         {
-            var camSize = cam.orthographicSize;
-            var transitionSizeDiff = transitionEndSize - transitionStartSize;
+            mySpriteRenderer = GetComponent<SpriteRenderer>();
+            camController = cam.GetComponent<CameraController>();
 
-            float smallBgAlpha;
-            if (camSize < transitionStartSize)
+        }
+
+        void Update()
+        {
+            if (camController.SizeHasChanged)
             {
-                smallBgAlpha = 1f;
-            } else if (camSize >= transitionStartSize && camSize <= transitionEndSize)
-            {
-                smallBgAlpha = 1f - ((camSize - transitionStartSize) / transitionSizeDiff);
-            } else // camSize > transitionEndSize
-            {
-                smallBgAlpha = 0f;
+                var camSize = cam.orthographicSize;
+                var transitionSizeDiff = transitionEndSize - transitionStartSize;
+
+                float smallBgAlpha;
+                if (camSize < transitionStartSize)
+                {
+                    smallBgAlpha = 1f;
+                } else if (camSize >= transitionStartSize && camSize <= transitionEndSize)
+                {
+                    smallBgAlpha = 1f - ((camSize - transitionStartSize) / transitionSizeDiff);
+                } else // camSize > transitionEndSize
+                {
+                    smallBgAlpha = 0f;
+                }
+
+                mySpriteRenderer.color = mySpriteRenderer.color.WithAlpha(smallBgAlpha);
             }
-
-            mySpriteRenderer.color = mySpriteRenderer.color.WithAlpha(smallBgAlpha);
         }
     }
 }

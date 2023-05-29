@@ -1,17 +1,21 @@
+using Scrapset.Engine;
 using UnityEngine;
 
-public class GateRef : MonoBehaviour
+namespace Scrapset.Editor
 {
-    public string SubroutineName { get; set; }
-    public int GateId { get; set; }
-
-    SubroutineManager subroutineManager;
-
-    void Start()
+    public class GateRef : MonoBehaviour
     {
-        if (subroutineManager == null)
+        public string SubroutineName { get; set; }
+        public int GateId { get; set; }
+
+        SubroutineManager subroutineManager;
+
+        void Start()
         {
-            subroutineManager = FindObjectOfType<SubroutineManager>();
+            if (subroutineManager == null)
+            {
+                subroutineManager = FindObjectOfType<SubroutineManager>();
+            }
         }
     }
 }
