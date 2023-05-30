@@ -22,6 +22,9 @@ namespace Scrapset.Editor
 
         void Start()
         {
+            //Debug.Log($"AddGate qualified assembly: {typeof(AddGate).AssemblyQualifiedName}");
+            System.Type.GetType("Scrapset.Engine.AddGate");
+            Debug.Log($"AddGate qualified assembly: {System.Type.GetType("Scrapset.Engine.AddGate").AssemblyQualifiedName}");
             var mainName = "Main";
             if (!SubroutineManager.HasDefinition(mainName))
             {
