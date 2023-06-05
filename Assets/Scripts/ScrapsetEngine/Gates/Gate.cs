@@ -12,28 +12,28 @@ namespace Scrapset.Engine
 
         public int Id { get; set; }
 
-        public Dictionary<string, ScrapsetTypes> InputParameters { get; protected set; } = new Dictionary<string, ScrapsetTypes>();
-        public Dictionary<string, ScrapsetTypes> OutputParameters { get; protected set; } = new Dictionary<string, ScrapsetTypes>();
+        public Dictionary<string, InputParameter> InputParameters { get; protected set; } = new Dictionary<string, InputParameter>();
+        public Dictionary<string, OutputParameter> OutputParameters { get; protected set; } = new Dictionary<string, OutputParameter>();
         public GenericTypeReconciler GenericTypeReconciler { get; private set; } = new GenericTypeReconciler();
 
-        public ScrapsetTypes GetInputParameter(string parameterName)
+        public InputParameter GetInputParameter(string parameterName)
         {
-            if (!InputParameters.TryGetValue(parameterName, out var parameterType))
+            if (!InputParameters.TryGetValue(parameterName, out var parameter))
             {
-                return ScrapsetTypes.None;
+                return new InputParameter() { Type = ScrapsetTypes.None };
             }
 
-            return parameterType;
+            return parameter;
         }
 
-        public ScrapsetTypes GetOutputParameter(string parameterName)
+        public OutputParameter GetOutputParameter(string parameterName)
         {
-            if (!OutputParameters.TryGetValue(parameterName, out var parameterType))
+            if (!OutputParameters.TryGetValue(parameterName, out var parameter))
             {
-                return ScrapsetTypes.None;
+                return new OutputParameter() { Type = ScrapsetTypes.None };
             }
 
-            return parameterType;
+            return parameter;
         }
     }
 }

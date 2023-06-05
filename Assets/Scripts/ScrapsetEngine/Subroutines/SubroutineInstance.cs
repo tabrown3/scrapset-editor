@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Scrapset.Engine
@@ -178,13 +180,10 @@ namespace Scrapset.Engine
             }
         }
 
-        private void InstantiateVariables(IReadOnlyDictionary<string, ScrapsetTypes> declarations, Dictionary<string, ScrapsetValue> variableStore)
+        private void InstantiateVariables(List<Tuple<string, ScrapsetTypes>> declarations, Dictionary<string, ScrapsetValue> variableStore)
         {
-            foreach (var kv in declarations)
+            foreach (var (variableName, variableType) in declarations)
             {
-                var variableName = kv.Key;
-                var variableType = kv.Value;
-
                 // basically allocating actual memory for the variables, one for each declared variable
                 if (!variableStore.ContainsKey(variableName))
                 {
@@ -197,7 +196,7 @@ namespace Scrapset.Engine
         }
 
         // the input variable store needs to be updated with whatever's pass into Execute
-        private void InstantiateInputVariables(IReadOnlyDictionary<string, ScrapsetTypes> declarations, Dictionary<string, ScrapsetValue> variableStore, Dictionary<string, ScrapsetValue> subroutineInputs)
+        private void InstantiateInputVariables(List<Tuple<string, ScrapsetTypes>> declarations, Dictionary<string, ScrapsetValue> variableStore, Dictionary<string, ScrapsetValue> subroutineInputs)
         {
             InstantiateVariables(declarations, variableStore);
             foreach (var kv in variableStore)
@@ -210,7 +209,7 @@ namespace Scrapset.Engine
                     continue;
                 }
 
-                if (!declarations.ContainsKey(variableName))
+                if (!declarations.Exists(u => u.Item1 == variableName))
                 {
                     throw new System.Exception($"The variable '{variableName}' was passed to the subroutine but was never declared... how did that happen?");
                 }
@@ -222,9 +221,12 @@ namespace Scrapset.Engine
 
         private void InstantiateAllVariables(Dictionary<string, ScrapsetValue> subroutineInputs)
         {
-            InstantiateVariables(SubroutineDefinition.LocalVariableDeclarations, localVariableValues);
-            InstantiateInputVariables(SubroutineDefinition.InputParameters, inputVariableValues, subroutineInputs);
-            InstantiateVariables(SubroutineDefinition.OutputParameters, outputVariableValues);
+            var localVars = SubroutineDefinition.LocalVariableDeclarations.Select(u => Tuple.Create(u.Key, u.Value)).ToList();
+            InstantiateVariables(localVars, localVariableValues);
+            var inputParams = SubroutineDefinition.InputParameters.Select(u => Tuple.Create(u.Key, u.Value.Type)).ToList();
+            InstantiateInputVariables(inputParams, inputVariableValues, subroutineInputs);
+            var outputParams = SubroutineDefinition.OutputParameters.Select(u => Tuple.Create(u.Key, u.Value.Type)).ToList();
+            InstantiateVariables(outputParams, outputVariableValues);
         }
 
         // after a gate's dependency has been evaluated and its output values are available, this method

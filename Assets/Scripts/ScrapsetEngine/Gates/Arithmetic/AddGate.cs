@@ -12,9 +12,9 @@ namespace Scrapset.Engine
 
         public AddGate()
         {
-            InputParameters.Add("A", ScrapsetTypes.Number);
-            InputParameters.Add("B", ScrapsetTypes.Number);
-            OutputParameters.Add("Out", ScrapsetTypes.Number);
+            InputParameters.Add("A", new InputParameter() { Type = ScrapsetTypes.Number });
+            InputParameters.Add("B", new InputParameter() { Type = ScrapsetTypes.Number });
+            OutputParameters.Add("Out", new OutputParameter() { Type = ScrapsetTypes.Number });
         }
 
         public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)

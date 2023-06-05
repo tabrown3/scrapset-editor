@@ -14,7 +14,7 @@ namespace Scrapset.Engine
 
         public BoolConstantValueGate()
         {
-            OutputParameters.Add("Out", ScrapsetTypes.Bool);
+            OutputParameters.Add("Out", new OutputParameter() { Type = ScrapsetTypes.Bool });
         }
 
         public BoolConstantValueGate(bool _constantValue) : this()

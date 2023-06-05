@@ -15,8 +15,8 @@ namespace Scrapset.Engine
 
         public NumberVariableGate()
         {
-            InputParameters.Add("In", ScrapsetTypes.Number);
-            OutputParameters.Add("Out", ScrapsetTypes.Number);
+            InputParameters.Add("In", new InputParameter() { Type = ScrapsetTypes.Number });
+            OutputParameters.Add("Out", new OutputParameter() { Type = ScrapsetTypes.Number });
         }
 
         // It might seem strange that you have to pass in the value store to get read by the variable,

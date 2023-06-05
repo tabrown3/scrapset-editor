@@ -15,8 +15,8 @@ namespace Scrapset.Engine
 
         public BoolVariableGate()
         {
-            InputParameters.Add("In", ScrapsetTypes.Bool);
-            OutputParameters.Add("Out", ScrapsetTypes.Bool);
+            InputParameters.Add("In", new InputParameter() { Type = ScrapsetTypes.Bool });
+            OutputParameters.Add("Out", new OutputParameter() { Type = ScrapsetTypes.Bool });
         }
 
         // It might seem strange that you have to pass in the value store to get read by the variable,

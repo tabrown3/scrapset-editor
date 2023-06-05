@@ -12,9 +12,9 @@ namespace Scrapset.Engine
 
         public AndGate()
         {
-            InputParameters.Add("A", ScrapsetTypes.Bool);
-            InputParameters.Add("B", ScrapsetTypes.Bool);
-            OutputParameters.Add("Out", ScrapsetTypes.Bool);
+            InputParameters.Add("A", new InputParameter() { Type = ScrapsetTypes.Bool, IsDeferred = true });
+            InputParameters.Add("B", new InputParameter() { Type = ScrapsetTypes.Bool, IsDeferred = true });
+            OutputParameters.Add("Out", new OutputParameter() { Type = ScrapsetTypes.Bool });
         }
 
         // allows for short circuiting, you must pass in callbacks that evaluate one of this gate's deps when executed

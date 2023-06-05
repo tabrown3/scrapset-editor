@@ -14,7 +14,7 @@ namespace Scrapset.Engine
 
         public NumberConstantValueGate()
         {
-            OutputParameters.Add("Out", ScrapsetTypes.Number);
+            OutputParameters.Add("Out", new OutputParameter() { Type = ScrapsetTypes.Number });
         }
 
         public NumberConstantValueGate(float _constantValue) : this()

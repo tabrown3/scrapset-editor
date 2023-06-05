@@ -14,9 +14,9 @@ namespace Scrapset.Engine
 
         public AssignmentGate()
         {
-            InputParameters.Add("In", ScrapsetTypes.Generic);
+            InputParameters.Add("In", new InputParameter() { Type = ScrapsetTypes.Generic });
             GenericTypeReconciler.AssignGenericIdentifierToInput("In", "T");
-            OutputParameters.Add("Out", ScrapsetTypes.Generic);
+            OutputParameters.Add("Out", new OutputParameter() { Type = ScrapsetTypes.Generic });
             GenericTypeReconciler.AssignGenericIdentifierToOutput("Out", "T");
         }
 

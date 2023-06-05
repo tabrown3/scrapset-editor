@@ -12,8 +12,8 @@ namespace Scrapset.Engine
         Dictionary<string, ScrapsetTypes> localVariableDeclarations = new Dictionary<string, ScrapsetTypes>();
         public IReadOnlyDictionary<string, ScrapsetTypes> LocalVariableDeclarations => localVariableDeclarations;
         // not only do subroutines contain gates with inputs/outputs, they have inputs/outputs themselves
-        public Dictionary<string, ScrapsetTypes> InputParameters { get; private set; } = new Dictionary<string, ScrapsetTypes>();
-        public Dictionary<string, ScrapsetTypes> OutputParameters { get; private set; } = new Dictionary<string, ScrapsetTypes>();
+        public Dictionary<string, InputParameter> InputParameters { get; private set; } = new Dictionary<string, InputParameter>();
+        public Dictionary<string, OutputParameter> OutputParameters { get; private set; } = new Dictionary<string, OutputParameter>();
         public GenericTypeReconciler GenericTypeReconciler { get; private set; } = new GenericTypeReconciler();
 
         int idCounter = 0;
@@ -154,7 +154,7 @@ namespace Scrapset.Engine
                 throw new System.Exception($"Input parameter '{parameterName}' has already been declared in this scope");
             }
 
-            InputParameters.Add(parameterName, scrapsetType);
+            InputParameters.Add(parameterName, new InputParameter() { Type = scrapsetType });
         }
 
         public int CreateInputVariableGate<T>(string inputName) where T : IGate, IIdentifiable, IReadable, new()
@@ -174,7 +174,7 @@ namespace Scrapset.Engine
                 throw new System.Exception($"Output parameter '{parameterName}' has already been declared in this scope");
             }
 
-            OutputParameters.Add(parameterName, scrapsetType);
+            OutputParameters.Add(parameterName, new OutputParameter() { Type = scrapsetType });
         }
 
         public int CreateOutputVariableGate<T>(string outputName) where T : IGate, IIdentifiable, IWritable, new()
@@ -213,21 +213,21 @@ namespace Scrapset.Engine
             return programFlowRegistry.GetProgramFlowLink(fromGate, flowName);
         }
 
-        public ScrapsetTypes GetInputParameter(string parameterName)
+        public InputParameter GetInputParameter(string parameterName)
         {
             if (!InputParameters.TryGetValue(parameterName, out var parameterType))
             {
-                return ScrapsetTypes.None;
+                return new InputParameter() { Type = ScrapsetTypes.None };
             }
 
             return parameterType;
         }
 
-        public ScrapsetTypes GetOutputParameter(string parameterName)
+        public OutputParameter GetOutputParameter(string parameterName)
         {
             if (!OutputParameters.TryGetValue(parameterName, out var parameterType))
             {
-                return ScrapsetTypes.None;
+                return new OutputParameter() { Type = ScrapsetTypes.None };
             }
 
             return parameterType;

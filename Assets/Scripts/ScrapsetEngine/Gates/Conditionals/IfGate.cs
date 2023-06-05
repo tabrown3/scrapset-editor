@@ -14,7 +14,7 @@ namespace Scrapset.Engine
 
         public IfGate()
         {
-            InputParameters.Add("Condition", ScrapsetTypes.Bool);
+            InputParameters.Add("Condition", new InputParameter() { Type = ScrapsetTypes.Bool });
         }
 
         public void PerformSideEffect(SubroutineInstance instance)
