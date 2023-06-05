@@ -137,13 +137,13 @@ namespace Scrapset.Engine
                     // Situation 1)
                     EvaluateDependencies(dependency); // update the global value store for all its dependencies
 
-                    var nullCheckedCachedInputValuesForDep = new Dictionary<string, ScrapsetValue>();
+                    var nullCheckedCachedInputValues = new Dictionary<string, ScrapsetValue>();
                     if (cachedInputValuesForGates.TryGetValue(dependency.Id, out Dictionary<string, ScrapsetValue> cachedValuesForDep))
                     {
-                        nullCheckedCachedInputValuesForDep = cachedValuesForDep;
+                        nullCheckedCachedInputValues = cachedValuesForDep;
                     }
 
-                    expressionOutputValues = dependencyAsExpression.Evaluate(nullCheckedCachedInputValuesForDep, lazyEvalCallbacks);
+                    expressionOutputValues = dependencyAsExpression.Evaluate(nullCheckedCachedInputValues, lazyEvalCallbacks);
                     CacheOutputValuesForGate(dependency, expressionOutputValues);
                 } else
                 {
