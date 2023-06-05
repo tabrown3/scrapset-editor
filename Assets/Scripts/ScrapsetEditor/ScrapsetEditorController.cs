@@ -68,11 +68,11 @@ namespace Scrapset.Editor
 
             var gameObject = Instantiate(GetGatePrefab(gate.Category));
             gameObject.name = gate.Name;
-            var subroutineRef = srGameObjects[activeSRDefinition.Name];
+            var subroutineRef = srGameObjects[activeSRDefinition.Identifier];
             gameObject.transform.SetParent(subroutineRef.transform);
 
             var gateRef = gameObject.GetComponent<GateRef>();
-            gateRef.SubroutineName = activeSRDefinition.Name;
+            gateRef.SubroutineName = activeSRDefinition.Identifier;
             gateRef.GateId = id;
         }
 

@@ -4,7 +4,7 @@ namespace Scrapset.Engine
 {
     public class SubroutineExpressionGate : Gate, IExpression
     {
-        public override string Name => subroutineDefinition.Name;
+        public override string Name => subroutineDefinition.Identifier;
 
         public override string Description => $"An instance of '{Name}' (subroutine)";
 

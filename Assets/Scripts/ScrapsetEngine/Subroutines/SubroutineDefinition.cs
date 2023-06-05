@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace Scrapset.Engine
 {
-    public class SubroutineDefinition : IInputOutput
+    public class SubroutineDefinition : IIdentifiable, IInputOutput
     {
-        public string Name { get; private set; }
+        public string Identifier { get; set; }
         public int EntrypointId { get; private set; }
         // all variable names -> types that the user has declared as part of this subroutine declaration
         Dictionary<string, ScrapsetTypes> localVariableDeclarations = new Dictionary<string, ScrapsetTypes>();
@@ -33,7 +33,7 @@ namespace Scrapset.Engine
             programFlowRegistry = new ProgramFlowRegistry(this);
             EntrypointId = CreateGate<Entrypoint>();
             subroutineManager = _subroutineManager;
-            Name = _name;
+            Identifier = _name;
         }
 
         public IGate GetGateById(int id)
@@ -116,7 +116,7 @@ namespace Scrapset.Engine
             var variableId = CreateGate<T>();
             var newGate = GetGateById(variableId);
             newGate.Category = category;
-            var newVariable = newGate as IIdentifiable;
+            var newVariable = newGate as IVariable;
             newVariable.Identifier = variableName;
 
             return variableId;
@@ -137,7 +137,7 @@ namespace Scrapset.Engine
             localVariableDeclarations.Add(variableName, scrapsetType);
         }
 
-        public int CreateLocalVariableGate<T>(string variableName) where T : IGate, IIdentifiable, new()
+        public int CreateLocalVariableGate<T>(string variableName) where T : IGate, IVariable, new()
         {
             if (!LocalVariableDeclarations.ContainsKey(variableName))
             {
@@ -157,7 +157,7 @@ namespace Scrapset.Engine
             InputParameters.Add(parameterName, new InputParameter() { Type = scrapsetType });
         }
 
-        public int CreateInputVariableGate<T>(string inputName) where T : IGate, IIdentifiable, IReadable, new()
+        public int CreateInputVariableGate<T>(string inputName) where T : IGate, IVariable, new()
         {
             if (!InputParameters.ContainsKey(inputName))
             {
@@ -177,7 +177,7 @@ namespace Scrapset.Engine
             OutputParameters.Add(parameterName, new OutputParameter() { Type = scrapsetType });
         }
 
-        public int CreateOutputVariableGate<T>(string outputName) where T : IGate, IIdentifiable, IWritable, new()
+        public int CreateOutputVariableGate<T>(string outputName) where T : IGate, IVariable, new()
         {
             if (!OutputParameters.ContainsKey(outputName))
             {

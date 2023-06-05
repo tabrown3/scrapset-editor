@@ -2,6 +2,11 @@
 
 namespace Scrapset.Engine
 {
+    public interface IVariable : IIdentifiable, IReadable, IWritable
+    {
+
+    }
+
     public interface IIdentifiable
     {
         string Identifier { get; set; }

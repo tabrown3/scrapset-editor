@@ -126,8 +126,8 @@ namespace Scrapset.Engine
             } else // otherwise the dependency needs to be evaluated and cached
             {
                 Dictionary<string, ScrapsetValue> expressionOutputValues;
-                var identifiableDep = dependency as IIdentifiable; // variables do not have dependencies
-                if (SubroutineDefinition.HasInputLinks(dependency.Id) && identifiableDep == null) // does it have dependencies that need evaluating?
+                var variableDep = dependency as IVariable; // variables do not have dependencies
+                if (SubroutineDefinition.HasInputLinks(dependency.Id) && variableDep == null) // does it have dependencies that need evaluating?
                 {
                     // the input params are iterated over and, depending on whether the dependency eval
                     //  IsDeferred or not, the value for the param will either come from LazyEvaluateDependencies
@@ -147,19 +147,19 @@ namespace Scrapset.Engine
                     CacheOutputValuesForGate(dependency, expressionOutputValues);
                 } else
                 {
-                    if (identifiableDep == null)
+                    if (variableDep == null)
                     {
                         // if the gate isn't identifiable, then it's just a gate that doesn't have dependencies, so pass in an empty dict
                         expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>(), new Dictionary<string, LazyEvaluateDependency>());
                         CacheOutputValuesForGate(dependency, expressionOutputValues);
                     } else // it's some kind of variable or sr input
                     {
-                        var isLocalVariable = SubroutineDefinition.LocalVariableDeclarations.ContainsKey(identifiableDep.Identifier);
-                        var isSubroutineInput = SubroutineDefinition.InputParameters.ContainsKey(identifiableDep.Identifier);
+                        var isLocalVariable = SubroutineDefinition.LocalVariableDeclarations.ContainsKey(variableDep.Identifier);
+                        var isSubroutineInput = SubroutineDefinition.InputParameters.ContainsKey(variableDep.Identifier);
 
                         if (!isLocalVariable && !isSubroutineInput)
                         {
-                            throw new System.Exception($"Variable '{identifiableDep.Identifier}' is not declared as a local variable or a subroutine input");
+                            throw new System.Exception($"Variable '{variableDep.Identifier}' is not declared as a local variable or a subroutine input");
                         }
 
                         // it's a regular old variable
@@ -174,7 +174,7 @@ namespace Scrapset.Engine
                             CacheOutputValuesForGate(dependency, expressionOutputValues);
                         } else
                         {
-                            throw new System.Exception($"The identifier {identifiableDep.Identifier} was declared as a local variable and a subroutine input: cannot be both");
+                            throw new System.Exception($"The identifier {variableDep.Identifier} was declared as a local variable and a subroutine input: cannot be both");
                         }
                     }
                 }
@@ -273,16 +273,15 @@ namespace Scrapset.Engine
 
             foreach (var gateLink in gateLinks)
             {
-                var variable = SubroutineDefinition.GetGateById(gateLink.InputGateId) as IWritable;
-                var identifable = variable as IIdentifiable;
+                var variable = SubroutineDefinition.GetGateById(gateLink.InputGateId) as IVariable;
                 if (variable == null)
                 {
-                    throw new System.Exception($"Cannot assign to input '{gateLink.InputParameterName}' of Gate ID {gateLink.InputGateId}: Gate ID {gateLink.InputGateId} is not writable");
+                    throw new System.Exception($"Cannot assign to input '{gateLink.InputParameterName}' of Gate ID {gateLink.InputGateId}: Gate ID {gateLink.InputGateId} is not a variable");
                 }
 
                 // are we assigning to a local variable or a subroutine output gate?
                 Dictionary<string, ScrapsetValue> variableStore;
-                if (SubroutineDefinition.OutputParameters.ContainsKey(identifable.Identifier))
+                if (SubroutineDefinition.OutputParameters.ContainsKey(variable.Identifier))
                 {
                     variableStore = outputVariableValues;
                 } else

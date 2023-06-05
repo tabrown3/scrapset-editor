@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Scrapset.Engine
 {
-    public class BoolVariableGate : Gate, IIdentifiable, IReadable, IWritable, IExpression
+    public class BoolVariableGate : Gate, IVariable, IExpression
     {
         override public string Name => "Bool Variable";
 

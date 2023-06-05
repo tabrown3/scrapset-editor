@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Scrapset.Engine
 {
-    public class StringVariableGate : Gate, IIdentifiable, IReadable, IWritable, IExpression
+    public class StringVariableGate : Gate, IVariable, IExpression
     {
         override public string Name => "String Variable";
 
