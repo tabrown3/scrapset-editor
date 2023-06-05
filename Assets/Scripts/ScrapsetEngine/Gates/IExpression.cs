@@ -4,6 +4,6 @@ namespace Scrapset.Engine
 {
     public interface IExpression
     {
-        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs);
+        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs, Dictionary<string, SubroutineInstance.LazyEvaluateDependency> deferredInputs);
     }
 }

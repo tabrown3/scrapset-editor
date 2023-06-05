@@ -2,7 +2,7 @@
 
 namespace Scrapset.Engine
 {
-    public class AndGate : Gate, IMultiPartExpression
+    public class AndGate : Gate, IExpression
     {
         public override string Name => "And";
 
@@ -18,13 +18,13 @@ namespace Scrapset.Engine
         }
 
         // allows for short circuiting, you must pass in callbacks that evaluate one of this gate's deps when executed
-        public Dictionary<string, ScrapsetValue> EvaluateMultiPart(Dictionary<string, SubroutineInstance.LazyEvaluateDependency> evalCallbacks)
+        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs, Dictionary<string, SubroutineInstance.LazyEvaluateDependency> deferredInputs)
         {
             var outDict = new Dictionary<string, ScrapsetValue>();
             var outVal = new ScrapsetValue(ScrapsetTypes.Bool);
 
             // only eval B if A is true
-            outVal.Value = (bool)evalCallbacks["A"]().Value && (bool)evalCallbacks["B"]().Value;
+            outVal.Value = (bool)deferredInputs["A"]().Value && (bool)deferredInputs["B"]().Value;
 
             outDict["Out"] = outVal;
             return outDict;

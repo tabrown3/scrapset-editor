@@ -19,7 +19,7 @@ namespace Scrapset.Engine
             OutputParameters = _subroutineDefinition.OutputParameters;
         }
 
-        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
+        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs, Dictionary<string, SubroutineInstance.LazyEvaluateDependency> deferredInputs)
         {
             var instance = new SubroutineInstance();
             instance.SubroutineDefinition = subroutineDefinition;

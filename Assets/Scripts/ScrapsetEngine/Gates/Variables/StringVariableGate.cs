@@ -53,7 +53,7 @@ namespace Scrapset.Engine
             Debug.Log($"Wrote value '{sInVal}' to variable '{Identifier}'");
         }
 
-        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> variableStore)
+        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> variableStore, Dictionary<string, SubroutineInstance.LazyEvaluateDependency> deferredInputs)
         {
             return new Dictionary<string, ScrapsetValue>() { { "Out", Read(variableStore) } };
         }

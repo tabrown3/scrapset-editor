@@ -78,6 +78,7 @@ namespace Scrapset.Engine
             // this executes once for every output feeding into the gate's inputs
             foreach (var kv in SubroutineDefinition.GetInputLinks(callingGate.Id))
             {
+                if (callingGate.InputParameters[kv.Key].IsDeferred) continue;
                 allDeps[callingGate.Id] = EvaluateDependency(callingGate, kv.Key, kv.Value);
             }
 
@@ -91,6 +92,7 @@ namespace Scrapset.Engine
             // this executes once for every output feeding into the gate's inputs
             foreach (var kv in SubroutineDefinition.GetInputLinks(callingGate.Id))
             {
+                if (!callingGate.InputParameters[kv.Key].IsDeferred) continue;
                 // evaluates the dep when cb is called and selects out the desired dep output, assigning it to the desired input in the out dict
                 evalDepCallbacksByInputName[kv.Key] = () => EvaluateDependency(callingGate, kv.Key, kv.Value)[kv.Value.OutputParameterName];
             }
@@ -106,8 +108,7 @@ namespace Scrapset.Engine
             Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
 
             var dependencyAsExpression = dependency as IExpression;
-            var dependencyAsMultipartExpression = dependency as IMultiPartExpression;
-            if (dependencyAsExpression == null && dependencyAsMultipartExpression == null)
+            if (dependencyAsExpression == null)
             {
                 throw new System.Exception($"Error with dependency feeding Gate {callingGate.Name}: Gate {dependency.Name} is not an expression");
             }
@@ -128,24 +129,28 @@ namespace Scrapset.Engine
                 var identifiableDep = dependency as IIdentifiable; // variables do not have dependencies
                 if (SubroutineDefinition.HasInputLinks(dependency.Id) && identifiableDep == null) // does it have dependencies that need evaluating?
                 {
-                    if (dependencyAsMultipartExpression != null) // surrenders control of dep eval to the gate, allowing for short-circuiting (e.g. ternary x?y:z, logical &&, ||, etc)
+                    // the input params are iterated over and, depending on whether the dependency eval
+                    //  IsDeferred or not, the value for the param will either come from LazyEvaluateDependencies
+                    //  or EvaluateDependencies, but not both
+                    // Situation 1) - deferred
+                    var lazyEvalCallbacks = LazyEvaluateDependencies(dependency);
+                    // Situation 1)
+                    EvaluateDependencies(dependency); // update the global value store for all its dependencies
+
+                    var nullCheckedCachedInputValuesForDep = new Dictionary<string, ScrapsetValue>();
+                    if (cachedInputValuesForGates.TryGetValue(dependency.Id, out Dictionary<string, ScrapsetValue> cachedValuesForDep))
                     {
-                        var lazyEvalCallbacks = LazyEvaluateDependencies(dependency);
-                        expressionOutputValues = dependencyAsMultipartExpression.EvaluateMultiPart(lazyEvalCallbacks);
-                        CacheOutputValuesForGate(dependency, expressionOutputValues);
-                    } else
-                    {
-                        // Situation 1)
-                        EvaluateDependencies(dependency); // update the global value store for all its dependencies
-                        expressionOutputValues = dependencyAsExpression.Evaluate(cachedInputValuesForGates[dependency.Id]);
-                        CacheOutputValuesForGate(dependency, expressionOutputValues);
+                        nullCheckedCachedInputValuesForDep = cachedValuesForDep;
                     }
+
+                    expressionOutputValues = dependencyAsExpression.Evaluate(nullCheckedCachedInputValuesForDep, lazyEvalCallbacks);
+                    CacheOutputValuesForGate(dependency, expressionOutputValues);
                 } else
                 {
                     if (identifiableDep == null)
                     {
                         // if the gate isn't identifiable, then it's just a gate that doesn't have dependencies, so pass in an empty dict
-                        expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>());
+                        expressionOutputValues = dependencyAsExpression.Evaluate(new Dictionary<string, ScrapsetValue>(), new Dictionary<string, LazyEvaluateDependency>());
                         CacheOutputValuesForGate(dependency, expressionOutputValues);
                     } else // it's some kind of variable or sr input
                     {
@@ -160,12 +165,12 @@ namespace Scrapset.Engine
                         // it's a regular old variable
                         if (isLocalVariable)
                         {
-                            expressionOutputValues = dependencyAsExpression.Evaluate(localVariableValues);
+                            expressionOutputValues = dependencyAsExpression.Evaluate(localVariableValues, new Dictionary<string, LazyEvaluateDependency>());
                             CacheOutputValuesForGate(dependency, expressionOutputValues);
                         } else if (isSubroutineInput)
                         {
                             // it's a subroutine input gate
-                            expressionOutputValues = dependencyAsExpression.Evaluate(inputVariableValues);
+                            expressionOutputValues = dependencyAsExpression.Evaluate(inputVariableValues, new Dictionary<string, LazyEvaluateDependency>());
                             CacheOutputValuesForGate(dependency, expressionOutputValues);
                         } else
                         {

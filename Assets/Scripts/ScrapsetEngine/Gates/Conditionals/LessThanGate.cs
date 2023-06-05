@@ -17,7 +17,7 @@ namespace Scrapset.Engine
             OutputParameters.Add("Out", new OutputParameter() { Type = ScrapsetTypes.Bool });
         }
 
-        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs)
+        public Dictionary<string, ScrapsetValue> Evaluate(Dictionary<string, ScrapsetValue> inputs, Dictionary<string, SubroutineInstance.LazyEvaluateDependency> deferredInputs)
         {
             var a = (float)ScrapsetValue.GetDefaultForType(ScrapsetTypes.Number);
             if (inputs.ContainsKey("A"))
