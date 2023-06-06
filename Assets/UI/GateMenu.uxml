@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="TopContainer" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 70%;" />
+    <ui:VisualElement name="BottomContainer" style="flex-grow: 0; flex-basis: 30%; flex-direction: row;">
+        <ui:VisualElement name="BottomLeftPanel" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 25%;" />
+        <ui:VisualElement name="BottomMiddlePanel" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 50%;" />
+        <ui:VisualElement name="BottomRightPanel" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 25%;" />
+    </ui:VisualElement>
+</ui:UXML>
