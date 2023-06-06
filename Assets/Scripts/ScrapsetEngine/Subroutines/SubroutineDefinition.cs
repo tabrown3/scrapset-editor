@@ -63,7 +63,7 @@ namespace Scrapset.Engine
             gate.Id = idCounter++;
             gates.Add(gate.Id, gate);
 
-            Debug.Log($"Registered gate '{gate.Name}' with ID {gate.Id}");
+            Debug.Log($"Registered gate '{gate.GetType()}' with ID {gate.Id}");
             return gate.Id;
         }
 
@@ -76,7 +76,7 @@ namespace Scrapset.Engine
                 throw new System.Exception($"Cannot remove gate with ID {gateId}: gate does not exist");
             }
 
-            var name = gate.Name;
+            var name = gate.GetType();
             var id = gate.Id;
             Debug.Log($"Removed gate '{name}' with ID {id}");
 
@@ -111,20 +111,14 @@ namespace Scrapset.Engine
             programFlowRegistry.RemoveAllProgramFlowLinks(gateId);
         }
 
-        private int CreateVariableGate<T>(string variableName, LanguageCategory category) where T : IGate, new()
+        private int CreateVariableGate<T>(string variableName) where T : IGate, new()
         {
             var variableId = CreateGate<T>();
             var newGate = GetGateById(variableId);
-            newGate.Category = category;
             var newVariable = newGate as IVariable;
             newVariable.Identifier = variableName;
 
             return variableId;
-        }
-
-        private int CreateVariableGate<T>(string variableName) where T : IGate, new()
-        {
-            return CreateVariableGate<T>(variableName, LanguageCategory.Variable);
         }
 
         public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
@@ -164,7 +158,7 @@ namespace Scrapset.Engine
                 throw new System.Exception($"Cannot spawn gate for input '{inputName}': input has not been declared");
             }
 
-            return CreateVariableGate<T>(inputName, LanguageCategory.SRInput);
+            return CreateVariableGate<T>(inputName);
         }
 
         public void DeclareOutputVariable(string parameterName, ScrapsetTypes scrapsetType)
@@ -184,7 +178,7 @@ namespace Scrapset.Engine
                 throw new System.Exception($"Cannot spawn gate for output '{outputName}': output has not been declared");
             }
 
-            return CreateVariableGate<T>(outputName, LanguageCategory.SROutput);
+            return CreateVariableGate<T>(outputName);
         }
 
         public int CreateSubroutineGate(SubroutineDefinition subroutineDefinition)

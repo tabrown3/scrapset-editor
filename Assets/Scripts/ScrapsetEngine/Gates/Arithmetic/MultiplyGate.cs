@@ -4,12 +4,6 @@ namespace Scrapset.Engine
 {
     public class MultiplyGate : Gate, IExpression
     {
-        override public string Name => "Multiply";
-
-        override public string Description => "Multiplies numbers together";
-
-        override public LanguageCategory Category { get; set; } = LanguageCategory.Expression;
-
         public MultiplyGate()
         {
             InputParameters.Add("A", new InputParameter() { Type = ScrapsetTypes.Number });

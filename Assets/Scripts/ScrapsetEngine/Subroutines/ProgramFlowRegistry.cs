@@ -55,7 +55,7 @@ namespace Scrapset.Engine
 
             programFlows.Add(programFlow);
 
-            Debug.Log($"Linked program flow from gate '{fromGate.Name}' to gate '{toGate.Name}'");
+            Debug.Log($"Linked program flow from gate '{fromGate.GetType()}' to gate '{toGate.GetType()}'");
         }
 
         public void RemoveProgramFlowLink(int fromId, string flowName)

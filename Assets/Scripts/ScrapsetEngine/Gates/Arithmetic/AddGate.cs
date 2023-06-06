@@ -4,12 +4,6 @@ namespace Scrapset.Engine
 {
     public class AddGate : Gate, IExpression
     {
-        override public string Name => "Add";
-
-        override public string Description => "Adds numbers together";
-
-        override public LanguageCategory Category { get; set; } = LanguageCategory.Expression;
-
         public AddGate()
         {
             InputParameters.Add("A", new InputParameter() { Type = ScrapsetTypes.Number });

@@ -4,12 +4,6 @@ namespace Scrapset.Engine
 {
     public abstract class Gate : IGate
     {
-        abstract public string Name { get; }
-
-        abstract public string Description { get; }
-
-        abstract public LanguageCategory Category { get; set; }
-
         public int Id { get; set; }
 
         public Dictionary<string, InputParameter> InputParameters { get; protected set; } = new Dictionary<string, InputParameter>();

@@ -6,12 +6,6 @@ namespace Scrapset.Engine
     {
         float constantValue = 1f;
 
-        override public string Name => "Number Constant Value";
-
-        override public string Description => "Returns a constant value";
-
-        override public LanguageCategory Category { get; set; } = LanguageCategory.Expression;
-
         public NumberConstantValueGate()
         {
             OutputParameters.Add("Out", new OutputParameter() { Type = ScrapsetTypes.Number });

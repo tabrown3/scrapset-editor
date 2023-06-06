@@ -4,12 +4,6 @@ namespace Scrapset.Engine
 {
     public class AndGate : Gate, IExpression
     {
-        public override string Name => "And";
-
-        public override string Description => "Performs logical AND on A and B";
-
-        public override LanguageCategory Category { get; set; } = LanguageCategory.Expression;
-
         public AndGate()
         {
             InputParameters.Add("A", new InputParameter() { Type = ScrapsetTypes.Bool, IsDeferred = true });

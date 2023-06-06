@@ -4,12 +4,6 @@ namespace Scrapset.Engine
 {
     public class SubroutineExpressionGate : Gate, IExpression
     {
-        public override string Name => subroutineDefinition.Identifier;
-
-        public override string Description => $"An instance of '{Name}' (subroutine)";
-
-        override public LanguageCategory Category { get; set; } = LanguageCategory.Subroutine;
-
         SubroutineDefinition subroutineDefinition;
 
         public SubroutineExpressionGate(SubroutineDefinition _subroutineDefinition)

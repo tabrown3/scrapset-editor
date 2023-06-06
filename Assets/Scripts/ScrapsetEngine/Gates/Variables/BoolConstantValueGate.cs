@@ -6,12 +6,6 @@ namespace Scrapset.Engine
     {
         bool constantValue = false;
 
-        override public string Name => "Bool Constant Value";
-
-        override public string Description => "Returns a constant value";
-
-        override public LanguageCategory Category { get; set; } = LanguageCategory.Variable;
-
         public BoolConstantValueGate()
         {
             OutputParameters.Add("Out", new OutputParameter() { Type = ScrapsetTypes.Bool });

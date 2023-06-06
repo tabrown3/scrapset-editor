@@ -5,12 +5,6 @@ namespace Scrapset.Engine
 {
     public class BoolVariableGate : Gate, IVariable, IExpression
     {
-        override public string Name => "Bool Variable";
-
-        override public string Description => "Stores a value of type Bool";
-
-        override public LanguageCategory Category { get; set; } = LanguageCategory.Variable;
-
         public string Identifier { get; set; }
 
         public BoolVariableGate()

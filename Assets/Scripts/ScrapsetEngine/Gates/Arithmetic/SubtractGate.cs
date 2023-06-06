@@ -4,12 +4,6 @@ namespace Scrapset.Engine
 {
     public class SubtractGate : Gate, IExpression
     {
-        override public string Name => "Subtract";
-
-        override public string Description => "Subtract two numbers";
-
-        override public LanguageCategory Category { get; set; } = LanguageCategory.Expression;
-
         public SubtractGate()
         {
             InputParameters.Add("A", new InputParameter() { Type = ScrapsetTypes.Number });

@@ -5,12 +5,6 @@ namespace Scrapset.Engine
 {
     public class StringVariableGate : Gate, IVariable, IExpression
     {
-        override public string Name => "String Variable";
-
-        override public string Description => "Stores a value of type String";
-
-        override public LanguageCategory Category { get; set; } = LanguageCategory.Variable;
-
         public string Identifier { get; set; }
 
         public StringVariableGate()

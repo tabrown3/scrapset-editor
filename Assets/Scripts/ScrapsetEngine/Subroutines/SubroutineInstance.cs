@@ -43,7 +43,7 @@ namespace Scrapset.Engine
                     throw new System.Exception("Statements must also implement IGate to be executed as part of the subroutine");
                 }
 
-                Debug.Log($"Started statement execution for gate '{currentGate.Name}' with ID {currentGate.Id}");
+                Debug.Log($"Started statement execution for gate '{currentGate.GetType()}' with ID {currentGate.Id}");
 
                 // kick off the recursive dependency evaluation; all of the statement's deps will be eval'd
                 //  depth-first and the results latched on both the dep's output param and the caller's
@@ -57,7 +57,7 @@ namespace Scrapset.Engine
 
                 cachedInputValuesForGates.Clear(); // clear the input value cache after each statement finishes
                 cachedOutputValuesForGates.Clear(); // clear the output value cache after each statement finishes
-                Debug.Log($"Finished statement execution for gate '{currentGate.Name}' with ID {currentGate.Id}");
+                Debug.Log($"Finished statement execution for gate '{currentGate.GetType()}' with ID {currentGate.Id}");
             }
 
             Debug.Log("Program execution finished!");
@@ -105,12 +105,12 @@ namespace Scrapset.Engine
         private Dictionary<string, ScrapsetValue> EvaluateDependency(IGate callingGate, string inputParamName, GateLink gateLink)
         {
             var dependency = SubroutineDefinition.GetGateById(gateLink.OutputGateId);
-            Debug.Log($"Gate '{callingGate.Name}' input param '{inputParamName}' is receiving from gate '{dependency.Name}' output param '{gateLink.OutputParameterName}'");
+            Debug.Log($"Gate '{callingGate.GetType()}' input param '{inputParamName}' is receiving from gate '{dependency.GetType()}' output param '{gateLink.OutputParameterName}'");
 
             var dependencyAsExpression = dependency as IExpression;
             if (dependencyAsExpression == null)
             {
-                throw new System.Exception($"Error with dependency feeding Gate {callingGate.Name}: Gate {dependency.Name} is not an expression");
+                throw new System.Exception($"Error with dependency feeding Gate {callingGate.GetType()}: Gate {dependency.GetType()} is not an expression");
             }
 
             // check to see if this dependency has already been evaluated and had its outputs cached
@@ -121,7 +121,7 @@ namespace Scrapset.Engine
                 var cachedExpressionOutputValues = cachedOutputValuesForGates[dependency.Id];
                 var evaluatedValue = cachedExpressionOutputValues[gateLink.OutputParameterName];
                 CacheInputValueForGate(callingGate, inputParamName, evaluatedValue);
-                Debug.Log($"Used cached value of gate '{dependency.Name}' output '{gateLink.OutputParameterName}'");
+                Debug.Log($"Used cached value of gate '{dependency.GetType()}' output '{gateLink.OutputParameterName}'");
                 return cachedExpressionOutputValues;
             } else // otherwise the dependency needs to be evaluated and cached
             {
@@ -292,7 +292,7 @@ namespace Scrapset.Engine
                 variable.Write(cachedInputValuesForGates[assigningGate.Id][inputName], variableStore);
             }
 
-            Debug.Log($"Assigned gate '{assigningGate.Name}' input '{inputName}' with value {cachedInputValuesForGates[assigningGate.Id][inputName].Value} to output '{outputName}'");
+            Debug.Log($"Assigned gate '{assigningGate.GetType()}' input '{inputName}' with value {cachedInputValuesForGates[assigningGate.Id][inputName].Value} to output '{outputName}'");
         }
 
         // follow the program flow from the source statement to the statement it's linked to via the named flow link
@@ -302,7 +302,7 @@ namespace Scrapset.Engine
             if (programFlow == null)
             {
                 nextStatement = null;
-                Debug.Log($"Followed outward path '{flowName}' from gate '{fromGate.Name}' with ID {fromGate.Id} to subroutine termination");
+                Debug.Log($"Followed outward path '{flowName}' from gate '{fromGate.GetType()}' with ID {fromGate.Id} to subroutine termination");
             } else
             {
                 var toGateId = programFlow.ToGateId;
@@ -319,7 +319,7 @@ namespace Scrapset.Engine
                 }
 
                 nextStatement = toStatement;
-                Debug.Log($"Followed outward path '{flowName}' from gate '{fromGate.Name}' with ID {fromGate.Id} to gate '{toGate.Name}' with ID {toGate.Id}");
+                Debug.Log($"Followed outward path '{flowName}' from gate '{fromGate.GetType()}' with ID {fromGate.Id} to gate '{toGate.GetType()}' with ID {toGate.Id}");
             }
         }
 

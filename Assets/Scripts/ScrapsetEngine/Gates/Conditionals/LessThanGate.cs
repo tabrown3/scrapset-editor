@@ -4,12 +4,6 @@ namespace Scrapset.Engine
 {
     public class LessThanGate : Gate, IExpression
     {
-        public override string Name => "Less Than";
-
-        public override string Description => "Compares inputs A and B and returns true if A is less than B";
-
-        public override LanguageCategory Category { get; set; } = LanguageCategory.Expression;
-
         public LessThanGate()
         {
             InputParameters.Add("A", new InputParameter() { Type = ScrapsetTypes.Number });
