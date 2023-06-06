@@ -66,7 +66,9 @@ namespace Scrapset.Editor
 
             var gate = activeSRDefinition.GetGateById(id);
 
-            var gameObject = Instantiate(GetGatePrefab(LanguageCategory.Entrypoint)); // TODO: replace with ScriptableObject Category or something
+            // TODO: refactor to Strategy Pattern - strategy accepts the gate and returns an object
+            //  that has an associated Prefab
+            var gameObject = Instantiate(GetGatePrefab(gate));
             gameObject.name = gate.GetType().ToString(); // TODO: replace with ScriptableObject Name
             var subroutineRef = srGameObjects[activeSRDefinition.Identifier];
             gameObject.transform.SetParent(subroutineRef.transform);
@@ -76,19 +78,26 @@ namespace Scrapset.Editor
             gateRef.GateId = id;
         }
 
-        GameObject GetGatePrefab(LanguageCategory category)
+        GameObject GetGatePrefab(IGate gate)
         {
-            switch (category)
+            if (gate.Id == activeSRDefinition.EntrypointId) return EntrypointPrefab;
+
+            var variable = gate as IVariable;
+
+            if (variable != null)
             {
-                case LanguageCategory.Entrypoint: return EntrypointPrefab;
-                case LanguageCategory.Expression: return ExpressionPrefab;
-                case LanguageCategory.SRInput: return SRInputPrefab;
-                case LanguageCategory.SROutput: return SROutputPrefab;
-                case LanguageCategory.Statement: return StatementPrefab;
-                case LanguageCategory.Subroutine: return SubroutinePrefab;
-                case LanguageCategory.Variable: return VariablePrefab;
-                default: throw new System.Exception($"Could not find prefab for gate language category: category {category} is not recognized");
+                if (activeSRDefinition.InputParameters.ContainsKey(variable.Identifier)) return SRInputPrefab;
+                if (activeSRDefinition.OutputParameters.ContainsKey(variable.Identifier)) return SROutputPrefab;
+                return VariablePrefab;
             }
+
+            var gateType = gate.GetType();
+
+            if (gateType == typeof(SubroutineExpressionGate)) return SubroutinePrefab;
+            if (gateType == typeof(IExpression)) return ExpressionPrefab;
+            if (gateType == typeof(IStatement)) return StatementPrefab;
+
+            throw new System.Exception($"Could not find prefab for gate: type {gateType} is not recognized");
         }
     }
 }
