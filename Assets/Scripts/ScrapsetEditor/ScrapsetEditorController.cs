@@ -1,4 +1,6 @@
 using Scrapset.Engine;
+using Scrapset.UI;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,9 +24,6 @@ namespace Scrapset.Editor
 
         void Start()
         {
-            //Debug.Log($"AddGate qualified assembly: {typeof(AddGate).AssemblyQualifiedName}");
-            System.Type.GetType("Scrapset.Engine.AddGate");
-            Debug.Log($"AddGate qualified assembly: {System.Type.GetType("Scrapset.Engine.AddGate").AssemblyQualifiedName}");
             var mainName = "Main";
             if (!SubroutineManager.HasDefinition(mainName))
             {
@@ -33,6 +32,16 @@ namespace Scrapset.Editor
                 CreateSubroutineRef(mainName);
                 CreateGateRef(activeSRDefinition.EntrypointId);
             }
+
+            // TODO: this is so dirty - clean it up
+            var gateCreationList = FindObjectOfType<GateCreationList>();
+            gateCreationList.OnClick += (gateMenuItem) =>
+            {
+                var gateTypeFromString = Type.GetType(gateMenuItem.AssemblyQualifiedName);
+                var newGate = (IGate)Activator.CreateInstance(gateTypeFromString);
+                var id = activeSRDefinition.RegisterGate(newGate);
+                CreateGateRef(id);
+            };
         }
 
         private void SetActiveSubroutine(string name)
@@ -94,8 +103,8 @@ namespace Scrapset.Editor
             var gateType = gate.GetType();
 
             if (gateType == typeof(SubroutineExpressionGate)) return SubroutinePrefab;
-            if (gateType == typeof(IExpression)) return ExpressionPrefab;
-            if (gateType == typeof(IStatement)) return StatementPrefab;
+            if (typeof(IExpression).IsAssignableFrom(gateType)) return ExpressionPrefab;
+            if (typeof(IStatement).IsAssignableFrom(gateType)) return StatementPrefab;
 
             throw new System.Exception($"Could not find prefab for gate: type {gateType} is not recognized");
         }
