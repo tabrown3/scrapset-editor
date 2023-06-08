@@ -1,11 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/GateMenu.uss?fileID=7433441132597879392&amp;guid=4c93f89d0f159f54faa2b4ccc67b5292&amp;type=3#GateMenu" />
     <ui:VisualElement name="TopContainer" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 70%; background-image: none;" />
     <ui:VisualElement name="BottomContainer" style="flex-grow: 0; flex-basis: 30%; flex-direction: column;">
         <ui:VisualElement style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 20%; background-image: none;" />
         <ui:VisualElement name="BottomPanels" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-direction: row; flex-basis: 80%;">
             <ui:VisualElement name="BottomLeftPanel" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 25%; background-image: url(&apos;project://database/Assets/Sprites/kenney_ui-pack-space-expansion/PNG/metalPanel_blueCorner.png?fileID=21300000&amp;guid=81fc4833e38728a4f9a8daa818dc3991&amp;type=3#metalPanel_blueCorner&apos;); scale: -1 1;" />
-            <ui:VisualElement name="BottomMiddlePanel" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 50%; background-image: url(&apos;project://database/Assets/Sprites/kenney_ui-pack-space-expansion/PNG/metalPanel_blue.png?fileID=21300000&amp;guid=e7f3c9ac20902b74c8d307ef9f816612&amp;type=3#metalPanel_blue&apos;);">
-                <ui:ListView focusable="true" name="ListView" style="height: 92px; width: 956px;" />
+            <ui:VisualElement name="BottomMiddlePanel" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 50%; background-image: url(&apos;project://database/Assets/Sprites/kenney_ui-pack-space-expansion/PNG/metalPanel_blue.png?fileID=21300000&amp;guid=e7f3c9ac20902b74c8d307ef9f816612&amp;type=3#metalPanel_blue&apos;); padding-top: 40px; padding-left: 32px; padding-right: 32px;">
+                <ui:ListView focusable="true" name="GateList" show-border="true" fixed-item-height="30" style="height: auto; width: auto; background-color: rgba(0, 0, 0, 0); -unity-text-align: middle-center;" />
             </ui:VisualElement>
             <ui:VisualElement name="BottomRightPanel" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 25%; background-image: url(&apos;project://database/Assets/Sprites/kenney_ui-pack-space-expansion/PNG/metalPanel_blueCorner.png?fileID=21300000&amp;guid=81fc4833e38728a4f9a8daa818dc3991&amp;type=3#metalPanel_blueCorner&apos;);" />
         </ui:VisualElement>

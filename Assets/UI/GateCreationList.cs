@@ -14,9 +14,10 @@ namespace Scrapset.UI
         void OnEnable()
         {
             var root = gateMenu.rootVisualElement;
-            var listView = root.Q<ListView>("ListView");
+            var listView = root.Q<ListView>("GateList");
 
             // TODO: pull this into resource management class
+            // pulls all GateMenuItems (ScriptableObjects) from the directory
             var gateMenuItems = Resources.LoadAll("ScriptableObjects/GateMenu/GateMenuItems");
 
             listView.itemsSource = gateMenuItems;
