@@ -4,5 +4,5 @@
     color: rgb(255, 255, 255);
     -unity-font: url('project://database/Assets/Fonts/Rajdhani/Rajdhani-SemiBold.ttf?fileID=12800000&guid=2709f68c597336e469a179a667440649&type=3#Rajdhani-SemiBold');
     -unity-font-definition: initial;
-    font-size: 20px;
+    font-size: 12px;
 }

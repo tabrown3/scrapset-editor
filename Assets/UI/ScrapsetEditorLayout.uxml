@@ -5,7 +5,9 @@
         <ui:VisualElement name="ProgrammingPanelContainer" style="flex-grow: 0; background-color: rgba(0, 0, 0, 0); flex-basis: 16%; padding-left: 16px; padding-bottom: 16px;">
             <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
                 <ui:VisualElement name="SubsystemPanel" style="flex-grow: 1; background-color: rgb(197, 197, 197); border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px;" />
-                <ui:VisualElement name="GatePanel" style="flex-grow: 1; background-color: rgb(197, 197, 197); border-left-width: 1px; border-right-width: 1px; border-top-width: 0; border-bottom-width: 1px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+                <ui:VisualElement name="GatePanel" style="flex-grow: 1; background-color: rgb(197, 197, 197); border-left-width: 1px; border-right-width: 1px; border-top-width: 0; border-bottom-width: 1px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);">
+                    <ui:ListView focusable="true" name="GateList" />
+                </ui:VisualElement>
                 <ui:VisualElement name="SubroutinePanel" style="flex-grow: 1; background-color: rgb(197, 197, 197); border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-left-width: 1px; border-right-width: 1px; border-top-width: 0; border-bottom-width: 1px;" />
             </ui:VisualElement>
         </ui:VisualElement>
