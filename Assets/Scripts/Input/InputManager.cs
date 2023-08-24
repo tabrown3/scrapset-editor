@@ -15,7 +15,25 @@ namespace Scrapset
 
         [SerializeField] Camera cam;
 
+        UIInputManager uiInputManager;
+
         bool prevIsPanningByDrag;
+
+        void Start()
+        {
+            uiInputManager = transform.GetComponent<UIInputManager>();
+        }
+
+        void OnPrimaryActionStart()
+        {
+            if (uiInputManager.IsPointerOverUI)
+            {
+                Debug.Log("Clicked UI!!!");
+            } else
+            {
+                Debug.Log("Clicked WORLD!!!");
+            }
+        }
 
         void OnPan(InputValue value)
         {

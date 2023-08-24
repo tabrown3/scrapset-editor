@@ -8,16 +8,17 @@ namespace Scrapset.Editor
 {
     public class ScrapsetEditorController : MonoBehaviour
     {
-        [SerializeField] SubroutineManager SubroutineManager;
+        [SerializeField] SubroutineManager subroutineManager;
+        [SerializeField] Camera cam;
 
-        [SerializeField] GameObject SubroutineDefinitionPrefab;
-        [SerializeField] GameObject EntrypointPrefab;
-        [SerializeField] GameObject ExpressionPrefab;
-        [SerializeField] GameObject SRInputPrefab;
-        [SerializeField] GameObject SROutputPrefab;
-        [SerializeField] GameObject StatementPrefab;
-        [SerializeField] GameObject SubroutinePrefab;
-        [SerializeField] GameObject VariablePrefab;
+        [SerializeField] GameObject subroutineDefinitionPrefab;
+        [SerializeField] GameObject entrypointPrefab;
+        [SerializeField] GameObject expressionPrefab;
+        [SerializeField] GameObject srInputPrefab;
+        [SerializeField] GameObject srOutputPrefab;
+        [SerializeField] GameObject statementPrefab;
+        [SerializeField] GameObject subroutinePrefab;
+        [SerializeField] GameObject variablePrefab;
 
         Dictionary<string, GameObject> srGameObjects = new Dictionary<string, GameObject>();
         SubroutineDefinition activeSRDefinition;
@@ -25,9 +26,9 @@ namespace Scrapset.Editor
         void Start()
         {
             var mainName = "Main";
-            if (!SubroutineManager.HasDefinition(mainName))
+            if (!subroutineManager.HasDefinition(mainName))
             {
-                activeSRDefinition = SubroutineManager.DeclareSubroutine(mainName);
+                activeSRDefinition = subroutineManager.DeclareSubroutine(mainName);
                 SetActiveSubroutine(mainName);
                 CreateSubroutineRef(mainName);
                 CreateGateRef(activeSRDefinition.EntrypointId);
@@ -46,17 +47,17 @@ namespace Scrapset.Editor
 
         private void SetActiveSubroutine(string name)
         {
-            if (!SubroutineManager.HasDefinition(name))
+            if (!subroutineManager.HasDefinition(name))
             {
                 throw new System.Exception($"Unable to set active subroutine: '{name}' does not exist");
             }
 
-            activeSRDefinition = SubroutineManager.GetDefinition(name);
+            activeSRDefinition = subroutineManager.GetDefinition(name);
         }
 
         void CreateSubroutineRef(string name)
         {
-            var gameObject = Instantiate(SubroutineDefinitionPrefab);
+            var gameObject = Instantiate(subroutineDefinitionPrefab);
             gameObject.name = name;
             gameObject.transform.SetParent(transform);
 
@@ -80,7 +81,8 @@ namespace Scrapset.Editor
             var gameObject = Instantiate(GetGatePrefab(gate));
             gameObject.name = gate.GetType().ToString(); // TODO: replace with ScriptableObject Name
             var subroutineRef = srGameObjects[activeSRDefinition.Identifier];
-            gameObject.transform.SetParent(subroutineRef.transform);
+            gameObject.transform.SetParent(subroutineRef.transform); // make the gate a child of the subroutine
+            gameObject.transform.position = new Vector2(cam.transform.position.x, cam.transform.position.y); // set the new gate to the cam's position
 
             var gateRef = gameObject.GetComponent<GateRef>();
             gateRef.SubroutineName = activeSRDefinition.Identifier;
@@ -89,22 +91,22 @@ namespace Scrapset.Editor
 
         GameObject GetGatePrefab(IGate gate)
         {
-            if (gate.Id == activeSRDefinition.EntrypointId) return EntrypointPrefab;
+            if (gate.Id == activeSRDefinition.EntrypointId) return entrypointPrefab;
 
             var variable = gate as IVariable;
 
             if (variable != null)
             {
-                if (activeSRDefinition.InputParameters.ContainsKey(variable.Identifier)) return SRInputPrefab;
-                if (activeSRDefinition.OutputParameters.ContainsKey(variable.Identifier)) return SROutputPrefab;
-                return VariablePrefab;
+                if (activeSRDefinition.InputParameters.ContainsKey(variable.Identifier)) return srInputPrefab;
+                if (activeSRDefinition.OutputParameters.ContainsKey(variable.Identifier)) return srOutputPrefab;
+                return variablePrefab;
             }
 
             var gateType = gate.GetType();
 
-            if (gateType == typeof(SubroutineExpressionGate)) return SubroutinePrefab;
-            if (typeof(IExpression).IsAssignableFrom(gateType)) return ExpressionPrefab;
-            if (typeof(IStatement).IsAssignableFrom(gateType)) return StatementPrefab;
+            if (gateType == typeof(SubroutineExpressionGate)) return subroutinePrefab;
+            if (typeof(IExpression).IsAssignableFrom(gateType)) return expressionPrefab;
+            if (typeof(IStatement).IsAssignableFrom(gateType)) return statementPrefab;
 
             throw new System.Exception($"Could not find prefab for gate: type {gateType} is not recognized");
         }

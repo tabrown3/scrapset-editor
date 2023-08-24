@@ -514,6 +514,7 @@ GameObject:
   - component: {fileID: 1382198970}
   - component: {fileID: 1382198971}
   - component: {fileID: 1382198972}
+  - component: {fileID: 1382198973}
   m_Layer: 0
   m_Name: Input Manager
   m_TagString: Untagged
@@ -529,7 +530,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1382198969}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -579,6 +580,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 519420031}
+--- !u!114 &1382198973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1382198969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfe8799d472885e428c034e0470bf695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  doc: {fileID: 616812377}
 --- !u!1 &1575960838
 GameObject:
   m_ObjectHideFlags: 0
@@ -623,15 +637,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab2ad14824c616a4fac3d77791801651, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SubroutineManager: {fileID: 411458758}
-  SubroutineDefinitionPrefab: {fileID: 3304032504848182575, guid: aea2916cb2380a84ea8c239aa4644771, type: 3}
-  EntrypointPrefab: {fileID: 6072672012342526287, guid: 92d485eec460777408773096e25dd375, type: 3}
-  ExpressionPrefab: {fileID: 7319916072830854709, guid: a7b236da3f528e748b84b77acdb7d59e, type: 3}
-  SRInputPrefab: {fileID: 6055869467265577679, guid: eef897959003b7242ad071455da88ed4, type: 3}
-  SROutputPrefab: {fileID: 7036937507233979863, guid: f4985ea4c3c2b61438b56ce11d20e3e8, type: 3}
-  StatementPrefab: {fileID: 8091313988554842725, guid: 3e45996e9571a1d47b412c4c2b224d1b, type: 3}
-  SubroutinePrefab: {fileID: 6805454097817814616, guid: 0fd0236d326905a4db6c1a0859cded65, type: 3}
-  VariablePrefab: {fileID: 5813359939711043890, guid: b74c73e9e5acf6c419b61712528a83cc, type: 3}
+  subroutineManager: {fileID: 411458758}
+  cam: {fileID: 519420031}
+  subroutineDefinitionPrefab: {fileID: 3304032504848182575, guid: aea2916cb2380a84ea8c239aa4644771, type: 3}
+  entrypointPrefab: {fileID: 6072672012342526287, guid: 92d485eec460777408773096e25dd375, type: 3}
+  expressionPrefab: {fileID: 7319916072830854709, guid: a7b236da3f528e748b84b77acdb7d59e, type: 3}
+  srInputPrefab: {fileID: 6055869467265577679, guid: eef897959003b7242ad071455da88ed4, type: 3}
+  srOutputPrefab: {fileID: 7036937507233979863, guid: f4985ea4c3c2b61438b56ce11d20e3e8, type: 3}
+  statementPrefab: {fileID: 8091313988554842725, guid: 3e45996e9571a1d47b412c4c2b224d1b, type: 3}
+  subroutinePrefab: {fileID: 6805454097817814616, guid: 0fd0236d326905a4db6c1a0859cded65, type: 3}
+  variablePrefab: {fileID: 5813359939711043890, guid: b74c73e9e5acf6c419b61712528a83cc, type: 3}
 --- !u!1 &1643483790
 GameObject:
   m_ObjectHideFlags: 0
