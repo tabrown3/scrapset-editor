@@ -3,6 +3,7 @@ using Scrapset.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Scrapset.Editor
 {
@@ -10,6 +11,7 @@ namespace Scrapset.Editor
     {
         [SerializeField] SubroutineManager subroutineManager;
         [SerializeField] Camera cam;
+        [SerializeField] InputManager inputManager;
 
         [SerializeField] GameObject subroutineDefinitionPrefab;
         [SerializeField] GameObject entrypointPrefab;
@@ -22,8 +24,26 @@ namespace Scrapset.Editor
 
         Dictionary<string, GameObject> srGameObjects = new Dictionary<string, GameObject>();
         SubroutineDefinition activeSRDefinition;
+        EditorObjectSelection editorObjectSelection = new EditorObjectSelection();
 
         void Start()
+        {
+            InitMainSubroutine();
+            inputManager.OnUIClick += OnUIClick;
+            inputManager.OnWorldClick += OnWorldClick;
+        }
+
+        void OnUIClick(InputValue value)
+        {
+            Debug.Log("Clicked UI!!!");
+        }
+
+        void OnWorldClick(InputValue value)
+        {
+            Debug.Log("Clicked WORLD!!!");
+        }
+
+        void InitMainSubroutine()
         {
             var mainName = "Main";
             if (!subroutineManager.HasDefinition(mainName))

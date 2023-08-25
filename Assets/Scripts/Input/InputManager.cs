@@ -1,4 +1,5 @@
 using Scrapset.Examples;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,10 +14,12 @@ namespace Scrapset
         public bool IsPanningByDrag { get; private set; }
         public Vector3 InitDragPosWorld { get; private set; }
 
+        public event Action<InputValue> OnUIClick;
+        public event Action<InputValue> OnWorldClick;
+
         [SerializeField] Camera cam;
 
         UIInputManager uiInputManager;
-
         bool prevIsPanningByDrag;
 
         void Start()
@@ -24,14 +27,14 @@ namespace Scrapset
             uiInputManager = transform.GetComponent<UIInputManager>();
         }
 
-        void OnPrimaryActionStart()
+        void OnPrimaryAction(InputValue value)
         {
             if (uiInputManager.IsPointerOverUI)
             {
-                Debug.Log("Clicked UI!!!");
+                OnUIClick?.Invoke(value);
             } else
             {
-                Debug.Log("Clicked WORLD!!!");
+                OnWorldClick?.Invoke(value);
             }
         }
 
@@ -42,7 +45,7 @@ namespace Scrapset
 
         void OnZoom(InputValue value)
         {
-            ZoomDelta = value.Get<Vector2>().y;
+            ZoomDelta = uiInputManager.IsPointerOverUI ? 0 : value.Get<Vector2>().y;
         }
 
         void OnCursorPosition(InputValue value)

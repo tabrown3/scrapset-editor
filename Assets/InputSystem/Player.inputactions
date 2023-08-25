@@ -6,6 +6,15 @@
             "id": "10769dbd-9a3e-4e32-98ac-aebb210d1ad2",
             "actions": [
                 {
+                    "name": "PrimaryAction",
+                    "type": "Value",
+                    "id": "c3730499-7f1a-41b3-a938-570a663f8fc6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "Pan",
                     "type": "Value",
                     "id": "628935c3-c388-44dc-ab8d-5dc837260ec2",
@@ -58,15 +67,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "PrimaryActionStart",
-                    "type": "PassThrough",
-                    "id": "c3730499-7f1a-41b3-a938-570a663f8fc6",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -215,17 +215,6 @@
                 },
                 {
                     "name": "",
-                    "id": "5be56b1e-18a5-47fa-8ea4-9fbb1b94a7d4",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "ActivatePanByDrag",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "31771f06-9522-4e25-9fa4-d2640418a8f1",
                     "path": "<Pointer>/position",
                     "interactions": "",
@@ -264,7 +253,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "PrimaryActionStart",
+                    "action": "PrimaryAction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
