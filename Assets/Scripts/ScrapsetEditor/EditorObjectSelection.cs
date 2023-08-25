@@ -3,34 +3,52 @@ using UnityEngine;
 
 namespace Scrapset.Editor
 {
+    // maintains a list of selected game objects and their Bounds
     public class EditorObjectSelection
     {
         public bool HasSelection
         {
             get
             {
-                return gateRefs.Count > 0;
+                return gameObjects.Count > 0;
             }
         }
 
-        List<GameObject> gateRefs = new List<GameObject>();
-        AABB aabb;
+        List<GameObject> gameObjects = new List<GameObject>();
+        Bounds bounds = new Bounds();
 
         public void Select(GameObject gameObject)
         {
-            if (gateRefs.Contains(gameObject)) { return; }
+            if (gameObjects.Contains(gameObject)) { return; }
 
-            gateRefs.Add(gameObject);
+            var collider = gameObject.transform.GetComponent<Collider2D>();
+            if (gameObjects.Count == 0)
+            {
+                bounds = collider.bounds;
+            } else
+            {
+                bounds.Encapsulate(collider.bounds);
+            }
+
+            gameObjects.Add(gameObject);
         }
 
         public void Deselect(GameObject gameObject)
         {
-            gateRefs.Remove(gameObject);
+            gameObjects.Remove(gameObject);
+            bounds = new Bounds();
+
+            foreach (var obj in gameObjects)
+            {
+                var collider = obj.transform.GetComponent<Collider2D>();
+                bounds.Encapsulate(collider.bounds);
+            }
         }
 
         public void Clear()
         {
-            gateRefs.Clear();
+            gameObjects.Clear();
+            bounds = new Bounds();
         }
     }
 }
