@@ -41,6 +41,14 @@ namespace Scrapset.Editor
         void OnWorldClick(InputValue value)
         {
             Debug.Log("Clicked WORLD!!!");
+            RaycastHit2D raycastHit = Physics2D.Raycast(
+                cam.ScreenToWorldPoint(new Vector3(inputManager.CursorPosScreen.x, inputManager.CursorPosScreen.y, 10)), Vector2.zero
+            );
+
+            if (raycastHit)
+            {
+                Debug.Log("Hit: " + raycastHit.transform.gameObject.name);
+            }
         }
 
         void InitMainSubroutine()

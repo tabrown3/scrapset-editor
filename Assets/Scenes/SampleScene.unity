@@ -639,6 +639,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   subroutineManager: {fileID: 411458758}
   cam: {fileID: 519420031}
+  inputManager: {fileID: 1382198972}
   subroutineDefinitionPrefab: {fileID: 3304032504848182575, guid: aea2916cb2380a84ea8c239aa4644771, type: 3}
   entrypointPrefab: {fileID: 6072672012342526287, guid: 92d485eec460777408773096e25dd375, type: 3}
   expressionPrefab: {fileID: 7319916072830854709, guid: a7b236da3f528e748b84b77acdb7d59e, type: 3}
