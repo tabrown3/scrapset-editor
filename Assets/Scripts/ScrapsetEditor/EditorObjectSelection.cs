@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Scrapset.Editor
 {
@@ -12,19 +13,19 @@ namespace Scrapset.Editor
             }
         }
 
-        List<GateRef> gateRefs = new List<GateRef>();
+        List<GameObject> gateRefs = new List<GameObject>();
         AABB aabb;
 
-        public void Select(GateRef gateRef)
+        public void Select(GameObject gameObject)
         {
-            if (gateRefs.Contains(gateRef)) { return; }
+            if (gateRefs.Contains(gameObject)) { return; }
 
-            gateRefs.Add(gateRef);
+            gateRefs.Add(gameObject);
         }
 
-        public void Deselect(GateRef gateRef)
+        public void Deselect(GameObject gameObject)
         {
-            gateRefs.Remove(gateRef);
+            gateRefs.Remove(gameObject);
         }
 
         public void Clear()
