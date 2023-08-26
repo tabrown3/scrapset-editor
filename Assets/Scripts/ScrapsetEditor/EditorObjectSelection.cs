@@ -122,12 +122,27 @@ namespace Scrapset.Editor
             {
                 Debug.Log("Clicked WORLD!!!");
                 // raycast to see what objects are under the cursor
-                RaycastHit2D raycastHit = Physics2D.Raycast(
-                    cam.ScreenToWorldPoint(new Vector3(inputManager.CursorPosScreen.x, inputManager.CursorPosScreen.y, 10)), Vector2.zero
+                RaycastHit2D[] raycastHits = Physics2D.RaycastAll(
+                    cam.ScreenToWorldPoint(new Vector3(inputManager.CursorPosScreen.x, inputManager.CursorPosScreen.y, 10)),
+                    Vector2.zero
                 );
 
+                RaycastHit2D raycastHit = new RaycastHit2D();
+                bool didHit = false;
+                foreach (var rh in raycastHits)
+                {
+                    var gateRef = rh.transform.GetComponent<GateRef>();
+
+                    if (gateRef != null)
+                    {
+                        raycastHit = rh;
+                        didHit = true;
+                        break;
+                    }
+                }
+
                 // clicked an object (currently just GateRefs)
-                if (raycastHit)
+                if (didHit)
                 {
                     var gameObject = raycastHit.transform.gameObject;
                     var gateRef = raycastHit.transform.GetComponent<GateRef>();
