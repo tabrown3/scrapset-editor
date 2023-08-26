@@ -26,10 +26,12 @@ namespace Scrapset.Editor
         Vector2 selectionStartPos;
         Vector2 selectionEndPos;
         SpriteRenderer selectionFillSpriteRenderer;
-        SelectionDetection selectionFillSelectionDetection;
+        SelectionDetection selectionDetection;
 
         public void Select(GameObject gameObject)
         {
+            if (!selectionDetection.IsValidSelectionTarget(gameObject)) return;
+
             if (gameObjects.Find(u => u.SelectedObject == gameObject) != null) { return; }
 
             var collider = gameObject.transform.GetComponent<Collider2D>();
@@ -47,6 +49,8 @@ namespace Scrapset.Editor
 
         public void Deselect(GameObject gameObject)
         {
+            if (!selectionDetection.IsValidSelectionTarget(gameObject)) return;
+
             var index = gameObjects.FindIndex(u => u.SelectedObject == gameObject);
             Destroy(gameObjects[index].SelectionOutline);
             gameObjects.RemoveAt(index);
@@ -57,6 +61,19 @@ namespace Scrapset.Editor
                 var editorObject = obj.SelectedObject;
                 var collider = editorObject.transform.GetComponent<Collider2D>();
                 bounds.Encapsulate(collider.bounds);
+            }
+        }
+
+        public void ToggleSelection(GameObject gameObject)
+        {
+            if (!selectionDetection.IsValidSelectionTarget(gameObject)) return;
+
+            if (gameObjects.Find(u => u.SelectedObject == gameObject) == null)
+            {
+                Select(gameObject);
+            } else
+            {
+                Deselect(gameObject);
             }
         }
 
@@ -80,10 +97,10 @@ namespace Scrapset.Editor
             inputManager.OnCursorMove += OnCursorMove;
 
             selectionFillSpriteRenderer = selectionFill.GetComponent<SpriteRenderer>();
-            selectionFillSelectionDetection = selectionFill.GetComponent<SelectionDetection>();
+            selectionDetection = selectionFill.GetComponent<SelectionDetection>();
 
-            selectionFillSelectionDetection.OnGateTouched += OnGateTouched;
-            selectionFillSelectionDetection.OnGateUntouched += OnGateUntouched;
+            selectionDetection.OnGateTouched += OnGateTouched;
+            selectionDetection.OnGateUntouched += OnGateUntouched;
         }
 
         // executes when a PrimaryAction event (left mouse click, etc) occurs with the cursor over the UI
@@ -118,14 +135,17 @@ namespace Scrapset.Editor
                     // if a gate was clicked, select it
                     if (gateRef != null)
                     {
-                        // if a gate is clicked and the multi-select modifier (Ctrl, Cmd, etc) isn't pressed,
-                        //  only allow a single selected gate by clearing before the selection
-                        if (!inputManager.IsMultiActionModifierPressed)
+                        // if the multi-select modifier is pressed, toggle selection state
+                        if (inputManager.IsMultiActionModifierPressed)
                         {
+                            ToggleSelection(gameObject);
+                        } else
+                        {
+                            // if a gate is clicked and the multi-select modifier (Ctrl, Cmd, etc) isn't pressed,
+                            //  only allow a single selected gate by clearing before the selection
                             Clear();
+                            Select(gameObject);
                         }
-
-                        Select(gameObject);
                     }
                 } else // clicked empty space
                 {

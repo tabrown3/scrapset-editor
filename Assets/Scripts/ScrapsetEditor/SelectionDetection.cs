@@ -8,9 +8,14 @@ namespace Scrapset.Editor
         public event Action<GameObject> OnGateTouched;
         public event Action<GameObject> OnGateUntouched;
 
+        public bool IsValidSelectionTarget(GameObject gameObject)
+        {
+            return gameObject.tag == "GateRef";
+        }
+
         void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.gameObject.tag == "GateRef")
+            if (IsValidSelectionTarget(collision.gameObject))
             {
                 OnGateTouched?.Invoke(collision.gameObject);
             }
@@ -18,7 +23,7 @@ namespace Scrapset.Editor
 
         void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.gameObject.tag == "GateRef")
+            if (IsValidSelectionTarget(collision.gameObject))
             {
                 OnGateUntouched?.Invoke(collision.gameObject);
             }
