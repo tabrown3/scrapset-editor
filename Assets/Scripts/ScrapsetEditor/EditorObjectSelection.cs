@@ -118,7 +118,13 @@ namespace Scrapset.Editor
                     // if a gate was clicked, select it
                     if (gateRef != null)
                     {
-                        Debug.Log("Selecting GateRef");
+                        // if a gate is clicked and the multi-select modifier (Ctrl, Cmd, etc) isn't pressed,
+                        //  only allow a single selected gate by clearing before the selection
+                        if (!inputManager.IsMultiActionModifierPressed)
+                        {
+                            Clear();
+                        }
+
                         Select(gameObject);
                     }
                 } else // clicked empty space

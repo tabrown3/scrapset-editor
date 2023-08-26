@@ -15,6 +15,24 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "MultiActionModifier",
+                    "type": "Value",
+                    "id": "38b324b4-7ab6-4c47-ae9c-b9832dc1b7df",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "RangeActionModifier",
+                    "type": "Value",
+                    "id": "9de13f48-4c88-48d9-9a78-e147816b5181",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "Pan",
                     "type": "Value",
                     "id": "628935c3-c388-44dc-ab8d-5dc837260ec2",
@@ -254,6 +272,28 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "PrimaryAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c7361a97-d8a5-4d52-8e24-95e4ac25590b",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "MultiActionModifier",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "62555ae1-4493-4fe6-9f09-4faf375065a0",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RangeActionModifier",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

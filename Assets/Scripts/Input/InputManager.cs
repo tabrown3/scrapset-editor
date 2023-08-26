@@ -13,6 +13,8 @@ namespace Scrapset
         public Vector3 CursorPosWorld { get; private set; }
         public bool IsPanningByDrag { get; private set; }
         public Vector3 InitDragPosWorld { get; private set; }
+        public bool IsMultiActionModifierPressed { get; private set; }
+        public bool IsRangeActionModifierPressed { get; private set; }
 
         public event Action<InputValue> OnUIClick;
         public event Action<InputValue> OnWorldClick;
@@ -37,6 +39,16 @@ namespace Scrapset
             {
                 OnWorldClick?.Invoke(value);
             }
+        }
+
+        void OnMultiActionModifier(InputValue value)
+        {
+            IsMultiActionModifierPressed = value.isPressed;
+        }
+
+        void OnRangeActionModifier(InputValue value)
+        {
+            IsRangeActionModifierPressed = value.isPressed;
         }
 
         void OnPan(InputValue value)
