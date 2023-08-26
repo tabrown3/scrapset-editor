@@ -9,7 +9,7 @@ namespace Scrapset.Editor
     {
         [SerializeField] InputManager inputManager;
         [SerializeField] Camera cam;
-        [SerializeField] SpriteRenderer selectionFill;
+        [SerializeField] GameObject selectionFill;
         [SerializeField] GameObject selectionOutline;
 
         public bool HasSelection
@@ -25,6 +25,8 @@ namespace Scrapset.Editor
         bool isSelecting = false;
         Vector2 selectionStartPos;
         Vector2 selectionEndPos;
+        SpriteRenderer selectionFillSpriteRenderer;
+        SelectionDetection selectionFillSelectionDetection;
 
         public void Select(GameObject gameObject)
         {
@@ -76,6 +78,12 @@ namespace Scrapset.Editor
             inputManager.OnUIClick += OnUIClick;
             inputManager.OnWorldClick += OnWorldClick;
             inputManager.OnCursorMove += OnCursorMove;
+
+            selectionFillSpriteRenderer = selectionFill.GetComponent<SpriteRenderer>();
+            selectionFillSelectionDetection = selectionFill.GetComponent<SelectionDetection>();
+
+            selectionFillSelectionDetection.OnGateTouched += OnGateTouched;
+            selectionFillSelectionDetection.OnGateUntouched += OnGateUntouched;
         }
 
         // executes when a PrimaryAction event (left mouse click, etc) occurs with the cursor over the UI
@@ -122,7 +130,7 @@ namespace Scrapset.Editor
                     selectionStartPos = inputManager.CursorPosWorld;
                     selectionEndPos = inputManager.CursorPosWorld;
                     selectionFill.transform.localScale = new Vector3(0, 0, 1);
-                    selectionFill.enabled = true;
+                    selectionFillSpriteRenderer.enabled = true;
                 }
             } else
             {
@@ -135,18 +143,35 @@ namespace Scrapset.Editor
             isSelecting = false;
             selectionStartPos = new Vector2();
             selectionEndPos = new Vector2();
-            selectionFill.enabled = false;
+            selectionFillSpriteRenderer.enabled = false;
         }
 
         void OnCursorMove(InputValue value)
         {
             if (isSelecting)
             {
+                // set blue selection fill position and scale
                 selectionEndPos = inputManager.CursorPosWorld;
                 var deltaX = selectionEndPos.x - selectionStartPos.x;
                 var deltaY = selectionEndPos.y - selectionStartPos.y;
                 selectionFill.transform.localScale = new Vector3(deltaX, deltaY, 1);
                 selectionFill.transform.position = selectionStartPos + new Vector2(deltaX / 2, deltaY / 2);
+            }
+        }
+
+        void OnGateTouched(GameObject gameObject)
+        {
+            if (isSelecting)
+            {
+                Select(gameObject);
+            }
+        }
+
+        void OnGateUntouched(GameObject gameObject)
+        {
+            if (isSelecting)
+            {
+                Deselect(gameObject);
             }
         }
     }

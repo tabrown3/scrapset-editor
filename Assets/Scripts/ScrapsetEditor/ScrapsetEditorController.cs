@@ -22,12 +22,10 @@ namespace Scrapset.Editor
 
         Dictionary<string, GameObject> srGameObjects = new Dictionary<string, GameObject>();
         SubroutineDefinition activeSRDefinition;
-        EditorObjectSelection editorObjectSelection;
 
         void Start()
         {
             InitMainSubroutine();
-            editorObjectSelection = GetComponent<EditorObjectSelection>();
         }
 
         void InitMainSubroutine()
