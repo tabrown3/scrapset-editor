@@ -3,7 +3,6 @@ using Scrapset.UI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Scrapset.Editor
 {
@@ -11,7 +10,6 @@ namespace Scrapset.Editor
     {
         [SerializeField] SubroutineManager subroutineManager;
         [SerializeField] Camera cam;
-        [SerializeField] InputManager inputManager;
 
         [SerializeField] GameObject subroutineDefinitionPrefab;
         [SerializeField] GameObject entrypointPrefab;
@@ -24,51 +22,12 @@ namespace Scrapset.Editor
 
         Dictionary<string, GameObject> srGameObjects = new Dictionary<string, GameObject>();
         SubroutineDefinition activeSRDefinition;
-        EditorObjectSelection editorObjectSelection = new EditorObjectSelection();
+        EditorObjectSelection editorObjectSelection;
 
         void Start()
         {
             InitMainSubroutine();
-
-            // TODO: combine OnUIClick and OnWorldClick and pass in an object with flag that indicates UI or not
-            inputManager.OnUIClick += OnUIClick;
-            inputManager.OnWorldClick += OnWorldClick;
-        }
-
-        // executes when a PrimaryAction event (left mouse click, etc) occurs with the cursor over the UI
-        //  (as opposed to the world)
-        void OnUIClick(InputValue value)
-        {
-            Debug.Log("Clicked UI!!!");
-        }
-
-        // executes when a PrimaryAction event (left mouse click, etc) occurs with the cursor over the WORLD
-        //  (as opposed to the UI)
-        void OnWorldClick(InputValue value)
-        {
-            if (value.isPressed)
-            {
-                Debug.Log("Clicked WORLD!!!");
-                // if player is clicking world, clear all current selections
-                editorObjectSelection.Clear();
-                // raycast to see what objects are under the cursor
-                RaycastHit2D raycastHit = Physics2D.Raycast(
-                    cam.ScreenToWorldPoint(new Vector3(inputManager.CursorPosScreen.x, inputManager.CursorPosScreen.y, 10)), Vector2.zero
-                );
-
-                if (raycastHit)
-                {
-                    var gameObject = raycastHit.transform.gameObject;
-                    var gateRef = raycastHit.transform.GetComponent<GateRef>();
-
-                    // if a gate was clicked, select it
-                    if (gateRef != null)
-                    {
-                        Debug.Log("Selecting GateRef");
-                        editorObjectSelection.Select(gameObject);
-                    }
-                }
-            }
+            editorObjectSelection = GetComponent<EditorObjectSelection>();
         }
 
         void InitMainSubroutine()

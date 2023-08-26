@@ -16,6 +16,7 @@ namespace Scrapset
 
         public event Action<InputValue> OnUIClick;
         public event Action<InputValue> OnWorldClick;
+        public event Action<InputValue> OnCursorMove;
 
         [SerializeField] Camera cam;
 
@@ -53,6 +54,7 @@ namespace Scrapset
             var screenPos = value.Get<Vector2>();
             CursorPosScreen = screenPos;
             CursorPosWorld = cam.ScreenToWorldPoint(screenPos);
+            OnCursorMove?.Invoke(value);
         }
 
         void OnActivatePanByDrag(InputValue value)
