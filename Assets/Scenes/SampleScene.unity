@@ -409,7 +409,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.2
+  m_Radius: 0.025
 --- !u!50 &760379042
 Rigidbody2D:
   serializedVersion: 4
@@ -764,6 +764,10 @@ MonoBehaviour:
   statementPrefab: {fileID: 8091313988554842725, guid: 3e45996e9571a1d47b412c4c2b224d1b, type: 3}
   subroutinePrefab: {fileID: 6805454097817814616, guid: 0fd0236d326905a4db6c1a0859cded65, type: 3}
   variablePrefab: {fileID: 5813359939711043890, guid: b74c73e9e5acf6c419b61712528a83cc, type: 3}
+  programFlowInPrefab: {fileID: 2868885363668784727, guid: 8d8f08ec8369f684aaffad3bda62a143, type: 3}
+  programFlowOutPrefab: {fileID: 2977033884347505695, guid: 765cbc0b0210f4449957fe0b52316385, type: 3}
+  gateInputPrefab: {fileID: 8996040774488056939, guid: 0a893b27cf842af4fa9c2fc00d7c4146, type: 3}
+  gateOutputPrefab: {fileID: 1099467407984049295, guid: 2e19b95ea9f65c64ba0445cafb639743, type: 3}
 --- !u!114 &1575960842
 MonoBehaviour:
   m_ObjectHideFlags: 0

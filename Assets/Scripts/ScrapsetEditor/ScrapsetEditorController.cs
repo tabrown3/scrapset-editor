@@ -20,12 +20,18 @@ namespace Scrapset.Editor
         [SerializeField] GameObject subroutinePrefab;
         [SerializeField] GameObject variablePrefab;
 
+        [SerializeField] GameObject programFlowInPrefab;
+        [SerializeField] GameObject programFlowOutPrefab;
+        [SerializeField] GameObject gateInputPrefab;
+        [SerializeField] GameObject gateOutputPrefab;
+
         Dictionary<string, GameObject> srGameObjects = new Dictionary<string, GameObject>();
         SubroutineDefinition activeSRDefinition;
 
         void Start()
         {
             InitMainSubroutine();
+            BindGateCreationHandler();
         }
 
         void InitMainSubroutine()
@@ -38,7 +44,10 @@ namespace Scrapset.Editor
                 CreateSubroutineRef(mainName);
                 CreateGateRef(activeSRDefinition.EntrypointId);
             }
+        }
 
+        void BindGateCreationHandler()
+        {
             // TODO: this is so dirty - clean it up
             var gateCreationList = FindObjectOfType<GateCreationList>();
             gateCreationList.OnClick += (gateMenuItem) =>
@@ -50,7 +59,7 @@ namespace Scrapset.Editor
             };
         }
 
-        private void SetActiveSubroutine(string name)
+        void SetActiveSubroutine(string name)
         {
             if (!subroutineManager.HasDefinition(name))
             {
@@ -88,6 +97,43 @@ namespace Scrapset.Editor
             var subroutineRef = srGameObjects[activeSRDefinition.Identifier];
             gameObject.transform.SetParent(subroutineRef.transform); // make the gate a child of the subroutine
             gameObject.transform.position = new Vector2(cam.transform.position.x, cam.transform.position.y); // set the new gate to the cam's position
+
+            // if it has at least one input
+            if (gate.InputParameters.Count > 0)
+            {
+                var gateInputRef = Instantiate(gateInputPrefab);
+                gateInputRef.transform.SetParent(gameObject.transform);
+                gateInputRef.transform.position = gameObject.transform.position + new Vector3(-0.7f, 0, 0);
+            }
+
+            // if it has at least one output
+            if (gate.OutputParameters.Count > 0)
+            {
+                var gateOutputRef = Instantiate(gateOutputPrefab);
+                gateOutputRef.transform.SetParent(gameObject.transform);
+                gateOutputRef.transform.position = gameObject.transform.position + new Vector3(0.7f, 0, 0);
+            }
+
+            var statement = gate as IStatement;
+            if (statement != null)
+            {
+                // the only gate without a program flow in is Entrypoint
+                if (!(statement is Entrypoint))
+                {
+                    var programFlowInRef = Instantiate(programFlowInPrefab);
+                    programFlowInRef.transform.SetParent(gameObject.transform);
+                    programFlowInRef.transform.position = gameObject.transform.position + new Vector3(0, 0.75f, 0);
+                }
+
+                // A statement should always have at least one outward path, unless it's a subroutine return or endpoint or something,
+                //  neither of which currently exist in the standard library
+                if (statement.OutwardPaths.Count > 0)
+                {
+                    var programFlowOutRef = Instantiate(programFlowOutPrefab);
+                    programFlowOutRef.transform.SetParent(gameObject.transform);
+                    programFlowOutRef.transform.position = gameObject.transform.position + new Vector3(0, -0.75f, 0);
+                }
+            }
 
             var gateRef = gameObject.GetComponent<GateRef>();
             gateRef.SubroutineName = activeSRDefinition.Identifier;
