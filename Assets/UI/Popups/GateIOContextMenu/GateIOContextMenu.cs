@@ -23,7 +23,7 @@ namespace Scrapset.UI
             var root = scrapsetEditorUI.rootVisualElement;
 
             // LAYOUT
-            Resources.Load<VisualTreeAsset>("GateIOContextMenuLayout").CloneTree(root);
+            Resources.Load<VisualTreeAsset>("GateIOContextMenuLayout").CloneTree(root); // clones asset and attaches to root
             layout = root.Q("GateIOContextMenu__Container");
 
             // STYLES
@@ -43,7 +43,7 @@ namespace Scrapset.UI
                 layout.style.right = root.resolvedStyle.width - screenPos.x;
             }
 
-            root.Q("Overlay").Add(layout);
+            root.Add(layout);
         }
 
         public void Detach()
@@ -51,7 +51,7 @@ namespace Scrapset.UI
             if (layout == null) return;
 
             var root = scrapsetEditorUI.rootVisualElement;
-            root.Q("Overlay").Remove(layout);
+            root.Remove(layout);
             layout = null;
         }
     }
