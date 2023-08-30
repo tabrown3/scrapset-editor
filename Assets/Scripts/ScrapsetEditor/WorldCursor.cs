@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Scrapset.Editor
@@ -8,6 +9,9 @@ namespace Scrapset.Editor
     //  when the cursor hovers over something, the WorldCursor collides with it and triggers.
     public class WorldCursor : MonoBehaviour
     {
+        public event Action<GameObject> OnEnter;
+        public event Action<GameObject> OnExit;
+
         [SerializeField] InputManager inputManager;
 
         void Start()
@@ -20,6 +24,9 @@ namespace Scrapset.Editor
         {
             // force the WorldCursor to stick with the UI cursor
             transform.position = inputManager.CursorPosWorld;
+
+            Debug.Log($"World: ({inputManager.CursorPosWorld.x}, {inputManager.CursorPosWorld.y})");
+            Debug.Log($"Screen: ({inputManager.CursorPosScreen.x}, {inputManager.CursorPosScreen.y})");
         }
 
         void OnTriggerEnter2D(Collider2D collision)
@@ -28,6 +35,7 @@ namespace Scrapset.Editor
             if (collision.gameObject.layer != 2)
             {
                 Debug.Log("Cursor over world object!!!");
+                OnEnter?.Invoke(collision.gameObject);
             }
         }
 
@@ -36,6 +44,7 @@ namespace Scrapset.Editor
             if (collision.gameObject.layer != 2)
             {
                 Debug.Log("Cursor out of world object!!!");
+                OnExit?.Invoke(collision.gameObject);
             }
         }
     }

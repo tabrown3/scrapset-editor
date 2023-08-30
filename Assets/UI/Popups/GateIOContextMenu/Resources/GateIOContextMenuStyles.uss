@@ -1,0 +1,14 @@
+.GateIOContextMenu__Container {
+    width: 15%;
+    height: 20%;
+    position: absolute;
+    flex-shrink: 1;
+    flex-direction: column;
+    flex-basis: auto;
+    background-color: rgb(255, 255, 255);
+    min-width: auto;
+    min-height: auto;
+    max-height: none;
+    left: 0;
+    top: 0;
+}

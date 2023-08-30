@@ -7,13 +7,13 @@ namespace Scrapset.UI
 {
     public class GateCreationList : MonoBehaviour
     {
-        [SerializeField] UIDocument gateMenu;
+        [SerializeField] UIDocument scrapsetEditorUI;
 
         public event Action<GateMenuItem> OnClick;
 
         void OnEnable()
         {
-            var root = gateMenu.rootVisualElement;
+            var root = scrapsetEditorUI.rootVisualElement;
             var listView = root.Q<ListView>("GateList");
 
             // TODO: pull this into resource management class
