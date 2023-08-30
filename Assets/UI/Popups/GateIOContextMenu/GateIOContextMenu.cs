@@ -1,45 +1,58 @@
-using Scrapset.Editor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Scrapset.UI
 {
+    public enum RenderSide
+    {
+        Right,
+        Left
+    }
+
     public class GateIOContextMenu : MonoBehaviour
     {
         [SerializeField] UIDocument scrapsetEditorUI;
-        [SerializeField] WorldCursor worldCursor;
         [SerializeField] Camera cam;
 
-        void Start()
-        {
-            worldCursor.OnEnter += OnWorldCursorEnter;
-            //worldCursor.OnExit += OnWorldCursorExit;
-        }
+        VisualElement layout;
 
-        void OnWorldCursorEnter(GameObject gameObject)
+        public void Attach(GameObject gameObject, RenderSide renderSide = RenderSide.Right)
         {
+            if (layout != null) return;
+
             var root = scrapsetEditorUI.rootVisualElement;
 
             // LAYOUT
             Resources.Load<VisualTreeAsset>("GateIOContextMenuLayout").CloneTree(root);
-            var layout = root.Q("GateIOContextMenu__Container");
+            layout = root.Q("GateIOContextMenu__Container");
 
             // STYLES
             var styles = Resources.Load<StyleSheet>("GateIOContextMenuStyles");
             layout.styleSheets.Add(styles);
-            var bob = cam.WorldToScreenPoint(gameObject.transform.position);
+            var screenPos = cam.WorldToScreenPoint(gameObject.transform.position);
 
-            layout.style.bottom = bob.y;
-            layout.style.left = bob.x;
+            // (0,0) in screen space is the bottom left corner. But we want to set top, not bottom,
+            //  so subtracting screenPos.y from height.
+            layout.style.top = root.resolvedStyle.height - screenPos.y;
+
+            if (renderSide == RenderSide.Right)
+            {
+                layout.style.left = screenPos.x;
+            } else if (renderSide == RenderSide.Left)
+            {
+                layout.style.right = root.resolvedStyle.width - screenPos.x;
+            }
 
             root.Q("Overlay").Add(layout);
         }
 
-        void OnWorldCursorExit(GameObject gameObject)
+        public void Detach()
         {
+            if (layout == null) return;
+
             var root = scrapsetEditorUI.rootVisualElement;
-            var layout = root.Q("GateIOContextMenu__Container");
             root.Q("Overlay").Remove(layout);
+            layout = null;
         }
     }
 }

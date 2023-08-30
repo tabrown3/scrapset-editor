@@ -94,6 +94,7 @@ GameObject:
   - component: {fileID: 7394035952611109259}
   - component: {fileID: 3726384699525589232}
   - component: {fileID: 4581979016251183155}
+  - component: {fileID: -8971453421331570904}
   m_Layer: 0
   m_Name: Gate Input
   m_TagString: Untagged
@@ -204,3 +205,16 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &-8971453421331570904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8996040774488056939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ebefd66adb7f76499d9ba24f2e0ec26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  renderSide: 1
