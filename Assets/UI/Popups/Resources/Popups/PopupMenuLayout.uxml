@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Popups/GateIOContextMenu/Resources/PopupMenuStyles.uss?fileID=7433441132597879392&amp;guid=571402dc6da0fb64281ca48e947dcd7b&amp;type=3#PopupMenuStyles" />
+    <ui:VisualElement name="PopupMenu__Container" class="PopupMenu__Container" style="top: auto; left: auto;" />
+</ui:UXML>

@@ -627,6 +627,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1380590508}
+  - component: {fileID: 1380590510}
   - component: {fileID: 1380590509}
   m_Layer: 5
   m_Name: Popups
@@ -663,8 +664,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scrapsetEditorUI: {fileID: 616812377}
-  worldCursor: {fileID: 760379040}
   cam: {fileID: 519420031}
+--- !u!114 &1380590510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1380590507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79d71d5e3314c74479998c5505fa78d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1382198969
 GameObject:
   m_ObjectHideFlags: 0

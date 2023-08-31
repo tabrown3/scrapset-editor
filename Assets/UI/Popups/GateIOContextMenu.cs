@@ -28,11 +28,11 @@ namespace Scrapset.UI
             var root = scrapsetEditorUI.rootVisualElement;
 
             // LAYOUT
-            Resources.Load<VisualTreeAsset>("GateIOContextMenuLayout").CloneTree(root); // clones asset and attaches to root
-            layout = root.Q("GateIOContextMenu__Container");
+            Resources.Load<VisualTreeAsset>("Popups/PopupMenuLayout").CloneTree(root); // clones asset and attaches to root
+            layout = root.Q("PopupMenu__Container");
 
             // STYLES
-            var styles = Resources.Load<StyleSheet>("GateIOContextMenuStyles");
+            var styles = Resources.Load<StyleSheet>("Popups/PopupMenuStyles");
             layout.styleSheets.Add(styles);
             var screenPos = cam.WorldToScreenPoint(gameObject.transform.position);
 
@@ -48,7 +48,8 @@ namespace Scrapset.UI
                 layout.style.right = root.resolvedStyle.width - screenPos.x;
             }
 
-            var listView = layout.Q<ListView>("GateIOContextMenu__IOList");
+            var listView = new ListView();
+            layout.Add(listView);
             FillPortList(listView, gate, portDirection);
 
             root.Add(layout);

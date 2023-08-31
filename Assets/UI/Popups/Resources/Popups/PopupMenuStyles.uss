@@ -1,4 +1,4 @@
-.GateIOContextMenu__Container {
+.PopupMenu__Container {
     width: 15%;
     height: 20%;
     position: absolute;
