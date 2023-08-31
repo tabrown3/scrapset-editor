@@ -49,10 +49,5 @@ namespace Scrapset.UI
                 button.clicked += () => { Debug.Log("Clicked!"); };
             };
         }
-
-        public void Detach()
-        {
-            popupMenuManager.Detach();
-        }
     }
 }

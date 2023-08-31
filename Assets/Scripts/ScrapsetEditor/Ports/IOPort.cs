@@ -32,12 +32,5 @@ namespace Scrapset.Editor
 
             menu.Attach(gameObject, gateRef.Gate, portDirection, anchor);
         }
-
-        void OnTriggerExit2D(Collider2D collision)
-        {
-            if (menu == null || worldCursor == null) return;
-
-            menu.Detach();
-        }
     }
 }
