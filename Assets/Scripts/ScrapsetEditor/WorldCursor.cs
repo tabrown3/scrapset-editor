@@ -24,9 +24,6 @@ namespace Scrapset.Editor
         {
             // force the WorldCursor to stick with the UI cursor
             transform.position = inputManager.CursorPosWorld;
-
-            Debug.Log($"World: ({inputManager.CursorPosWorld.x}, {inputManager.CursorPosWorld.y})");
-            Debug.Log($"Screen: ({inputManager.CursorPosScreen.x}, {inputManager.CursorPosScreen.y})");
         }
 
         void OnTriggerEnter2D(Collider2D collision)

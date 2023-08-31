@@ -12,6 +12,11 @@ namespace Scrapset
         void OnEnable()
         {
             var root = doc.rootVisualElement;
+            RegisterEnterExitEvents(root);
+        }
+
+        void RegisterEnterExitEvents(VisualElement root)
+        {
             var programmingPanel = root.Q<VisualElement>("ProgrammingPanel");
             var contextPanel = root.Q<VisualElement>("ContextPanel");
             var readoutPanel = root.Q<VisualElement>("ReadoutPanel");

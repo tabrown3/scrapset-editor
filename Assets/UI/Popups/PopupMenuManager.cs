@@ -30,6 +30,8 @@ namespace Scrapset.UI
             // STYLES
             var styles = Resources.Load<StyleSheet>("Popups/PopupMenuStyles");
             layout.styleSheets.Add(styles);
+
+            RegisterAutoDetachHandlers();
         }
 
         public void Attach(GameObject gameObject, VisualElement content, Anchor anchor = Anchor.Right)
@@ -99,6 +101,32 @@ namespace Scrapset.UI
                 layout.style.right = root.resolvedStyle.width - screenPos.x;
                 layout.style.left = StyleKeyword.Auto;
             }
+        }
+
+        // The auto-detach handlers are two handlers for the same event, PointerDownEvent,
+        //  registered one against the root, the other against the popup. Because the child
+        //  handler always executes first (by default), it sets a flag to tell the root handler
+        //  NOT to detach if the click originated from the popup.
+        // Ultimately this makes it to where clicking anywhere outside the popup closes it, but
+        //  clicking anywhere inside the popup does not close it.
+        void RegisterAutoDetachHandlers()
+        {
+            var root = scrapsetEditorUI.rootVisualElement;
+            var fromPopup = false;
+            root.RegisterCallback<PointerDownEvent>(e =>
+            {
+                Debug.Log("Root handler");
+                if (!fromPopup && attachedGameObject != null)
+                {
+                    Detach();
+                }
+                fromPopup = false;
+            });
+            layout.RegisterCallback<PointerDownEvent>(e =>
+            {
+                Debug.Log($"Local handler");
+                fromPopup = true;
+            });
         }
     }
 }
