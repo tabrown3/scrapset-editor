@@ -134,7 +134,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ebefd66adb7f76499d9ba24f2e0ec26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alignment: 0
+  portDirection: 1
+  renderSide: 0
 --- !u!1 &2906362048364499336
 GameObject:
   m_ObjectHideFlags: 0

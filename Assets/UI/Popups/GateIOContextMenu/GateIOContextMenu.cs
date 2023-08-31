@@ -1,3 +1,8 @@
+using Scrapset.Editor;
+using Scrapset.Engine;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,7 +21,7 @@ namespace Scrapset.UI
 
         VisualElement layout;
 
-        public void Attach(GameObject gameObject, RenderSide renderSide = RenderSide.Right)
+        public void Attach(GameObject gameObject, IGate gate, PortDirection portDirection, RenderSide renderSide = RenderSide.Right)
         {
             if (layout != null) return;
 
@@ -43,7 +48,35 @@ namespace Scrapset.UI
                 layout.style.right = root.resolvedStyle.width - screenPos.x;
             }
 
+            var listView = layout.Q<ListView>("GateIOContextMenu__IOList");
+            FillPortList(listView, gate, portDirection);
+
             root.Add(layout);
+        }
+
+        void FillPortList(ListView listView, IGate gate, PortDirection portDirection)
+        {
+            List<ParameterNameTypePair> parameterNameTypePairs;
+            if (portDirection == PortDirection.Input)
+            {
+                parameterNameTypePairs = gate.InputParameters.Select(u => new ParameterNameTypePair() { Name = u.Key, Type = u.Value.Type }).ToList();
+            } else if (portDirection == PortDirection.Output)
+            {
+                parameterNameTypePairs = gate.OutputParameters.Select(u => new ParameterNameTypePair() { Name = u.Key, Type = u.Value.Type }).ToList();
+            } else
+            {
+                throw new Exception("Could not generate parameter list: portDirection must be Input or Output");
+            }
+
+            listView.itemsSource = parameterNameTypePairs;
+            listView.makeItem = () => new Button();
+            listView.bindItem = (elem, ind) =>
+            {
+                var button = elem as Button;
+                var item = parameterNameTypePairs[ind];
+                button.text = $"{item.Name}: {item.Type}";
+                button.clicked += () => { Debug.Log("Clicked!"); };
+            };
         }
 
         public void Detach()
