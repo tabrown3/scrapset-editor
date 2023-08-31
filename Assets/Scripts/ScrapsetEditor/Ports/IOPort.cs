@@ -12,7 +12,7 @@ namespace Scrapset.Editor
     public class IOPort : MonoBehaviour
     {
         [SerializeField] PortDirection portDirection;
-        [SerializeField] RenderSide renderSide;
+        [SerializeField] Anchor anchor;
 
         GateIOContextMenu menu;
         WorldCursor worldCursor;
@@ -30,7 +30,7 @@ namespace Scrapset.Editor
             if (menu == null || worldCursor == null) return;
             if (collision.gameObject != worldCursor.gameObject) return; // only attach on WorldCursor collision
 
-            menu.Attach(gameObject, gateRef.Gate, portDirection, renderSide);
+            menu.Attach(gameObject, gateRef.Gate, portDirection, anchor);
         }
 
         void OnTriggerExit2D(Collider2D collision)

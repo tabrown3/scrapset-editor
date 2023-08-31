@@ -8,51 +8,21 @@ using UnityEngine.UIElements;
 
 namespace Scrapset.UI
 {
-    public enum RenderSide
-    {
-        Right,
-        Left
-    }
-
     public class GateIOContextMenu : MonoBehaviour
     {
-        [SerializeField] UIDocument scrapsetEditorUI;
-        [SerializeField] Camera cam;
+        PopupMenuManager popupMenuManager;
 
-        VisualElement layout;
-
-        public void Attach(GameObject gameObject, IGate gate, PortDirection portDirection, RenderSide renderSide = RenderSide.Right)
+        void Start()
         {
-            if (layout != null) return;
+            popupMenuManager = GetComponent<PopupMenuManager>();
+        }
 
-            var root = scrapsetEditorUI.rootVisualElement;
-
-            // LAYOUT
-            Resources.Load<VisualTreeAsset>("Popups/PopupMenuLayout").CloneTree(root); // clones asset and attaches to root
-            layout = root.Q("PopupMenu__Container");
-
-            // STYLES
-            var styles = Resources.Load<StyleSheet>("Popups/PopupMenuStyles");
-            layout.styleSheets.Add(styles);
-            var screenPos = cam.WorldToScreenPoint(gameObject.transform.position);
-
-            // (0,0) in screen space is the bottom left corner. But we want to set top, not bottom,
-            //  so subtracting screenPos.y from height.
-            layout.style.top = root.resolvedStyle.height - screenPos.y;
-
-            if (renderSide == RenderSide.Right)
-            {
-                layout.style.left = screenPos.x;
-            } else if (renderSide == RenderSide.Left)
-            {
-                layout.style.right = root.resolvedStyle.width - screenPos.x;
-            }
-
+        public void Attach(GameObject gameObject, IGate gate, PortDirection portDirection, Anchor anchor = Anchor.Right)
+        {
             var listView = new ListView();
-            layout.Add(listView);
             FillPortList(listView, gate, portDirection);
 
-            root.Add(layout);
+            popupMenuManager.Attach(gameObject, listView, anchor);
         }
 
         void FillPortList(ListView listView, IGate gate, PortDirection portDirection)
@@ -82,11 +52,7 @@ namespace Scrapset.UI
 
         public void Detach()
         {
-            if (layout == null) return;
-
-            var root = scrapsetEditorUI.rootVisualElement;
-            root.Remove(layout);
-            layout = null;
+            popupMenuManager.Detach();
         }
     }
 }

@@ -217,4 +217,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ebefd66adb7f76499d9ba24f2e0ec26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderSide: 1
+  portDirection: 0
+  anchor: 1
