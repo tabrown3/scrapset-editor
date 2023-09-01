@@ -663,8 +663,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59cd85a079a1e934dba38dbbbe355139, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scrapsetEditorUI: {fileID: 616812377}
-  cam: {fileID: 519420031}
 --- !u!114 &1380590510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -679,6 +677,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scrapsetEditorUI: {fileID: 616812377}
   cam: {fileID: 519420031}
+  uiInputManager: {fileID: 1382198973}
 --- !u!1 &1382198969
 GameObject:
   m_ObjectHideFlags: 0

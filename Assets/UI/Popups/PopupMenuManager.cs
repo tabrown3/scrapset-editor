@@ -13,6 +13,7 @@ namespace Scrapset.UI
     {
         [SerializeField] UIDocument scrapsetEditorUI;
         [SerializeField] Camera cam;
+        [SerializeField] UIInputManager uiInputManager;
 
         VisualElement layout;
 
@@ -32,6 +33,7 @@ namespace Scrapset.UI
             layout.styleSheets.Add(styles);
 
             RegisterAutoDetachHandlers();
+            uiInputManager.RegisterInteractiveUI(layout);
         }
 
         public void Attach(GameObject gameObject, VisualElement content, Anchor anchor = Anchor.Right)

@@ -21,13 +21,15 @@ namespace Scrapset
             var contextPanel = root.Q<VisualElement>("ContextPanel");
             var readoutPanel = root.Q<VisualElement>("ReadoutPanel");
 
-            programmingPanel.RegisterCallback<PointerEnterEvent>(HandlePointerEnter);
-            contextPanel.RegisterCallback<PointerEnterEvent>(HandlePointerEnter);
-            readoutPanel.RegisterCallback<PointerEnterEvent>(HandlePointerEnter);
+            RegisterInteractiveUI(programmingPanel);
+            RegisterInteractiveUI(contextPanel);
+            RegisterInteractiveUI(readoutPanel);
+        }
 
-            programmingPanel.RegisterCallback<PointerLeaveEvent>(HandlePointerLeave);
-            contextPanel.RegisterCallback<PointerLeaveEvent>(HandlePointerLeave);
-            readoutPanel.RegisterCallback<PointerLeaveEvent>(HandlePointerLeave);
+        public void RegisterInteractiveUI(VisualElement el)
+        {
+            el.RegisterCallback<PointerEnterEvent>(HandlePointerEnter);
+            el.RegisterCallback<PointerLeaveEvent>(HandlePointerLeave);
         }
 
         void HandlePointerEnter(PointerEnterEvent e)
