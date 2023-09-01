@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -6,7 +7,9 @@ namespace Scrapset.UI
     public enum Anchor
     {
         Right,
-        Left
+        Left,
+        Top,
+        Bottom
     }
 
     public class PopupMenuManager : MonoBehaviour
@@ -92,16 +95,38 @@ namespace Scrapset.UI
 
             // (0,0) in screen space is the bottom left corner. But we want to set top, not bottom,
             //  so subtracting screenPos.y from height.
-            layout.style.top = root.resolvedStyle.height - screenPos.y;
-
-            if (attachedAnchor == Anchor.Right)
+            if (attachedAnchor == Anchor.Right || attachedAnchor == Anchor.Left)
             {
+                layout.style.top = root.resolvedStyle.height - screenPos.y;
+
+                if (attachedAnchor == Anchor.Right)
+                {
+                    layout.style.left = screenPos.x;
+                    layout.style.right = StyleKeyword.Auto;
+                } else if (attachedAnchor == Anchor.Left)
+                {
+                    layout.style.right = root.resolvedStyle.width - screenPos.x;
+                    layout.style.left = StyleKeyword.Auto;
+                }
+            } else if (attachedAnchor == Anchor.Top || attachedAnchor == Anchor.Bottom)
+            {
+                // positioning for Anchor.Right
                 layout.style.left = screenPos.x;
                 layout.style.right = StyleKeyword.Auto;
-            } else if (attachedAnchor == Anchor.Left)
+
+                if (attachedAnchor == Anchor.Top)
+                {
+                    layout.style.bottom = screenPos.y;
+                    layout.style.top = StyleKeyword.Auto;
+                } else if (attachedAnchor == Anchor.Bottom)
+                {
+                    // currently the same as Anchor.Right
+                    layout.style.top = root.resolvedStyle.height - screenPos.y;
+                    layout.style.bottom = StyleKeyword.Auto;
+                }
+            } else
             {
-                layout.style.right = root.resolvedStyle.width - screenPos.x;
-                layout.style.left = StyleKeyword.Auto;
+                throw new Exception($"Could not anchor context menu: anchor position {attachedAnchor} is invalid");
             }
         }
 
@@ -117,7 +142,6 @@ namespace Scrapset.UI
             var fromPopup = false;
             root.RegisterCallback<PointerDownEvent>(e =>
             {
-                Debug.Log("Root handler");
                 if (!fromPopup && attachedGameObject != null)
                 {
                     Detach();
@@ -126,7 +150,6 @@ namespace Scrapset.UI
             });
             layout.RegisterCallback<PointerDownEvent>(e =>
             {
-                Debug.Log($"Local handler");
                 fromPopup = true;
             });
         }

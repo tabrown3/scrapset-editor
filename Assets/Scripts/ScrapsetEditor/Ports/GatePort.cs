@@ -1,4 +1,5 @@
 ﻿using Scrapset.UI;
+using System;
 using UnityEngine;
 
 namespace Scrapset.Editor
@@ -9,18 +10,37 @@ namespace Scrapset.Editor
         Output
     }
 
-    public class IOPort : MonoBehaviour
+    public enum LinkType
+    {
+        InputOutput,
+        ProgramFlow
+    }
+
+    public class GatePort : MonoBehaviour
     {
         [SerializeField] PortDirection portDirection;
         [SerializeField] Anchor anchor;
+        [SerializeField] LinkType linkType;
 
-        GateIOContextMenu menu;
+        // TODO: create interface for GateIO and ProgramFlowContextMenu to share
+        IContextMenu menu;
         WorldCursor worldCursor;
         GateRef gateRef;
 
-        private void Start()
+        void Start()
         {
-            menu = FindObjectOfType<GateIOContextMenu>();
+            if (linkType == LinkType.InputOutput)
+            {
+                menu = FindObjectOfType<GateIOContextMenu>();
+            } else if (linkType == LinkType.ProgramFlow)
+            {
+                menu = FindObjectOfType<ProgramFlowContextMenu>();
+            } else
+            {
+                throw new Exception($"Cannot attach context menu: invalid LinkType {linkType}");
+            }
+
+
             worldCursor = FindObjectOfType<WorldCursor>();
             gateRef = transform.parent.GetComponent<GateRef>();
         }

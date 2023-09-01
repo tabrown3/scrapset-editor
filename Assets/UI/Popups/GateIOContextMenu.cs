@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 namespace Scrapset.UI
 {
-    public class GateIOContextMenu : MonoBehaviour
+    public class GateIOContextMenu : MonoBehaviour, IContextMenu
     {
         PopupMenuManager popupMenuManager;
 
