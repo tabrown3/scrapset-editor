@@ -155,23 +155,31 @@ namespace Scrapset.Engine
                 InputParameterName = inputParameterName,
             };
 
-            if (!linksByGateIdInputParam.ContainsKey(inputGateId))
+            Dictionary<string, GateLink> outLinksByInputParam;
+            if (linksByGateIdInputParam.TryGetValue(inputGateId, out outLinksByInputParam))
             {
-                linksByGateIdInputParam.Add(inputGateId, new Dictionary<string, GateLink>());
-            }
-
-            var linkByInput = linksByGateIdInputParam[inputGateId];
-            if (!linkByInput.ContainsKey(inputParameterName))
-            {
-                linkByInput.Add(inputParameterName, link);
+                if (!outLinksByInputParam.ContainsKey(inputParameterName))
+                {
+                    // the gate already contains an input param dict (presumably because it has other inputs already linked),
+                    //  but does not contain a link for this input, so just add a new link to the dict for the input
+                    outLinksByInputParam.Add(inputParameterName, link);
+                } else
+                {
+                    // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
+                    //  single source.
+                    var existingLink = linksByGateIdInputParam[inputGateId][inputParameterName];
+                    throw new System.Exception($"Input param '{inputParameterName}' for calling gate ID {inputGateId} is" +
+                        $"already linked to output param '{existingLink.OutputParameterName}' of source gate ID {existingLink.OutputGateId}");
+                }
             } else
             {
-                // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
-                //  single source.
-                var existingLink = linksByGateIdInputParam[inputGateId][inputParameterName];
-                throw new System.Exception($"Input param '{inputParameterName}' for calling gate ID {inputGateId} is" +
-                    $"already linked to output param '{existingLink.OutputParameterName}' of source gate ID {existingLink.OutputGateId}");
+                // create a linksByInputParam dict for the gate and add the new link to the new dict
+                Dictionary<string, GateLink> newLinksByInputParam = new Dictionary<string, GateLink>();
+                newLinksByInputParam.Add(inputParameterName, link);
+                linksByGateIdInputParam.Add(inputGateId, newLinksByInputParam);
             }
+
+
 
             if (!linksByGateIdOutputParam.ContainsKey(outputGateId))
             {
