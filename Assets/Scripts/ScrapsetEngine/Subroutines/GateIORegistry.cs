@@ -59,6 +59,17 @@ namespace Scrapset.Engine
         // create an I/O link between gates
         public void CreateInputOutputLink(int inputGateId, string inputParameterName, int outputGateId, string outputParameterName)
         {
+            /*************************************************
+            *** START VALIDATION - DO NOT MODIFY STATE HERE ****
+            *************************************************/
+
+            /*** NOTE on validations ***/
+            /* The following validations should be the counterparts of the state manipulations that take place
+             *  later on. DO NOT MODIFY STATE HERE. If state is modified here but an error is detected afterward,
+             *  the result is partially updated state that's ultimately in an invalid state. We want to avoid that
+             *  at all cost, even if it means duplicating a few if/else blocks in the state manipulation section.
+             */
+
             var outputGate = subroutineDefinition.GetGateById(outputGateId);
             if (outputGate == null)
             {
@@ -110,14 +121,11 @@ namespace Scrapset.Engine
                     if (genericType == ScrapsetTypes.None)
                     {
                         // if "T" doesn't have an inferred type set, set one based on the other param's type
-                        inputGate.GenericTypeReconciler.SetInputGenericTypeMapping(inputParameterName, outputParameter.Type);
                         inferredInputParam.Type = outputParameter.Type;
-                        Debug.Log($"Input param '{inputParameterName}' of gate '{inputGate.GetType()}' with ID {inputGateId} had its generic identifier '{genericIdentifier}' set to {outputParameter} from the output param '{outputParameterName}' of gate '{outputGate.GetType()}' with ID {outputGateId}");
                     } else
                     {
                         // otherwise use the existing inferred type
                         inferredInputParam.Type = genericType;
-                        Debug.Log($"Input param '{inputParameterName}' of gate '{inputGate.GetType()}' with ID {inputGateId} had its generic identifier '{genericIdentifier}' inferred as {genericType} from a previous connection involving generic identifier '{genericIdentifier}'");
                     }
 
                 } else // if the output param's the generic
@@ -131,13 +139,10 @@ namespace Scrapset.Engine
                     var genericType = outputGate.GenericTypeReconciler.GetTypeOfGenericIdentifier(genericIdentifier);
                     if (genericType == ScrapsetTypes.None)
                     {
-                        outputGate.GenericTypeReconciler.SetOutputGenericTypeMapping(outputParameterName, inputParameter.Type);
                         inferredOutputParam.Type = inputParameter.Type;
-                        Debug.Log($"Output param '{outputParameterName}' of gate '{outputGate.GetType()}' with ID {outputGateId} had its generic identifier '{genericIdentifier}' set to {inputParameter} from the input param '{inputParameterName}' of gate '{inputGate.GetType()} with ID {inputGateId}'");
                     } else
                     {
                         inferredOutputParam.Type = genericType;
-                        Debug.Log($"Output param '{outputParameterName}' of gate '{outputGate.GetType()}' with ID {outputGateId} had its generic identifier '{genericIdentifier}' inferred as {genericType} from a previous connection involving generic identifier '{genericIdentifier}'");
                     }
                 }
             }
@@ -145,6 +150,57 @@ namespace Scrapset.Engine
             if (inferredInputParam.Type != inferredOutputParam.Type)
             {
                 throw new System.Exception($"Output '{outputParameterName}' ({inferredOutputParam}) and input '{inputParameterName}' ({inferredInputParam}) are not of the same Scrapset type");
+            }
+
+            Dictionary<string, GateLink> outLinksByInputParam;
+            if (linksByGateIdInputParam.TryGetValue(inputGateId, out outLinksByInputParam)
+                && outLinksByInputParam.ContainsKey(inputParameterName))
+            {
+                // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
+                //  single source.
+                var existingLink = linksByGateIdInputParam[inputGateId][inputParameterName];
+                throw new System.Exception($"Input param '{inputParameterName}' for calling gate ID {inputGateId} is" +
+                    $"already linked to output param '{existingLink.OutputParameterName}' of source gate ID {existingLink.OutputGateId}");
+            }
+
+            /*************************************************
+            *** END VALIDATION - START STATE MANIPULATION ****
+            *************************************************/
+
+            /*** NOTE on state manipulations ***/
+            /* The following state manipulations should be the counterparts of validation check that have already
+             *  taken place. What that means is no validation takes place below, only state changes. If you need
+             *  to perform validation, do it in the validation section.
+             */
+
+            if (inputParameter.Type == ScrapsetTypes.Generic || outputParameter.Type == ScrapsetTypes.Generic)
+            {
+                if (inputParameter.Type == ScrapsetTypes.Generic)
+                {
+                    var genericIdentifier = inputGate.GenericTypeReconciler.GetGenericIdentifierOfInputParam(inputParameterName);
+                    var genericType = inputGate.GenericTypeReconciler.GetTypeOfGenericIdentifier(genericIdentifier);
+                    if (genericType == ScrapsetTypes.None)
+                    {
+                        // if "T" doesn't have an inferred type set, set one based on the other param's type
+                        inputGate.GenericTypeReconciler.SetInputGenericTypeMapping(inputParameterName, outputParameter.Type);
+                        Debug.Log($"Input param '{inputParameterName}' of gate '{inputGate.GetType()}' with ID {inputGateId} had its generic identifier '{genericIdentifier}' set to {outputParameter} from the output param '{outputParameterName}' of gate '{outputGate.GetType()}' with ID {outputGateId}");
+                    } else
+                    {
+                        Debug.Log($"Input param '{inputParameterName}' of gate '{inputGate.GetType()}' with ID {inputGateId} had its generic identifier '{genericIdentifier}' inferred as {genericType} from a previous connection involving generic identifier '{genericIdentifier}'");
+                    }
+                } else
+                {
+                    var genericIdentifier = outputGate.GenericTypeReconciler.GetGenericIdentifierOfOutputParam(outputParameterName);
+                    var genericType = outputGate.GenericTypeReconciler.GetTypeOfGenericIdentifier(genericIdentifier);
+                    if (genericType == ScrapsetTypes.None)
+                    {
+                        outputGate.GenericTypeReconciler.SetOutputGenericTypeMapping(outputParameterName, inputParameter.Type);
+                        Debug.Log($"Output param '{outputParameterName}' of gate '{outputGate.GetType()}' with ID {outputGateId} had its generic identifier '{genericIdentifier}' set to {inputParameter} from the input param '{inputParameterName}' of gate '{inputGate.GetType()} with ID {inputGateId}'");
+                    } else
+                    {
+                        Debug.Log($"Output param '{outputParameterName}' of gate '{outputGate.GetType()}' with ID {outputGateId} had its generic identifier '{genericIdentifier}' inferred as {genericType} from a previous connection involving generic identifier '{genericIdentifier}'");
+                    }
+                }
             }
 
             var link = new GateLink()
@@ -155,22 +211,11 @@ namespace Scrapset.Engine
                 InputParameterName = inputParameterName,
             };
 
-            Dictionary<string, GateLink> outLinksByInputParam;
             if (linksByGateIdInputParam.TryGetValue(inputGateId, out outLinksByInputParam))
             {
-                if (!outLinksByInputParam.ContainsKey(inputParameterName))
-                {
-                    // the gate already contains an input param dict (presumably because it has other inputs already linked),
-                    //  but does not contain a link for this input, so just add a new link to the dict for the input
-                    outLinksByInputParam.Add(inputParameterName, link);
-                } else
-                {
-                    // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
-                    //  single source.
-                    var existingLink = linksByGateIdInputParam[inputGateId][inputParameterName];
-                    throw new System.Exception($"Input param '{inputParameterName}' for calling gate ID {inputGateId} is" +
-                        $"already linked to output param '{existingLink.OutputParameterName}' of source gate ID {existingLink.OutputGateId}");
-                }
+                // the gate already contains an input param dict (presumably because it has other inputs already linked),
+                //  but does not contain a link for this input, so just add a new link to the dict for the input
+                outLinksByInputParam.Add(inputParameterName, link);
             } else
             {
                 // create a linksByInputParam dict for the gate and add the new link to the new dict
@@ -196,7 +241,8 @@ namespace Scrapset.Engine
             if (linkList.Any(u => u.InputParameterName == inputParameterName && u.InputGateId == inputGateId))
             {
                 // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
-                //  single source. We determined in the check above that the input doesn't have a source, so this could only result as a bug.
+                //  single source. We determined in the validations above that the input doesn't have a source, so this could only result as a bug.
+                //  That's why I'm keeping it as an actual exception here. It should not occur.
                 throw new System.Exception($"The output list for gate ID {outputGateId} already contains an entry for input param" +
                     $"'{inputParameterName}' of gate ID {inputGateId}. This is likely a bug in the SubroutineInstance class.");
             } else
