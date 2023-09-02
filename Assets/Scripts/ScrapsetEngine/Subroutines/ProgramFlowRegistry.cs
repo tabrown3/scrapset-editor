@@ -17,6 +17,7 @@ namespace Scrapset.Engine
         // establish program execution order by linking statements together
         public void CreateProgramFlowLink(int fromId, string flowName, int toId)
         {
+            /*** START VALIDATION - DO NOT MODIFY STATE HERE ***/
             var fromGate = subroutineDefinition.GetGateById(fromId);
             if (fromGate == null)
             {
@@ -45,6 +46,8 @@ namespace Scrapset.Engine
             {
                 throw new System.Exception($"Gate with ID {fromId} does not have outward path of '${flowName}'");
             }
+
+            /*** END VALIDATION - START STATE MANIPULATION ***/
 
             var programFlow = new ProgramFlow()
             {
