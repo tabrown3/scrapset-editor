@@ -2,7 +2,23 @@
 {
     public enum ValidationErrorCode
     {
-        Unknown
+        Unknown,
+        /* Gate IO link creation codes */
+        OutputGateNotFound,
+        InputGateNotFound,
+        OutputParamNotFound,
+        InputParamNotFound,
+        GenericToGenericUnsupported, // generic-to-generic links will hopefully be supported at some point
+        GenericInputTypeIdentifierNotFound,
+        GenericOutputTypeIdentifierNotFound,
+        TypeMismatch,
+        InputParamAlreadyLinked,
+        /* Program flow link creation codes */
+        FromGateNotFound,
+        ToGateNotFound,
+        FromGateNotStatement,
+        ToGateNotStatement,
+        OutwardPathNameNotFound,
     }
 
     public class ValidationError

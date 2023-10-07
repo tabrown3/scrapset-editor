@@ -4,6 +4,16 @@ namespace Scrapset.Engine
 {
     public class ValidationResult
     {
+        public ValidationResult() { }
+        public ValidationResult(string message, ValidationErrorCode errorCode)
+        {
+            AddError(message, errorCode);
+        }
+        public ValidationResult(string message, ValidationWarningCode warningCode)
+        {
+            AddWarning(message, warningCode);
+        }
+
         public bool HasErrors => Errors.Count > 0;
         public bool HasWarnings => Warnings.Count > 0;
 

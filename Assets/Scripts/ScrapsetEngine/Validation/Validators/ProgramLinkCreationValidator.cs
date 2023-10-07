@@ -20,33 +20,33 @@
             var fromGate = subroutineDefinition.GetGateById(fromId);
             if (fromGate == null)
             {
-                throw new System.Exception($"Gate with ID {fromId} not found");
+                return new ValidationResult($"Gate with ID {fromId} not found", ValidationErrorCode.FromGateNotFound);
             }
 
             var toGate = subroutineDefinition.GetGateById(toId);
             if (toGate == null)
             {
-                throw new System.Exception($"Gate with ID {toId} not found");
+                return new ValidationResult($"Gate with ID {toId} not found", ValidationErrorCode.ToGateNotFound);
             }
 
             IStatement fromStatement = fromGate as IStatement;
             if (fromStatement == null)
             {
-                throw new System.Exception($"Gate with ID {fromId} does not implement IStatement");
+                return new ValidationResult($"Gate with ID {fromId} does not implement IStatement", ValidationErrorCode.FromGateNotStatement);
             }
 
             IStatement toStatement = toGate as IStatement;
             if (toStatement == null)
             {
-                throw new System.Exception($"Gate with ID {toId} does not implement IStatement");
+                return new ValidationResult($"Gate with ID {toId} does not implement IStatement", ValidationErrorCode.ToGateNotFound);
             }
 
             if (!fromStatement.OutwardPaths.Contains(flowName))
             {
-                throw new System.Exception($"Gate with ID {fromId} does not have outward path of '${flowName}'");
+                return new ValidationResult($"Gate with ID {fromId} does not have outward path of '${flowName}'", ValidationErrorCode.OutwardPathNameNotFound);
             }
 
-            throw new System.NotImplementedException();
+            return new ValidationResult();
         }
     }
 }
