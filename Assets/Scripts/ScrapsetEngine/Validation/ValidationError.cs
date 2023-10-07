@@ -2,7 +2,7 @@
 {
     public enum ValidationErrorCode
     {
-        Unknown,
+        Unknown = 100,
         /* Gate IO link creation codes */
         OutputGateNotFound,
         InputGateNotFound,
@@ -30,6 +30,11 @@
         {
             Message = message;
             ErrorCode = errorCode;
+        }
+
+        public override string ToString()
+        {
+            return $"{Message} - {ErrorCode}";
         }
     }
 }

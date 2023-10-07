@@ -18,34 +18,16 @@ namespace Scrapset.Engine
         public void CreateProgramFlowLink(int fromId, string flowName, int toId)
         {
             /*** START VALIDATION - DO NOT MODIFY STATE HERE ***/
-            var fromGate = subroutineDefinition.GetGateById(fromId);
-            if (fromGate == null)
+            var result = ProgramFlowLinkRuleset.ValidateLinkCreation(subroutineDefinition, fromId, flowName, toId);
+
+            if (result.HasErrors)
             {
-                throw new System.Exception($"Gate with ID {fromId} not found");
+                var error = result.Errors.First();
+                throw new System.Exception(error.ToString());
             }
 
-            var toGate = subroutineDefinition.GetGateById(toId);
-            if (toGate == null)
-            {
-                throw new System.Exception($"Gate with ID {toId} not found");
-            }
-
-            IStatement fromStatement = fromGate as IStatement;
-            if (fromStatement == null)
-            {
-                throw new System.Exception($"Gate with ID {fromId} does not implement IStatement");
-            }
-
-            IStatement toStatement = toGate as IStatement;
-            if (toStatement == null)
-            {
-                throw new System.Exception($"Gate with ID {toId} does not implement IStatement");
-            }
-
-            if (!fromStatement.OutwardPaths.Contains(flowName))
-            {
-                throw new System.Exception($"Gate with ID {fromId} does not have outward path of '${flowName}'");
-            }
+            var fromGate = result.ComputedValues.FromGate;
+            var toGate = result.ComputedValues.ToGate;
 
             /*** END VALIDATION - START STATE MANIPULATION ***/
 

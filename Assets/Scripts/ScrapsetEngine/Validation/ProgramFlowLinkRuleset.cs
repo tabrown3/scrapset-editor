@@ -2,7 +2,7 @@
 {
     public class ProgramFlowLinkRuleset
     {
-        public ValidationResult ValidateLinkCreation(SubroutineDefinition subroutineDefinition, int fromId, string flowName, int toId)
+        public static ValidationResult<ProgramLinkCreationComputedValues> ValidateLinkCreation(SubroutineDefinition subroutineDefinition, int fromId, string flowName, int toId)
         {
             var validator = new ProgramLinkCreationValidator(subroutineDefinition, fromId, flowName, toId);
 

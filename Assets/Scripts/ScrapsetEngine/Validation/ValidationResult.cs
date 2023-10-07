@@ -2,8 +2,13 @@
 
 namespace Scrapset.Engine
 {
-    public class ValidationResult
+    public class ValidationResult<T>
     {
+        // ComputedValues allows a Validator to return any values that may be needed by
+        //  the business logic. This could reduce redundancy (code duplication and computation).
+        //  It is entirely optional, and there's no guarantee the caller will actually use it.
+        public T ComputedValues { get; set; }
+
         public ValidationResult() { }
         public ValidationResult(string message, ValidationErrorCode errorCode)
         {

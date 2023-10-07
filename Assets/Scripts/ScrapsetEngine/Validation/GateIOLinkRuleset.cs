@@ -4,7 +4,7 @@ namespace Scrapset.Engine
 {
     public class GateIOLinkRuleset
     {
-        public ValidationResult ValidateLinkCreation(
+        public static ValidationResult<GateIOLinkCreationComputedValues> ValidateLinkCreation(
             Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam,
             SubroutineDefinition subroutineDefinition,
             int inputGateId,

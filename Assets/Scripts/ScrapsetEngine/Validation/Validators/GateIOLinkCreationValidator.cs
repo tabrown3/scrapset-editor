@@ -2,7 +2,7 @@
 
 namespace Scrapset.Engine
 {
-    public class GateIOLinkCreationValidator : IScrapsetValidator
+    public class GateIOLinkCreationValidator : IScrapsetValidator<GateIOLinkCreationComputedValues>
     {
         Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam;
         SubroutineDefinition subroutineDefinition;
@@ -27,30 +27,30 @@ namespace Scrapset.Engine
             this.outputParameterName = outputParameterName;
         }
 
-        public ValidationResult Validate()
+        public ValidationResult<GateIOLinkCreationComputedValues> Validate()
         {
             var outputGate = subroutineDefinition.GetGateById(outputGateId);
             if (outputGate == null)
             {
-                return new ValidationResult($"Could not find output gate with ID ${outputGateId}", ValidationErrorCode.OutputGateNotFound);
+                return new ValidationResult<GateIOLinkCreationComputedValues>($"Could not find output gate with ID ${outputGateId}", ValidationErrorCode.OutputGateNotFound);
             }
 
             var inputGate = subroutineDefinition.GetGateById(inputGateId);
             if (inputGate == null)
             {
-                return new ValidationResult($"Could not find input gate with ID ${inputGateId}", ValidationErrorCode.InputGateNotFound);
+                return new ValidationResult<GateIOLinkCreationComputedValues>($"Could not find input gate with ID ${inputGateId}", ValidationErrorCode.InputGateNotFound);
             }
 
             var outputParameter = outputGate.GetOutputParameter(outputParameterName);
             if (outputParameter.Type == ScrapsetTypes.None)
             {
-                return new ValidationResult($"The output gate '{outputGate.GetType()}' with ID {outputGateId} does not have an output parameter '{outputParameterName}'", ValidationErrorCode.OutputParamNotFound);
+                return new ValidationResult<GateIOLinkCreationComputedValues>($"The output gate '{outputGate.GetType()}' with ID {outputGateId} does not have an output parameter '{outputParameterName}'", ValidationErrorCode.OutputParamNotFound);
             }
 
             var inputParameter = inputGate.GetInputParameter(inputParameterName);
             if (inputParameter.Type == ScrapsetTypes.None)
             {
-                return new ValidationResult($"The input gate '{inputGate.GetType()}' with ID {inputGateId} does not have an input parameter '{inputParameterName}'", ValidationErrorCode.InputParamNotFound);
+                return new ValidationResult<GateIOLinkCreationComputedValues>($"The input gate '{inputGate.GetType()}' with ID {inputGateId} does not have an input parameter '{inputParameterName}'", ValidationErrorCode.InputParamNotFound);
             }
 
             /*** Beginning of generic type checking/inference logic ***/
@@ -63,7 +63,7 @@ namespace Scrapset.Engine
                 //  --  the generics for the gates is inferred in the future and then sets the other
                 if (inputParameter.Type == ScrapsetTypes.Generic && outputParameter.Type == ScrapsetTypes.Generic)
                 {
-                    return new ValidationResult("Connecting two generic ports is not supported at this time, sorry!", ValidationErrorCode.GenericToGenericUnsupported);
+                    return new ValidationResult<GateIOLinkCreationComputedValues>("Connecting two generic ports is not supported at this time, sorry!", ValidationErrorCode.GenericToGenericUnsupported);
                 }
 
                 // if the input param's the generic
@@ -72,7 +72,7 @@ namespace Scrapset.Engine
                     var genericIdentifier = inputGate.GenericTypeReconciler.GetGenericIdentifierOfInputParam(inputParameterName);
                     if (genericIdentifier == null)
                     {
-                        return new ValidationResult($"Cannot determine generic type: input param '{inputParameterName}' of gate '{inputGate.GetType()}' is set as generic but has no generic identifier (e.g. 'T')", ValidationErrorCode.GenericInputTypeIdentifierNotFound);
+                        return new ValidationResult<GateIOLinkCreationComputedValues>($"Cannot determine generic type: input param '{inputParameterName}' of gate '{inputGate.GetType()}' is set as generic but has no generic identifier (e.g. 'T')", ValidationErrorCode.GenericInputTypeIdentifierNotFound);
                     }
 
                     // you pass in "T" and it returns the currently inferred type for "T"
@@ -92,7 +92,7 @@ namespace Scrapset.Engine
                     var genericIdentifier = outputGate.GenericTypeReconciler.GetGenericIdentifierOfOutputParam(outputParameterName);
                     if (genericIdentifier == null)
                     {
-                        return new ValidationResult($"Cannot determine generic type: output param '{outputParameterName}' of gate '{outputGate.GetType()}' is set as generic but has no generic identifier (e.g. 'T')", ValidationErrorCode.GenericOutputTypeIdentifierNotFound);
+                        return new ValidationResult<GateIOLinkCreationComputedValues>($"Cannot determine generic type: output param '{outputParameterName}' of gate '{outputGate.GetType()}' is set as generic but has no generic identifier (e.g. 'T')", ValidationErrorCode.GenericOutputTypeIdentifierNotFound);
                     }
 
                     var genericType = outputGate.GenericTypeReconciler.GetTypeOfGenericIdentifier(genericIdentifier);
@@ -108,7 +108,7 @@ namespace Scrapset.Engine
 
             if (inferredInputParam.Type != inferredOutputParam.Type)
             {
-                return new ValidationResult($"Output '{outputParameterName}' ({inferredOutputParam}) and input '{inputParameterName}' ({inferredInputParam}) are not of the same Scrapset type", ValidationErrorCode.TypeMismatch);
+                return new ValidationResult<GateIOLinkCreationComputedValues>($"Output '{outputParameterName}' ({inferredOutputParam}) and input '{inputParameterName}' ({inferredInputParam}) are not of the same Scrapset type", ValidationErrorCode.TypeMismatch);
             }
 
             Dictionary<string, GateLink> outLinksByInputParam;
@@ -118,11 +118,28 @@ namespace Scrapset.Engine
                 // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
                 //  single source.
                 var existingLink = linksByGateIdInputParam[inputGateId][inputParameterName];
-                return new ValidationResult($"Input param '{inputParameterName}' for calling gate ID {inputGateId} is" +
+                return new ValidationResult<GateIOLinkCreationComputedValues>($"Input param '{inputParameterName}' for calling gate ID {inputGateId} is" +
                     $"already linked to output param '{existingLink.OutputParameterName}' of source gate ID {existingLink.OutputGateId}", ValidationErrorCode.InputParamAlreadyLinked);
             }
 
-            return new ValidationResult();
+            return new ValidationResult<GateIOLinkCreationComputedValues>()
+            {
+                ComputedValues = new GateIOLinkCreationComputedValues()
+                {
+                    InputParameter = inputParameter,
+                    OutputParameter = outputParameter,
+                    InputGate = inputGate,
+                    OutputGate = outputGate,
+                }
+            };
         }
+    }
+
+    public class GateIOLinkCreationComputedValues
+    {
+        public InputParameter InputParameter { get; set; }
+        public OutputParameter OutputParameter { get; set; }
+        public IGate InputGate { get; set; }
+        public IGate OutputGate { get; set; }
     }
 }

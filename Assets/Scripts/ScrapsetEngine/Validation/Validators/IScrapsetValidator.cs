@@ -1,7 +1,7 @@
 ﻿namespace Scrapset.Engine
 {
-    public interface IScrapsetValidator
+    public interface IScrapsetValidator<T>
     {
-        public ValidationResult Validate();
+        public ValidationResult<T> Validate();
     }
 }
