@@ -25,7 +25,7 @@ namespace Scrapset.Engine
 
         public SubroutineDefinition DeclareSubroutine(string name)
         {
-            var subroutineDefinition = new SubroutineDefinition(name, this);
+            var subroutineDefinition = new SubroutineDefinition(name);
 
             if (subroutineDefinitions.ContainsKey(name))
             {

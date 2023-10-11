@@ -1,9 +1,10 @@
 {
-    "name": "PlayModeTests",
+    "name": "ScrapsetEngineTests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "ScrapsetEngine"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

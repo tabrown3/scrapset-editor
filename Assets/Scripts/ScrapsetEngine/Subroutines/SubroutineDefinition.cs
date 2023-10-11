@@ -24,16 +24,13 @@ namespace Scrapset.Engine
         GateIORegistry gateIORegistry;
         // manages the program flow connections
         ProgramFlowRegistry programFlowRegistry;
-        // the manager storing this definition
-        SubroutineManager subroutineManager;
 
-        public SubroutineDefinition(string _name, SubroutineManager _subroutineManager)
+        public SubroutineDefinition(string name)
         {
             gateIORegistry = new GateIORegistry(this);
             programFlowRegistry = new ProgramFlowRegistry(this);
             EntrypointId = CreateGate<Entrypoint>();
-            subroutineManager = _subroutineManager;
-            Identifier = _name;
+            Identifier = name;
         }
 
         public IGate GetGateById(int id)
