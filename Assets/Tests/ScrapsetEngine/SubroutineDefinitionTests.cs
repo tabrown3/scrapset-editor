@@ -19,4 +19,51 @@ public class SubroutineDefinitionTests
         var entrypoint = gates[0];
         Assert.IsInstanceOf<Entrypoint>(entrypoint);
     }
+
+    [Test]
+    public void SubroutineDefinition_RegisterGate_ShouldRegisterPreexistingGatesOfAnyLanguageFeature()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        // expression
+        var addGate = new AddGate();
+        var addGateId = subroutineDefinition.RegisterGate(addGate);
+        Assert.AreEqual(addGateId, 1);
+
+        // statement
+        var assignmentGate = new AssignmentGate();
+        var assignmentGateId = subroutineDefinition.RegisterGate(assignmentGate);
+        Assert.AreEqual(assignmentGateId, 2);
+
+        // variable
+        var numberVariable = new NumberVariableGate();
+        var numberVariableGateId = subroutineDefinition.RegisterGate(numberVariable);
+        Assert.AreEqual(numberVariableGateId, 3);
+
+        // another subroutine
+        var innerSubroutineDefinition = new SubroutineDefinition("InnerTestDefinition");
+        var subroutineGate = new SubroutineExpressionGate(innerSubroutineDefinition);
+        var subroutineGateId = subroutineDefinition.RegisterGate(subroutineGate);
+        Assert.AreEqual(subroutineGateId, 4);
+    }
+
+    [Test]
+    public void SubroutineDefinition_GetGateById_ShouldReturnTheGateWithTheAssociatedIdOrNull()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        var entrypoint = subroutineDefinition.GetGateById(0);
+        Assert.IsInstanceOf<Entrypoint>(entrypoint);
+
+        subroutineDefinition.RegisterGate(new AddGate());
+        var addGate = subroutineDefinition.GetGateById(1);
+        Assert.IsInstanceOf<AddGate>(addGate);
+
+        subroutineDefinition.RegisterGate(new SubtractGate());
+        var subtractGate = subroutineDefinition.GetGateById(2);
+        Assert.IsInstanceOf<SubtractGate>(subtractGate);
+
+        var nonExistentGate = subroutineDefinition.GetGateById(3);
+        Assert.IsNull(nonExistentGate);
+    }
 }
