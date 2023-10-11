@@ -192,12 +192,27 @@ namespace Scrapset.Engine
             return gateIORegistry.HasInputLinks(gateId);
         }
 
-        public IList<KeyValuePair<string, GateLink>> GetInputLinks(int gateId)
+        public IDictionary<string, GateLink> GetInputLinks(int gateId)
         {
             return gateIORegistry.GetInputLinks(gateId);
         }
 
-        public List<GateLink> GetOutputLinks(int gateId, string parameterName)
+        public bool TryGetInputLinks(int gateId, out Dictionary<string, GateLink> linksByInputParam)
+        {
+            return gateIORegistry.TryGetInputLinks(gateId, out linksByInputParam);
+        }
+
+        public bool HasInputLink(int gateId, string parameterName)
+        {
+            return gateIORegistry.HasInputLink(gateId, parameterName);
+        }
+
+        public bool TryGetInputLink(int gateId, string parameterName, out GateLink gateLink)
+        {
+            return gateIORegistry.TryGetInputLink(gateId, parameterName, out gateLink);
+        }
+
+        public IList<GateLink> GetOutputLinks(int gateId, string parameterName)
         {
             return gateIORegistry.GetOutputLinks(gateId, parameterName);
         }

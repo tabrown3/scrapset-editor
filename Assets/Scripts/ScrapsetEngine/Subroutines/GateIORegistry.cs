@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Scrapset.Engine
@@ -21,9 +20,14 @@ namespace Scrapset.Engine
             subroutineDefinition = _subroutineDefinition;
         }
 
+        public bool TryGetInputLinks(int gateId, out Dictionary<string, GateLink> linksByInputParam)
+        {
+            return linksByGateIdInputParam.TryGetValue(gateId, out linksByInputParam);
+        }
+
         public bool HasInputLinks(int gateId)
         {
-            if (!linksByGateIdInputParam.TryGetValue(gateId, out var linksByInputParam))
+            if (!TryGetInputLinks(gateId, out var linksByInputParam))
             {
                 return false;
             }
@@ -31,14 +35,30 @@ namespace Scrapset.Engine
             return linksByInputParam != null && linksByInputParam.Count > 0;
         }
 
-        public IList<KeyValuePair<string, GateLink>> GetInputLinks(int gateId)
+        public IDictionary<string, GateLink> GetInputLinks(int gateId)
         {
-            if (HasInputLinks(gateId))
+            if (TryGetInputLinks(gateId, out var linksByInputParam))
             {
-                return linksByGateIdInputParam[gateId].AsReadOnlyList();
+                return linksByInputParam;
             }
 
-            return new List<KeyValuePair<string, GateLink>>();
+            return new Dictionary<string, GateLink>();
+        }
+
+        public bool TryGetInputLink(int gateId, string parameterName, out GateLink gateLink)
+        {
+            if (!TryGetInputLinks(gateId, out var linksByInputParam))
+            {
+                gateLink = null;
+                return false;
+            }
+
+            return linksByInputParam.TryGetValue(parameterName, out gateLink);
+        }
+
+        public bool HasInputLink(int gateId, string parameterName)
+        {
+            return TryGetInputLink(gateId, parameterName, out _);
         }
 
         public List<GateLink> GetOutputLinks(int gateId, string parameterName)
@@ -70,7 +90,7 @@ namespace Scrapset.Engine
              *  at all cost, even if it means duplicating a few if/else blocks in the state manipulation section.
              */
 
-            var result = GateIOLinkRuleset.ValidateLinkCreation(linksByGateIdInputParam, subroutineDefinition, inputGateId, inputParameterName, outputGateId, outputParameterName);
+            var result = GateIOLinkRuleset.ValidateLinkCreation(subroutineDefinition, inputGateId, inputParameterName, outputGateId, outputParameterName);
 
             if (result.HasErrors)
             {

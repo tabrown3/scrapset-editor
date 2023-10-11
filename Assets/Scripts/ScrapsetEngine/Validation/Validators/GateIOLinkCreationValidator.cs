@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace Scrapset.Engine
+﻿namespace Scrapset.Engine
 {
     public class GateIOLinkCreationValidator : IScrapsetValidator<GateIOLinkCreationComputedValues>
     {
-        Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam;
         SubroutineDefinition subroutineDefinition;
         int inputGateId;
         string inputParameterName;
@@ -12,14 +9,12 @@ namespace Scrapset.Engine
         string outputParameterName;
 
         public GateIOLinkCreationValidator(
-            Dictionary<int, Dictionary<string, GateLink>> linksByGateIdInputParam,
             SubroutineDefinition subroutineDefinition,
             int inputGateId,
             string inputParameterName,
             int outputGateId,
             string outputParameterName)
         {
-            this.linksByGateIdInputParam = linksByGateIdInputParam;
             this.subroutineDefinition = subroutineDefinition;
             this.inputGateId = inputGateId;
             this.inputParameterName = inputParameterName;
@@ -111,13 +106,10 @@ namespace Scrapset.Engine
                 return new ValidationResult<GateIOLinkCreationComputedValues>($"Output '{outputParameterName}' ({inferredOutputParam}) and input '{inputParameterName}' ({inferredInputParam}) are not of the same Scrapset type", ValidationErrorCode.TypeMismatch);
             }
 
-            Dictionary<string, GateLink> outLinksByInputParam;
-            if (linksByGateIdInputParam.TryGetValue(inputGateId, out outLinksByInputParam)
-                && outLinksByInputParam.ContainsKey(inputParameterName))
+            if (subroutineDefinition.TryGetInputLink(inputGateId, inputParameterName, out var existingLink))
             {
                 // The rationale here is that an output can serve as a data source for any number of inputs, but an input can only accept data from a
                 //  single source.
-                var existingLink = linksByGateIdInputParam[inputGateId][inputParameterName];
                 return new ValidationResult<GateIOLinkCreationComputedValues>($"Input param '{inputParameterName}' for calling gate ID {inputGateId} is" +
                     $"already linked to output param '{existingLink.OutputParameterName}' of source gate ID {existingLink.OutputGateId}", ValidationErrorCode.InputParamAlreadyLinked);
             }
