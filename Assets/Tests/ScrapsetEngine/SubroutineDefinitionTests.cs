@@ -66,4 +66,20 @@ public class SubroutineDefinitionTests
         var nonExistentGate = subroutineDefinition.GetGateById(3);
         Assert.IsNull(nonExistentGate);
     }
+
+    [Test]
+    public void SubroutineDefinition_GetAllGates_ShouldReturnAllRegisteredGates()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+        var allGates1 = subroutineDefinition.GetAllGates();
+        Assert.AreEqual(1, allGates1.Count);
+        Assert.NotNull(allGates1[0]);
+        Assert.IsInstanceOf<Entrypoint>(allGates1[0]);
+
+        subroutineDefinition.RegisterGate(new AddGate());
+        var allGates2 = subroutineDefinition.GetAllGates();
+        Assert.AreEqual(2, allGates2.Count);
+        Assert.NotNull(allGates2[1]);
+        Assert.IsInstanceOf<AddGate>(allGates2[1]);
+    }
 }
