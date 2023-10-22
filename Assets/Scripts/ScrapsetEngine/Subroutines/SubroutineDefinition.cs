@@ -66,6 +66,11 @@ namespace Scrapset.Engine
 
         public void RemoveGate(int gateId)
         {
+            if (gateId == EntrypointId)
+            {
+                throw new System.Exception($"Cannot remove gate with ID {gateId}: Entrypoint cannot be deleted");
+            }
+
             var gate = GetGateById(gateId);
 
             if (gate == null)

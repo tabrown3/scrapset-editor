@@ -126,5 +126,8 @@ public class SubroutineDefinitionTests
         Assert.IsNotNull(subroutineDefinition.GetGateById(3));
         subroutineDefinition.RemoveGate(3);
         Assert.IsNull(subroutineDefinition.GetGateById(3));
+
+        // cannot remove Entrypoint - currently it should throw
+        Assert.Throws<System.Exception>(() => { subroutineDefinition.RemoveGate(0); });
     }
 }
