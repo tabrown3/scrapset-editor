@@ -82,4 +82,22 @@ public class SubroutineDefinitionTests
         Assert.NotNull(allGates2[1]);
         Assert.IsInstanceOf<AddGate>(allGates2[1]);
     }
+
+    [Test]
+    public void SubroutineDefinition_CreateGate_ShouldCreateAndRegisterGates()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        // expression
+        var addGateId = subroutineDefinition.CreateGate<AddGate>();
+        Assert.AreEqual(addGateId, 1);
+
+        // statement
+        var assignmentGateId = subroutineDefinition.CreateGate<AssignmentGate>();
+        Assert.AreEqual(assignmentGateId, 2);
+
+        // variable
+        var numberVariableGateId = subroutineDefinition.CreateGate<NumberVariableGate>();
+        Assert.AreEqual(numberVariableGateId, 3);
+    }
 }
