@@ -100,4 +100,31 @@ public class SubroutineDefinitionTests
         var numberVariableGateId = subroutineDefinition.CreateGate<NumberVariableGate>();
         Assert.AreEqual(numberVariableGateId, 3);
     }
+
+    [Test]
+    public void SubroutineDefinition_RemoveGate_ShouldRemoveTheGateWithTheAssociatedId()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        var addGate = new AddGate();
+        subroutineDefinition.RegisterGate(addGate); // 1
+
+        var assignmentGate = new AssignmentGate();
+        subroutineDefinition.RegisterGate(assignmentGate); // 2
+
+        var numberVariable = new NumberVariableGate();
+        subroutineDefinition.RegisterGate(numberVariable); // 3
+
+        var innerSubroutineDefinition = new SubroutineDefinition("InnerTestDefinition");
+        var subroutineGate = new SubroutineExpressionGate(innerSubroutineDefinition);
+        subroutineDefinition.RegisterGate(subroutineGate); // 4
+
+        Assert.IsNotNull(subroutineDefinition.GetGateById(1));
+        subroutineDefinition.RemoveGate(1);
+        Assert.IsNull(subroutineDefinition.GetGateById(1));
+
+        Assert.IsNotNull(subroutineDefinition.GetGateById(3));
+        subroutineDefinition.RemoveGate(3);
+        Assert.IsNull(subroutineDefinition.GetGateById(3));
+    }
 }

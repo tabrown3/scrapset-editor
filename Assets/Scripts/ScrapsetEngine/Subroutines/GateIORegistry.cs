@@ -230,15 +230,21 @@ namespace Scrapset.Engine
         public void RemoveAllInputOutputLinks(int gateId)
         {
             var gate = subroutineDefinition.GetGateById(gateId);
-            foreach (var input in gate.InputParameters)
+
+            var hasInputs = linksByGateIdInputParam.TryGetValue(gateId, out var inputs);
+            if (hasInputs)
             {
-                RemoveInputOutputLink(gateId, input.Key);
+                foreach (var input in inputs)
+                {
+                    RemoveInputOutputLink(gateId, input.Key);
+                }
             }
 
+            var hasOutputs = linksByGateIdOutputParam.TryGetValue(gateId, out var outputs);
             // remove all links from this gate's outputs
-            if (linksByGateIdOutputParam.ContainsKey(gateId))
+            if (hasOutputs)
             {
-                foreach (var kv in linksByGateIdOutputParam[gateId])
+                foreach (var kv in outputs)
                 {
                     var gateLinks = kv.Value;
 
