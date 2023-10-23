@@ -129,5 +129,106 @@ public class SubroutineDefinitionTests
 
         // cannot remove Entrypoint - currently it should throw
         Assert.Throws<System.Exception>(() => { subroutineDefinition.RemoveGate(0); });
+
+        // cannot remove non-existent gate - currently it should throw
+        Assert.Throws<System.Exception>(() => { subroutineDefinition.RemoveGate(5); });
+    }
+
+    // the following is a very light test of the CreateInputOutputLink behavior,
+    //  since it's basically a pass-through for GateIORegistry
+    [Test]
+    public void SubroutineDefinition_CreateInputOutputLink_ShouldLinkOneInputToOneOutput()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        var addGate = new AddGate();
+        var addGateId = subroutineDefinition.RegisterGate(addGate);
+
+        var assignmentGate = new AssignmentGate();
+        var assignmentGateId = subroutineDefinition.RegisterGate(assignmentGate);
+
+        var numberVariable = new NumberVariableGate();
+        var numberVariableId = subroutineDefinition.RegisterGate(numberVariable);
+
+        var actualHasInputLinks1 = subroutineDefinition.HasInputLinks(assignmentGateId);
+        subroutineDefinition.CreateInputOutputLink(assignmentGateId, "In", addGateId, "Out");
+        subroutineDefinition.CreateInputOutputLink(addGateId, "A", numberVariableId, "Out");
+        subroutineDefinition.CreateInputOutputLink(addGateId, "B", numberVariableId, "Out");
+        var actualHasInputLinks2 = subroutineDefinition.HasInputLinks(assignmentGateId);
+
+        Assert.IsFalse(actualHasInputLinks1);
+        Assert.IsTrue(actualHasInputLinks2);
+    }
+
+    // the following is a very light test of the CreateProgramFlowLink behavior,
+    //  since it's basically a pass-through for ProgramFlowRegistry
+    [Test]
+    public void SubroutineDefinition_CreateProgramFlowLink_ShouldCreateLinkToAllowProgramToFlowFromOneStatementToTheNext()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        var assignmentGate1 = new AssignmentGate();
+        var assignmentGate1Id = subroutineDefinition.RegisterGate(assignmentGate1);
+
+        var assignmentGate2 = new AssignmentGate();
+        var assignmentGate2Id = subroutineDefinition.RegisterGate(assignmentGate2);
+
+        var actualLink1 = subroutineDefinition.GetProgramFlowLink(assignmentGate1, "Next");
+        subroutineDefinition.CreateProgramFlowLink(assignmentGate1Id, "Next", assignmentGate2Id);
+        var actualLink2 = subroutineDefinition.GetProgramFlowLink(assignmentGate1, "Next");
+
+        Assert.IsNull(actualLink1);
+        Assert.IsNotNull(actualLink2);
+    }
+
+    // the following is a very light test of the RemoveProgramFlowLink behavior,
+    //  since it's basically a pass-through for ProgramFlowRegistry
+    [Test]
+    public void SubroutineDefinition_RemoveProgramFlowLink_ShouldRemoveExistingProgramFlowLink()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        var assignmentGate1 = new AssignmentGate();
+        var assignmentGate1Id = subroutineDefinition.RegisterGate(assignmentGate1);
+
+        var assignmentGate2 = new AssignmentGate();
+        var assignmentGate2Id = subroutineDefinition.RegisterGate(assignmentGate2);
+
+        subroutineDefinition.CreateProgramFlowLink(assignmentGate1Id, "Next", assignmentGate2Id);
+
+        var actualLink1 = subroutineDefinition.GetProgramFlowLink(assignmentGate1, "Next");
+        subroutineDefinition.RemoveProgramFlowLink(assignmentGate1Id, "Next");
+        var actualLink2 = subroutineDefinition.GetProgramFlowLink(assignmentGate1, "Next");
+
+        Assert.IsNotNull(actualLink1);
+        Assert.IsNull(actualLink2);
+    }
+
+    // the following is a very light test of the RemoveAllProgramFlowLinks behavior,
+    //  since it's basically a pass-through for ProgramFlowRegistry
+    [Test]
+    public void SubroutineDefinition_RemoveAllProgramFlowLinks_ShouldRemoveAllExistingProgramFlowLinks()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        var assignmentGate1 = new AssignmentGate();
+        var assignmentGate1Id = subroutineDefinition.RegisterGate(assignmentGate1);
+
+        var assignmentGate2 = new AssignmentGate();
+        var assignmentGate2Id = subroutineDefinition.RegisterGate(assignmentGate2);
+        
+        subroutineDefinition.CreateProgramFlowLink(assignmentGate1Id, "Next", assignmentGate2Id);
+        subroutineDefinition.CreateProgramFlowLink(assignmentGate2Id, "Next", assignmentGate1Id);
+
+        var actualLink1 = subroutineDefinition.GetProgramFlowLink(assignmentGate1, "Next");
+        var actualLink2 = subroutineDefinition.GetProgramFlowLink(assignmentGate2, "Next");
+        subroutineDefinition.RemoveAllProgramFlowLinks(assignmentGate1Id);
+        var actualLink3 = subroutineDefinition.GetProgramFlowLink(assignmentGate1, "Next");
+        var actualLink4 = subroutineDefinition.GetProgramFlowLink(assignmentGate2, "Next");
+
+        Assert.IsNotNull(actualLink1);
+        Assert.IsNotNull(actualLink2);
+        Assert.IsNull(actualLink3);
+        Assert.IsNull(actualLink4);
     }
 }

@@ -58,10 +58,10 @@ namespace Scrapset.Engine
 
         public void RemoveAllProgramFlowLinks(int gateId)
         {
-            var flowsForGate = programFlows.Where(u => u.FromGateId == gateId || u.ToGateId == gateId);
-            foreach (var programFlow in flowsForGate)
+            var flowsForGate = programFlows.Where(u => u.FromGateId == gateId || u.ToGateId == gateId).ToList();
+            for (var i = flowsForGate.Count - 1; i >= 0; i--)
             {
-                programFlows.Remove(programFlow);
+                programFlows.Remove(programFlows[i]);
             }
 
             Debug.Log($"Removed all program flow links for gate ID {gateId}");
