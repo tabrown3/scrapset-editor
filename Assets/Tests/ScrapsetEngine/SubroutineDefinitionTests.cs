@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using Scrapset.Engine;
+using System.Linq;
 
 public class SubroutineDefinitionTests
 {
@@ -216,7 +217,7 @@ public class SubroutineDefinitionTests
 
         var assignmentGate2 = new AssignmentGate();
         var assignmentGate2Id = subroutineDefinition.RegisterGate(assignmentGate2);
-        
+
         subroutineDefinition.CreateProgramFlowLink(assignmentGate1Id, "Next", assignmentGate2Id);
         subroutineDefinition.CreateProgramFlowLink(assignmentGate2Id, "Next", assignmentGate1Id);
 
@@ -230,5 +231,102 @@ public class SubroutineDefinitionTests
         Assert.IsNotNull(actualLink2);
         Assert.IsNull(actualLink3);
         Assert.IsNull(actualLink4);
+    }
+
+    [Test]
+    public void SubroutineDefinition_DeclareLocalVariable_ShouldCreateNewVariableOfGivenType()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        var actual1 = subroutineDefinition.GetLocalVariableDeclaration("TestVariable");
+        subroutineDefinition.DeclareLocalVariable("TestVariable", ScrapsetTypes.Bool);
+        var actual2 = subroutineDefinition.GetLocalVariableDeclaration("TestVariable");
+
+        Assert.IsNull(actual1);
+        Assert.IsNotNull(actual2);
+        Assert.AreEqual(actual2.Name, "TestVariable");
+        Assert.AreEqual(actual2.Type, ScrapsetTypes.Bool);
+    }
+
+    [Test]
+    public void SubroutineDefinition_DeclareLocalVariable_ShouldThrowIfVariableNameIsAlreadyInUse()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        subroutineDefinition.DeclareLocalVariable("TestVariable", ScrapsetTypes.Bool);
+
+        // redeclare variable with same name and same type - throw exception
+        Assert.Throws<System.Exception>(() =>
+        {
+            subroutineDefinition.DeclareLocalVariable("TestVariable", ScrapsetTypes.Bool);
+        });
+
+        // redeclare variable with same name and different type - throw exception
+        Assert.Throws<System.Exception>(() =>
+        {
+            subroutineDefinition.DeclareLocalVariable("TestVariable", ScrapsetTypes.Number);
+        });
+    }
+
+    [Test]
+    public void SubroutineDefinition_DeclareLocalVariable_ShouldAllowVariableWithDifferentCapitalization()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        subroutineDefinition.DeclareLocalVariable("TestVariable", ScrapsetTypes.Bool);
+
+        // declare same name with different capitalization and same type
+        Assert.DoesNotThrow(() =>
+        {
+            subroutineDefinition.DeclareLocalVariable("testVariable", ScrapsetTypes.Bool);
+        });
+
+        // declare same name with different capitalization and different type
+        Assert.DoesNotThrow(() =>
+        {
+            subroutineDefinition.DeclareLocalVariable("testvariable", ScrapsetTypes.Number);
+        });
+
+        var declaration1 = subroutineDefinition.GetLocalVariableDeclaration("TestVariable");
+        Assert.AreEqual(declaration1.Name, "TestVariable");
+        Assert.AreEqual(declaration1.Type, ScrapsetTypes.Bool);
+
+        var declaration2 = subroutineDefinition.GetLocalVariableDeclaration("testVariable");
+        Assert.AreEqual(declaration2.Name, "testVariable");
+        Assert.AreEqual(declaration2.Type, ScrapsetTypes.Bool);
+
+        var declaration3 = subroutineDefinition.GetLocalVariableDeclaration("testvariable");
+        Assert.AreEqual(declaration3.Name, "testvariable");
+        Assert.AreEqual(declaration3.Type, ScrapsetTypes.Number);
+    }
+
+    [Test]
+    public void SubroutineDefinition_CreateLocalVariableGate_ShouldCreateAGateThatActsAsALocalVariable()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        subroutineDefinition.DeclareLocalVariable("TestVariable", ScrapsetTypes.String);
+
+        var variableGateId = subroutineDefinition.CreateLocalVariableGate<StringVariableGate>("TestVariable");
+
+        var gate = subroutineDefinition.GetGateById(variableGateId);
+        var variable = gate as IVariable;
+
+        Assert.IsNotNull(gate);
+        Assert.IsNotNull(variable);
+        Assert.AreEqual("TestVariable", variable.Identifier);
+        Assert.AreEqual(ScrapsetTypes.String, gate.InputParameters.First().Value.Type);
+        Assert.AreEqual(ScrapsetTypes.String, gate.OutputParameters.First().Value.Type);
+    }
+
+    [Test]
+    public void SubroutineDefinition_CreateLocalVariableGate_ShouldThrowIfVariableIsNotDeclared()
+    {
+        var subroutineDefinition = new SubroutineDefinition("TestDefinition");
+
+        Assert.Throws<System.Exception>(() =>
+        {
+            var variableGateId = subroutineDefinition.CreateLocalVariableGate<StringVariableGate>("TestVariable");
+        });
     }
 }

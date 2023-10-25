@@ -27,13 +27,13 @@ namespace Scrapset.UI
 
         void FillPortList(ListView listView, IGate gate, PortDirection portDirection)
         {
-            List<ParameterNameTypePair> parameterNameTypePairs;
+            List<VariableDeclaration> parameterNameTypePairs;
             if (portDirection == PortDirection.Input)
             {
-                parameterNameTypePairs = gate.InputParameters.Select(u => new ParameterNameTypePair() { Name = u.Key, Type = u.Value.Type }).ToList();
+                parameterNameTypePairs = gate.InputParameters.Select(u => new VariableDeclaration() { Name = u.Key, Type = u.Value.Type }).ToList();
             } else if (portDirection == PortDirection.Output)
             {
-                parameterNameTypePairs = gate.OutputParameters.Select(u => new ParameterNameTypePair() { Name = u.Key, Type = u.Value.Type }).ToList();
+                parameterNameTypePairs = gate.OutputParameters.Select(u => new VariableDeclaration() { Name = u.Key, Type = u.Value.Type }).ToList();
             } else
             {
                 throw new Exception("Could not generate parameter list: portDirection must be Input or Output");

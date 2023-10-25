@@ -123,6 +123,16 @@ namespace Scrapset.Engine
             return variableId;
         }
 
+        public VariableDeclaration GetLocalVariableDeclaration(string variableName)
+        {
+            if (!localVariableDeclarations.TryGetValue(variableName, out var localVariableType))
+            {
+                return null;
+            }
+
+            return new VariableDeclaration() { Name = variableName, Type = localVariableType };
+        }
+
         public void DeclareLocalVariable(string variableName, ScrapsetTypes scrapsetType)
         {
             if (LocalVariableDeclarations.ContainsKey(variableName))
